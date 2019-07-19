@@ -1,0 +1,62 @@
+################################################################################
+#                                                                              #
+#  makefile for UPROG2 universal programmer                                    #
+#                                                                              #
+#  (c) 2010-2016 Joerg Wolfram (joerg@jcwolfram.de)                            #
+#                                                                              #
+################################################################################
+
+myNAME=uprog2-64-test
+
+################################################################################
+
+CC=gcc
+AS=as
+AR=ar
+LD=gcc
+OC=objcopy
+OD=objdump
+SZ=size
+
+CFLAGS=-Wall -O3
+CFLAGS+=-I./inc
+LIBS=-lc -lftdi1 -lbluetooth
+
+
+CSOURCES     := $(shell find ./ -type f -name *.c)
+COBJECTS     := $(patsubst ./%,build/%,$(CSOURCES:.c=.o))
+
+################################################################################
+
+bin:	dir $(COBJECTS)
+	$(LD) $(LDOPTS)  -o $(myNAME) $(COBJECTS) $(LDFLAGS) $(LIBS)
+
+lib:	dir $(COBJECTS)
+	$(AR) $(ARFLAGS) $(myNAME).a $(COBJECTS)
+
+build/%.o: ./%.c
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+dir:	
+	mkdir -p build
+
+install:	bin
+	cp -f uprog2-64 /usr/local/bin/uprog2-test
+
+clean:
+	@rm -rf build
+	@rm -f $(myNAME)
+
+
+depend:
+		@(sed '/^### DO NOT DELETE THIS LINE ###/,$$d' Makefile;\
+		echo '### DO NOT DELETE THIS LINE ###';\
+		$(CC) -MM $(CFLAGS) $(CSOURCES) |\
+		sed ':1;/\.o: .* \\/{;N;s/ *\\\n */ /;};s/ \/[^ ]*h */ /;t1';\
+		echo '### DEPENDENCIES END ###') > Makefile~ &&\
+		mv Makefile~ Makefile
+
+### DO NOT DELETE THIS LINE ###
+main.o: main.c
+### DEPENDENCIES END ###
