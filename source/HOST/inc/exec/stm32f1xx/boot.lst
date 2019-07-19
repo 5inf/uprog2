@@ -1,0 +1,284 @@
+
+boot.elf:     file format elf32-littlearm
+boot.elf
+architecture: arm, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x20000000
+
+Program Header:
+    LOAD off    0x00010000 vaddr 0x20000000 paddr 0x20000000 align 2**16
+         filesz 0x00000134 memsz 0x00000234 flags rwx
+private flags = 5000200: [Version5 EABI] [soft-float ABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000134  20000000  20000000  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .heap         00000100  20000134  20000134  00010134  2**0
+                  ALLOC
+  2 .ARM.attributes 00000021  00000000  00000000  00010134  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+20000000 l    d  .text	00000000 .text
+20000134 l    d  .heap	00000000 .heap
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+00000000 l    df *ABS*	00000000 build/src/boot.o
+40022000 l       *ABS*	00000000 FLASH_BASE
+00000000 l       *ABS*	00000000 FLASH_ACR
+00000004 l       *ABS*	00000000 FLASH_KEYR
+00000008 l       *ABS*	00000000 FLASH_OPTKEYR
+0000000c l       *ABS*	00000000 FLASH_SR
+00000010 l       *ABS*	00000000 FLASH_CR
+00000014 l       *ABS*	00000000 FLASH_AR
+0000001c l       *ABS*	00000000 FLASH_OBR
+00000020 l       *ABS*	00000000 FLASH_WRPR
+00000044 l       *ABS*	00000000 FLASH_KEYR2
+0000004c l       *ABS*	00000000 FLASH_SR2
+00000050 l       *ABS*	00000000 FLASH_CR2
+00000054 l       *ABS*	00000000 FLASH_AR2
+20000000 l       .text	00000000 reset_vector
+20000008 l       .text	00000000 main_start
+2000000e l       .text	00000000 main_loop
+20000014 l       .text	00000000 main_loop_wait
+2000005c l       .text	00000000 prog_flash
+200000d6 l       .text	00000000 prog_opt
+20000032 l       .text	00000000 opt_erase
+20000030 l       .text	00000000 tloop
+20000054 l       .text	00000000 opt_erase_1
+2000009e l       .text	00000000 prog_flash1
+20000078 l       .text	00000000 prog_flash_1
+20000094 l       .text	00000000 prog_flash_3a
+2000008e l       .text	00000000 prog_flash_3
+20000098 l       .text	00000000 prog_flash_4
+200000b0 l       .text	00000000 prog_flash1_1
+200000cc l       .text	00000000 prog_flash1_3a
+200000c6 l       .text	00000000 prog_flash1_3
+200000d0 l       .text	00000000 prog_flash1_4
+200000ec l       .text	00000000 prog_opt_1
+200000fa l       .text	00000000 prog_opt_3
+20000100 l       .text	00000000 prog_opt_4
+20000000 g       .text	00000000 reset_addr
+00000100 g       *ABS*	00000000 heap_size
+00000000 g       *ABS*	00000000 _sidata
+20000134 g       .text	00000000 __exidx_end
+20000134 g       .text	00000000 _etext
+20000134 g       .text	00000000 _sbss
+20000134 g       .text	00000000 __bss_start__
+20000134 g       .text	00000000 _sdata
+20000234 g       .heap	00000000 _heap_end
+20000134 g       .text	00000000 __exidx_start
+20000134 g       .text	00000000 _ebss
+20000134 g       .heap	00000000 _heap_start
+20000134 g       .text	00000000 __bss_end__
+00000400 g       *ABS*	00000000 stack_size
+20000c00 g       *ABS*	00000000 _stack_end
+20001000 g       *ABS*	00000000 _stack_start
+20000134 g       .text	00000000 _edata
+
+
+
+Disassembly of section .text:
+
+20000000 <reset_addr>:
+20000000:	20001000 	andcs	r1, r0, r0
+20000004:	20000009 	andcs	r0, r0, r9
+
+20000008 <main_start>:
+20000008:	4c41      	ldr	r4, [pc, #260]	; (20000110 <prog_opt_4+0x10>)
+2000000a:	2331      	movs	r3, #49	; 0x31
+2000000c:	6023      	str	r3, [r4, #0]
+
+2000000e <main_loop>:
+2000000e:	4941      	ldr	r1, [pc, #260]	; (20000114 <prog_opt_4+0x14>)
+20000010:	2200      	movs	r2, #0
+20000012:	600a      	str	r2, [r1, #0]
+
+20000014 <main_loop_wait>:
+20000014:	6808      	ldr	r0, [r1, #0]
+20000016:	4290      	cmp	r0, r2
+20000018:	d0fc      	beq.n	20000014 <main_loop_wait>
+2000001a:	1c07      	adds	r7, r0, #0
+2000001c:	4a3e      	ldr	r2, [pc, #248]	; (20000118 <prog_opt_4+0x18>)
+2000001e:	4017      	ands	r7, r2
+20000020:	22ff      	movs	r2, #255	; 0xff
+20000022:	4010      	ands	r0, r2
+20000024:	2852      	cmp	r0, #82	; 0x52
+20000026:	d019      	beq.n	2000005c <prog_flash>
+20000028:	2872      	cmp	r0, #114	; 0x72
+2000002a:	d054      	beq.n	200000d6 <prog_opt>
+2000002c:	2873      	cmp	r0, #115	; 0x73
+2000002e:	d000      	beq.n	20000032 <opt_erase>
+
+20000030 <tloop>:
+20000030:	e7ed      	b.n	2000000e <main_loop>
+
+20000032 <opt_erase>:
+20000032:	4c37      	ldr	r4, [pc, #220]	; (20000110 <prog_opt_4+0x10>)
+20000034:	2300      	movs	r3, #0
+20000036:	6123      	str	r3, [r4, #16]
+20000038:	4a38      	ldr	r2, [pc, #224]	; (2000011c <prog_opt_4+0x1c>)
+2000003a:	4b39      	ldr	r3, [pc, #228]	; (20000120 <prog_opt_4+0x20>)
+2000003c:	6062      	str	r2, [r4, #4]
+2000003e:	6063      	str	r3, [r4, #4]
+20000040:	60a2      	str	r2, [r4, #8]
+20000042:	60a3      	str	r3, [r4, #8]
+20000044:	6922      	ldr	r2, [r4, #16]
+20000046:	2320      	movs	r3, #32
+20000048:	431a      	orrs	r2, r3
+2000004a:	6122      	str	r2, [r4, #16]
+2000004c:	2340      	movs	r3, #64	; 0x40
+2000004e:	431a      	orrs	r2, r3
+20000050:	6122      	str	r2, [r4, #16]
+20000052:	2301      	movs	r3, #1
+
+20000054 <opt_erase_1>:
+20000054:	68e2      	ldr	r2, [r4, #12]
+20000056:	421a      	tst	r2, r3
+20000058:	d1fc      	bne.n	20000054 <opt_erase_1>
+2000005a:	e7d8      	b.n	2000000e <main_loop>
+
+2000005c <prog_flash>:
+2000005c:	4a31      	ldr	r2, [pc, #196]	; (20000124 <prog_opt_4+0x24>)
+2000005e:	1c3b      	adds	r3, r7, #0
+20000060:	4013      	ands	r3, r2
+20000062:	4293      	cmp	r3, r2
+20000064:	d01b      	beq.n	2000009e <prog_flash1>
+20000066:	4930      	ldr	r1, [pc, #192]	; (20000128 <prog_opt_4+0x28>)
+20000068:	4e30      	ldr	r6, [pc, #192]	; (2000012c <prog_opt_4+0x2c>)
+2000006a:	4c29      	ldr	r4, [pc, #164]	; (20000110 <prog_opt_4+0x10>)
+2000006c:	4a2b      	ldr	r2, [pc, #172]	; (2000011c <prog_opt_4+0x1c>)
+2000006e:	4b2c      	ldr	r3, [pc, #176]	; (20000120 <prog_opt_4+0x20>)
+20000070:	6062      	str	r2, [r4, #4]
+20000072:	6063      	str	r3, [r4, #4]
+20000074:	2300      	movs	r3, #0
+20000076:	6123      	str	r3, [r4, #16]
+
+20000078 <prog_flash_1>:
+20000078:	8808      	ldrh	r0, [r1, #0]
+2000007a:	4b2d      	ldr	r3, [pc, #180]	; (20000130 <prog_opt_4+0x30>)
+2000007c:	4298      	cmp	r0, r3
+2000007e:	d009      	beq.n	20000094 <prog_flash_3a>
+20000080:	6922      	ldr	r2, [r4, #16]
+20000082:	2301      	movs	r3, #1
+20000084:	431a      	orrs	r2, r3
+20000086:	6122      	str	r2, [r4, #16]
+20000088:	8038      	strh	r0, [r7, #0]
+2000008a:	0c00      	lsrs	r0, r0, #16
+2000008c:	2301      	movs	r3, #1
+
+2000008e <prog_flash_3>:
+2000008e:	68e2      	ldr	r2, [r4, #12]
+20000090:	421a      	tst	r2, r3
+20000092:	d1fc      	bne.n	2000008e <prog_flash_3>
+
+20000094 <prog_flash_3a>:
+20000094:	3702      	adds	r7, #2
+20000096:	3102      	adds	r1, #2
+
+20000098 <prog_flash_4>:
+20000098:	3e01      	subs	r6, #1
+2000009a:	d1ed      	bne.n	20000078 <prog_flash_1>
+2000009c:	e7b7      	b.n	2000000e <main_loop>
+
+2000009e <prog_flash1>:
+2000009e:	4922      	ldr	r1, [pc, #136]	; (20000128 <prog_opt_4+0x28>)
+200000a0:	4e22      	ldr	r6, [pc, #136]	; (2000012c <prog_opt_4+0x2c>)
+200000a2:	4c1b      	ldr	r4, [pc, #108]	; (20000110 <prog_opt_4+0x10>)
+200000a4:	2300      	movs	r3, #0
+200000a6:	6523      	str	r3, [r4, #80]	; 0x50
+200000a8:	4a1c      	ldr	r2, [pc, #112]	; (2000011c <prog_opt_4+0x1c>)
+200000aa:	4b1d      	ldr	r3, [pc, #116]	; (20000120 <prog_opt_4+0x20>)
+200000ac:	6462      	str	r2, [r4, #68]	; 0x44
+200000ae:	6463      	str	r3, [r4, #68]	; 0x44
+
+200000b0 <prog_flash1_1>:
+200000b0:	8808      	ldrh	r0, [r1, #0]
+200000b2:	4b1f      	ldr	r3, [pc, #124]	; (20000130 <prog_opt_4+0x30>)
+200000b4:	4298      	cmp	r0, r3
+200000b6:	d009      	beq.n	200000cc <prog_flash1_3a>
+200000b8:	6d22      	ldr	r2, [r4, #80]	; 0x50
+200000ba:	2301      	movs	r3, #1
+200000bc:	431a      	orrs	r2, r3
+200000be:	6522      	str	r2, [r4, #80]	; 0x50
+200000c0:	8038      	strh	r0, [r7, #0]
+200000c2:	0c00      	lsrs	r0, r0, #16
+200000c4:	2301      	movs	r3, #1
+
+200000c6 <prog_flash1_3>:
+200000c6:	6ce2      	ldr	r2, [r4, #76]	; 0x4c
+200000c8:	421a      	tst	r2, r3
+200000ca:	d1fc      	bne.n	200000c6 <prog_flash1_3>
+
+200000cc <prog_flash1_3a>:
+200000cc:	3702      	adds	r7, #2
+200000ce:	3102      	adds	r1, #2
+
+200000d0 <prog_flash1_4>:
+200000d0:	3e01      	subs	r6, #1
+200000d2:	d1ed      	bne.n	200000b0 <prog_flash1_1>
+200000d4:	e79b      	b.n	2000000e <main_loop>
+
+200000d6 <prog_opt>:
+200000d6:	4914      	ldr	r1, [pc, #80]	; (20000128 <prog_opt_4+0x28>)
+200000d8:	2608      	movs	r6, #8
+200000da:	4c0d      	ldr	r4, [pc, #52]	; (20000110 <prog_opt_4+0x10>)
+200000dc:	2300      	movs	r3, #0
+200000de:	6123      	str	r3, [r4, #16]
+200000e0:	4a0e      	ldr	r2, [pc, #56]	; (2000011c <prog_opt_4+0x1c>)
+200000e2:	4b0f      	ldr	r3, [pc, #60]	; (20000120 <prog_opt_4+0x20>)
+200000e4:	6062      	str	r2, [r4, #4]
+200000e6:	6063      	str	r3, [r4, #4]
+200000e8:	60a2      	str	r2, [r4, #8]
+200000ea:	60a3      	str	r3, [r4, #8]
+
+200000ec <prog_opt_1>:
+200000ec:	8808      	ldrh	r0, [r1, #0]
+200000ee:	6922      	ldr	r2, [r4, #16]
+200000f0:	2310      	movs	r3, #16
+200000f2:	431a      	orrs	r2, r3
+200000f4:	6122      	str	r2, [r4, #16]
+200000f6:	8038      	strh	r0, [r7, #0]
+200000f8:	2301      	movs	r3, #1
+
+200000fa <prog_opt_3>:
+200000fa:	68e2      	ldr	r2, [r4, #12]
+200000fc:	421a      	tst	r2, r3
+200000fe:	d1fc      	bne.n	200000fa <prog_opt_3>
+
+20000100 <prog_opt_4>:
+20000100:	3702      	adds	r7, #2
+20000102:	3102      	adds	r1, #2
+20000104:	3e01      	subs	r6, #1
+20000106:	d1f1      	bne.n	200000ec <prog_opt_1>
+20000108:	2300      	movs	r3, #0
+2000010a:	6123      	str	r3, [r4, #16]
+2000010c:	e77f      	b.n	2000000e <main_loop>
+2000010e:	46c0      	nop			; (mov r8, r8)
+20000110:	40022000 	andmi	r2, r2, r0
+20000114:	20000c00 	andcs	r0, r0, r0, lsl #24
+20000118:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
+2000011c:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
+20000120:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 200003d4 <_heap_end+0x1a0>
+20000124:	00080000 	andeq	r0, r8, r0
+20000128:	20000400 	andcs	r0, r0, r0, lsl #8
+2000012c:	00000400 	andeq	r0, r0, r0, lsl #8
+20000130:	0000ffff 	strdeq	pc, [r0], -pc	; <UNPREDICTABLE>
+
+Disassembly of section .heap:
+
+20000134 <_heap_start>:
+	...
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00002041 	andeq	r2, r0, r1, asr #32
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000016 	andeq	r0, r0, r6, lsl r0
+  10:	726f4305 	rsbvc	r4, pc, #335544320	; 0x14000000
+  14:	2d786574 	cfldr64cs	mvdx6, [r8, #-464]!	; 0xfffffe30
+  18:	0600304d 	streq	r3, [r0], -sp, asr #32
+  1c:	094d070c 	stmdbeq	sp, {r2, r3, r8, r9, sl}^
+  20:	Address 0x00000020 is out of bounds.
+

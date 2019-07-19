@@ -1,0 +1,16 @@
+#!/bin/bash
+
+cd stage2
+./compile > ../cresult
+cd ..
+
+cp unlock_77.asm unlock.asm
+
+cat ./cresult | grep 3f8 | gawk '{i=substr($0,0,6)} {printf("xtest:\t\tlb\t#0x%s\n",i)}' >jump_to_c.asm
+
+
+tms2000_asm boot_stage1
+./makeboot.pl boot_stage1.lst unlock_77.asm
+
+./create_loader
+

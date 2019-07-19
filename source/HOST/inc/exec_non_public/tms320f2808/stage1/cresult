@@ -1,0 +1,12 @@
+[main.c]
+[DSP280x_GlobalVariableDefs.c]
+[DSP280x_Gpio.c]
+[DSP280x_SysCtrl.c]
+[codestart.asm]
+<Linking>
+Translating to Intel format...
+   "result.out"   ==> .text
+   "result.out"   ==> .cinit
+   "result.out"   ==> codestart
+   "result.out"   ==> .econst
+3f89c6:              _c_int00:

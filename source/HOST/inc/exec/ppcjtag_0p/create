@@ -1,0 +1,7 @@
+#!/bin/bash
+
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-as -mvle -al=boot.lst boot.vleasm
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-objcopy -O srec a.out boot.s19
+dos2unix boot.s19
+rm -f a.out
+./generate_boot.pl boot.s19 exec_ppcjtag.h exec_ppcjtag_0p 

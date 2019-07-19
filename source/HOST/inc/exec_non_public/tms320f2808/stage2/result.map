@@ -1,0 +1,29 @@
+********************************************************************************
+TMS320C2000 Hex Converter                                                 v6.1.3
+********************************************************************************
+
+INPUT FILE NAME: <result.out>
+OUTPUT FORMAT:   Intel
+
+PHYSICAL MEMORY PARAMETERS
+   Default data width   :  16
+   Default memory width :  16
+   Default output width :   8
+
+
+OUTPUT TRANSLATION MAP
+--------------------------------------------------------------------------------
+00000000..003fffff  Page=0  Memory Width=16  ROM Width=8
+--------------------------------------------------------------------------------
+   OUTPUT FILES: result.lsb [b0..b7]
+                 result.msb [b8..b15]
+
+   CONTENTS: 003f8000..003f8b91   result.out(.text) Data Width=2   
+             003f8b92..003f8bb1   result.out(.cinit) Data Width=2   
+             003f8bb2..003f8bb3   result.out(codestart) Data Width=2   
+             003f914c..003f916f   result.out(.econst) Data Width=2   
+
+--------------------------------------------------------------------------------
+00000000..003fffff  Page=1  Memory Width=16  ROM Width=8  "*DEFAULT PAGE 1*"
+--------------------------------------------------------------------------------
+   NO CONTENTS

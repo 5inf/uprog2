@@ -1,0 +1,4 @@
+#!/bin/bash
+
+msp430asm proghelper
+./generate_boot.pl msp430f5xx

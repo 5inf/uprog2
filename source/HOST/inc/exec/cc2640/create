@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./generate_boot.pl main.s37 exec_cc2640.h exec_cc2640 

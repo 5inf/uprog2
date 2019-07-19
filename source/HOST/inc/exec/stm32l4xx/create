@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+/usr/local/toolchain/arm-none-eabi/bin/arm-none-eabi-as -mthumb -al=boot.lst boot.asm
+/usr/local/toolchain/arm-none-eabi/bin/arm-none-eabi-objdump -S -D -xDC a.out > boot.lst2
+/usr/local/toolchain/arm-none-eabi/bin/arm-none-eabi-objcopy --gap-fill 0xff -O srec a.out boot.s19
+dos2unix boot.s19
+rm -f a.out
+./generate_boot.pl

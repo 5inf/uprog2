@@ -1,0 +1,7 @@
+
+	if(find_cmd("5v"))
+	{
+		errc=prg_comm(0xfb,0,0,0,0,0,0,0,0);	//5V mode
+		printf("## using 5V VDD\n");
+	}
+

@@ -1,0 +1,46 @@
+#################################################################################
+#										#
+# SPC560B-Bootcode for uprog2							#
+# version 1.10									#
+#										#
+# copyright (c) 2014-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+#										#
+# This program is free software; you can redistribute it and/or			#
+# modify it under the terms of the GNU General Public License			#
+# as published by the Free Software Foundation; either version 2		#
+# of the License, or (at your option) any later version.			#
+#										#
+# This program is distributed in the hope that it will be useful,		#
+# but WITHOUT ANY WARRANTY; without even the implied warranty of		#
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU		#
+# General Public License for more details.					#
+#										#
+# You should have received a copy of the GNU General Public			#
+# License along with this library; if not, write to the				#
+# Free Software Foundation, Inc., 59 Temple Place - Suite 330,			#
+# Boston, MA 02111-1307, USA.							#
+#										#
+#################################################################################
+
+			.include "/usr/local/toolchain/powerpc-vle-elf/include_asm/regs_spc560p.asm"
+
+			.equ	block_size,2048
+
+			.equ	shadow_unlock_lo,	0xffff
+			.equ	shadow_unlock_hi,	0xffef
+
+			.text
+			.org 0x00100
+
+main_start:
+
+################################################################################
+# set mode
+################################################################################
+			e_lis		r24,FMPLL_BASE
+			e_lis		r28,0x2640		#f / 10 * 64 / 8
+			e_li		r29,0x100
+			se_or		r28,r29
+			e_stw		r28,FMPLL0_CR(r24)
+
+			.include "boot.vleasm"

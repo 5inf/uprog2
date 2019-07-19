@@ -1,0 +1,27 @@
+#!/bin/bash
+
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-as -mvle -al=boot.lst boot_08.vleasm
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-objcopy -O srec a.out boot_08.s19
+dos2unix boot_08.s19
+rm -f a.out
+./generate_boot.pl boot_08.s19 exec_ppcbam_08.h exec_ppcbam_0p_08 
+
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-as -mvle -al=boot.lst boot_16.vleasm
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-objcopy -O srec a.out boot_16.s19
+dos2unix boot_16.s19
+rm -f a.out
+./generate_boot.pl  boot_16.s19 exec_ppcbam_16.h exec_ppcbam_0p_16
+
+
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-as -mvle -al=boot.lst boot_20.vleasm
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-objcopy -O srec a.out boot_20.s19
+dos2unix boot_20.s19
+rm -f a.out
+./generate_boot.pl  boot_20.s19 exec_ppcbam_20.h exec_ppcbam_0p_20
+
+
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-as -mvle -al=boot.lst boot_40.vleasm
+/usr/local/toolchain/powerpc-vle-elf/bin/powerpc-elf-objcopy -O srec a.out boot_40.s19
+dos2unix boot_40.s19
+rm -f a.out
+./generate_boot.pl  boot_40.s19 exec_ppcbam_40.h exec_ppcbam_0p_40

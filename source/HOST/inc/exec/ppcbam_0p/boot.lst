@@ -1,0 +1,1341 @@
+GAS LISTING boot_40.vleasm 			page 1
+
+
+   1              	#################################################################################
+   2              	#										#
+   3              	# SPC560B-Bootcode for uprog2							#
+   4              	# version 1.10									#
+   5              	#										#
+   6              	# copyright (c) 2014-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+   7              	#										#
+   8              	# This program is free software; you can redistribute it and/or			#
+   9              	# modify it under the terms of the GNU General Public License			#
+  10              	# as published by the Free Software Foundation; either version 2		#
+  11              	# of the License, or (at your option) any later version.			#
+  12              	#										#
+  13              	# This program is distributed in the hope that it will be useful,		#
+  14              	# but WITHOUT ANY WARRANTY; without even the implied warranty of		#
+  15              	# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU		#
+  16              	# General Public License for more details.					#
+  17              	#										#
+  18              	# You should have received a copy of the GNU General Public			#
+  19              	# License along with this library; if not, write to the				#
+  20              	# Free Software Foundation, Inc., 59 Temple Place - Suite 330,			#
+  21              	# Boston, MA 02111-1307, USA.							#
+  22              	#										#
+  23              	#################################################################################
+  24              	
+  25              				.include "/usr/local/toolchain/powerpc-vle-elf/include_asm/regs_spc560p.asm"
+   1              		.equ	r0,0
+   2              		.equ	r1,1
+   3              		.equ	rsp,1
+   4              		.equ	r2,2
+   5              		.equ	r3,3
+   6              		.equ	r4,4
+   7              		.equ	r5,5
+   8              		.equ	r6,6
+   9              		.equ	r7,7
+  10              		.equ	r8,8
+  11              		.equ	r9,9
+  12              		.equ	r10,10
+  13              		.equ	r11,11
+  14              		.equ	r12,12
+  15              		.equ	r13,13
+  16              		.equ	r14,14
+  17              		.equ	r15,15
+  18              		.equ	r16,16
+  19              		.equ	r17,17
+  20              		.equ	r18,18
+  21              		.equ	r19,19
+  22              		.equ	r20,20
+  23              		.equ	r21,21
+  24              		.equ	r22,22
+  25              		.equ	r23,23
+  26              		.equ	r24,24
+  27              		.equ	r25,25
+  28              		.equ	r26,26
+  29              		.equ	r27,27
+  30              		.equ	r28,28
+  31              		.equ	r29,29
+  32              		.equ	r30,30
+GAS LISTING boot_40.vleasm 			page 2
+
+
+  33              		.equ	r31,31
+  34              		.equ	rsp,1
+  35              	
+  36              		.equ	SIUL_BASE,0xc3f9
+  37              		#port output (4 bits per WORD)
+  38              		.equ	GPDO0,0x0600	#PA 0-3
+  39              		.equ	GPDO1,0x0604	#PA 4-7
+  40              		.equ	GPDO2,0x0608	#PA 8-11
+  41              		.equ	GPDO3,0x060c	#PA 12-15
+  42              	
+  43              		.equ	GPDO4,0x0610	#PB 0-3
+  44              		.equ	GPDO5,0x0614	#PB 4-7
+  45              		.equ	GPDO6,0x0618	#PB 8-11
+  46              		.equ	GPDO7,0x061c	#PB 12-15
+  47              	
+  48              		.equ	GPDO8,0x0620	#PC 0-3
+  49              		.equ	GPDO9,0x0624	#PC 4-7
+  50              		.equ	GPDO10,0x0628	#PC 8-11
+  51              		.equ	GPDO11,0x062c	#PC 12-15
+  52              	
+  53              		.equ	GPDO12,0x0630	#PD 0-3
+  54              		.equ	GPDO13,0x0634	#PD 4-7
+  55              		.equ	GPDO14,0x0638	#PD 8-11
+  56              		.equ	GPDO15,0x063c	#PD 12-15
+  57              	
+  58              		.equ	GPDO16,0x0640	#PE 0-3
+  59              		.equ	GPDO17,0x0644	#PE 4-7
+  60              		.equ	GPDO18,0x0648	#PE 8-11
+  61              		.equ	GPDO19,0x064c	#PE 12-15
+  62              	
+  63              		.equ	GPDO20,0x0650	#PF 0-3
+  64              		.equ	GPDO21,0x0654	#PF 4-7
+  65              		.equ	GPDO22,0x0658	#PF 8-11
+  66              		.equ	GPDO23,0x065c	#PF 12-15
+  67              	
+  68              		.equ	GPDO24,0x0660	#PG 0-3
+  69              		.equ	GPDO25,0x0664	#PG 4-7
+  70              		.equ	GPDO26,0x0668	#PG 8-11
+  71              		.equ	GPDO27,0x066c	#PG 12-15
+  72              	
+  73              		.equ	GPDO28,0x0670	#PH 0-3
+  74              		.equ	GPDO29,0x0674	#PH 4-7
+  75              		.equ	GPDO30,0x0678	#PH 8-11
+  76              		.equ	GPDO31,0x067c	#PH 12-15
+  77              	
+  78              		#port input (4 bits per WORD)
+  79              		.equ	PDI0,0x0800	#PA 0-3
+  80              		.equ	PDI1,0x0804	#PA 4-7
+  81              		.equ	PDI2,0x0808	#PA 8-11
+  82              		.equ	PDI3,0x080c	#PA 12-15
+  83              	
+  84              		.equ	PDI4,0x0810	#PB 0-3
+  85              		.equ	PDI5,0x0814	#PB 4-7
+  86              		.equ	PDI6,0x0818	#PB 8-11
+  87              		.equ	PDI7,0x081c	#PB 12-15
+  88              	
+  89              		.equ	PDI8,0x0820	#PC 0-3
+GAS LISTING boot_40.vleasm 			page 3
+
+
+  90              		.equ	PDI9,0x0824	#PC 4-7
+  91              		.equ	PDI10,0x0828	#PC 8-11
+  92              		.equ	PDI11,0x082c	#PC 12-15
+  93              	
+  94              		.equ	PDI12,0x0830	#PD 0-3
+  95              		.equ	PDI13,0x0834	#PD 4-7
+  96              		.equ	PDI14,0x0838	#PD 8-11
+  97              		.equ	PDI15,0x083c	#PD 12-15
+  98              	
+  99              		.equ	PDI16,0x0840	#PE 0-3
+ 100              		.equ	PDI17,0x0844	#PE 4-7
+ 101              		.equ	PDI18,0x0848	#PE 8-11
+ 102              		.equ	PDI19,0x084c	#PE 12-15
+ 103              	
+ 104              		.equ	PDI20,0x0850	#PF 0-3
+ 105              		.equ	PDI21,0x0854	#PF 4-7
+ 106              		.equ	PDI22,0x0858	#PF 8-11
+ 107              		.equ	PDI23,0x085c	#PF 12-15
+ 108              	
+ 109              		.equ	PDI24,0x0860	#PG 0-3
+ 110              		.equ	PDI25,0x0864	#PG 4-7
+ 111              		.equ	PDI26,0x0868	#PG 8-11
+ 112              		.equ	PDI27,0x086c	#PG 12-15
+ 113              	
+ 114              		.equ	PDI28,0x0870	#PH 0-3
+ 115              		.equ	PDI29,0x0874	#PH 4-7
+ 116              		.equ	PDI30,0x0878	#PH 8-11
+ 117              		.equ	PDI31,0x087c	#PH 12-15
+ 118              	
+ 119              		#port output (32 bits per WORD)
+ 120              		.equ	PGPDO0,0x0c00		# PORT A+B
+ 121              		.equ	PGPDO1,0x0c04		# PORT C+D
+ 122              		.equ	PGPDO2,0x0c08		# PORT E+F
+ 123              		.equ	PGPDO3,0x0c0c		# PORT G+H
+ 124              		.equ	POUT_A,PGPDO0		# PORT A
+ 125              		.equ	POUT_B,PGPDO0+2		# PORT B
+ 126              		.equ	POUT_C,PGPDO1		# PORT C
+ 127              		.equ	POUT_D,PGPDO1+2		# PORT D
+ 128              		.equ	POUT_E,PGPDO2		# PORT E
+ 129              		.equ	POUT_F,PGPDO2+2		# PORT F
+ 130              		.equ	POUT_G,PGPDO3		# PORT G
+ 131              		.equ	POUT_H,PGPDO3+2		# PORT H
+ 132              	
+ 133              	
+ 134              		#port input (32 bits per WORD)
+ 135              		.equ	PGPDI0,0x0c40		# PORT A+B
+ 136              		.equ	PGPDI1,0x0c44		# PORT C+D
+ 137              		.equ	PGPDI2,0x0c48		# PORT E+F
+ 138              		.equ	PGPDI3,0x0c4c		# PORT G+H
+ 139              		.equ	PIN_A,PGPDI0		# PORT A
+ 140              		.equ	PIN_B,PGPDI0+2		# PORT B
+ 141              		.equ	PIN_C,PGPDI1		# PORT C
+ 142              		.equ	PIN_D,PGPDI1+2		# PORT D
+ 143              		.equ	PIN_E,PGPDI2		# PORT E
+ 144              		.equ	PIN_F,PGPDI2+2		# PORT F
+ 145              		.equ	PIN_G,PGPDI3		# PORT G
+ 146              		.equ	PIN_H,PGPDI3+2		# PORT H
+GAS LISTING boot_40.vleasm 			page 4
+
+
+ 147              	
+ 148              		#port config registers
+ 149              		.equ	PCR0,0x0040		# PA[0]
+ 150              		.equ	PCR1,0x0042		# PA[1]
+ 151              		.equ	PCR2,0x0044		# PA[2]
+ 152              		.equ	PCR3,0x0046		# PA[3]
+ 153              		.equ	PCR4,0x0048		# PA[4]
+ 154              		.equ	PCR5,0x004a		# PA[5]
+ 155              		.equ	PCR6,0x004c		# PA[6]
+ 156              		.equ	PCR7,0x004e		# PA[7]
+ 157              		.equ	PCR8,0x0050		# PA[8]
+ 158              		.equ	PCR9,0x0052		# PA[9]
+ 159              		.equ	PCR10,0x0054		# PA[10]
+ 160              		.equ	PCR11,0x0056		# PA[11]
+ 161              		.equ	PCR12,0x0058		# PA[12]
+ 162              		.equ	PCR13,0x005a		# PA[13]
+ 163              		.equ	PCR14,0x005c		# PA[14]
+ 164              		.equ	PCR15,0x005e		# PA[15]
+ 165              	
+ 166              		.equ	PCR16,0x0060		# PB[0]
+ 167              		.equ	PCR17,0x0062		# PB[1]
+ 168              		.equ	PCR18,0x0064		# PB[2]
+ 169              		.equ	PCR19,0x0066		# PB[3]
+ 170              		.equ	PCR20,0x0068		# PB[4]
+ 171              		.equ	PCR21,0x006a		# PB[5]
+ 172              		.equ	PCR22,0x006c		# PB[6]
+ 173              		.equ	PCR23,0x006e		# PB[7]
+ 174              		.equ	PCR24,0x0070		# PB[8]
+ 175              		.equ	PCR25,0x0072		# PB[9]
+ 176              		.equ	PCR26,0x0074		# PB[10]
+ 177              		.equ	PCR27,0x0076		# PB[11]
+ 178              		.equ	PCR28,0x0078		# PB[12]
+ 179              		.equ	PCR29,0x007a		# PB[13]
+ 180              		.equ	PCR30,0x007c		# PB[14]
+ 181              		.equ	PCR31,0x007e		# PB[15]
+ 182              	
+ 183              		.equ	PCR32,0x0080		# PC[0]
+ 184              		.equ	PCR33,0x0082		# PC[1]
+ 185              		.equ	PCR34,0x0084		# PC[2]
+ 186              		.equ	PCR35,0x0086		# PC[3]
+ 187              		.equ	PCR36,0x0088		# PC[4]
+ 188              		.equ	PCR37,0x008a		# PC[5]
+ 189              		.equ	PCR38,0x008c		# PC[6]
+ 190              		.equ	PCR39,0x008e		# PC[7]
+ 191              		.equ	PCR40,0x0090		# PC[8]
+ 192              		.equ	PCR41,0x0092		# PC[9]
+ 193              		.equ	PCR42,0x0094		# PC[10]
+ 194              		.equ	PCR43,0x0096		# PC[11]
+ 195              		.equ	PCR44,0x0098		# PC[12]
+ 196              		.equ	PCR45,0x009a		# PC[13]
+ 197              		.equ	PCR46,0x009c		# PC[14]
+ 198              		.equ	PCR47,0x009e		# PC[15]
+ 199              	
+ 200              		.equ	PCR48,0x00a0		# PD[0]
+ 201              		.equ	PCR49,0x00a2		# PD[1]
+ 202              		.equ	PCR50,0x00a4		# PD[2]
+ 203              		.equ	PCR51,0x00a6		# PD[3]
+GAS LISTING boot_40.vleasm 			page 5
+
+
+ 204              		.equ	PCR52,0x00a8		# PD[4]
+ 205              		.equ	PCR53,0x00aa		# PD[5]
+ 206              		.equ	PCR54,0x00ac		# PD[6]
+ 207              		.equ	PCR55,0x00ae		# PD[7]
+ 208              		.equ	PCR56,0x00b0		# PD[8]
+ 209              		.equ	PCR57,0x00b2		# PD[9]
+ 210              		.equ	PCR58,0x00b4		# PD[10]
+ 211              		.equ	PCR59,0x00b6		# PD[11]
+ 212              		.equ	PCR60,0x00b8		# PD[12]
+ 213              		.equ	PCR61,0x00ba		# PD[13]
+ 214              		.equ	PCR62,0x00bc		# PD[14]
+ 215              		.equ	PCR63,0x00be		# PD[15]
+ 216              	
+ 217              		.equ	PCR64,0x00c0		# PE[0]
+ 218              		.equ	PCR65,0x00c2		# PE[1]
+ 219              		.equ	PCR66,0x00c4		# PE[2]
+ 220              		.equ	PCR67,0x00c6		# PE[3]
+ 221              		.equ	PCR68,0x00c8		# PE[4]
+ 222              		.equ	PCR69,0x00ca		# PE[5]
+ 223              		.equ	PCR70,0x00cc		# PE[6]
+ 224              		.equ	PCR71,0x00ce		# PE[7]
+ 225              		.equ	PCR72,0x00d0		# PE[8]
+ 226              		.equ	PCR73,0x00d2		# PE[9]
+ 227              		.equ	PCR74,0x00d4		# PE[10]
+ 228              		.equ	PCR75,0x00d6		# PE[11]
+ 229              		.equ	PCR76,0x00d8		# PE[12]
+ 230              		.equ	PCR77,0x00da		# PE[13]
+ 231              		.equ	PCR78,0x00dc		# PE[14]
+ 232              		.equ	PCR79,0x00de		# PE[15]
+ 233              	
+ 234              		.equ	PCR80,0x00e0		# PF[0]
+ 235              		.equ	PCR81,0x00e2		# PF[1]
+ 236              		.equ	PCR82,0x00e4		# PF[2]
+ 237              		.equ	PCR83,0x00e6		# PF[3]
+ 238              		.equ	PCR84,0x00e8		# PF[4]
+ 239              		.equ	PCR85,0x00ea		# PF[5]
+ 240              		.equ	PCR86,0x00ec		# PF[6]
+ 241              		.equ	PCR87,0x00ee		# PF[7]
+ 242              		.equ	PCR88,0x00f0		# PF[8]
+ 243              		.equ	PCR89,0x00f2		# PF[9]
+ 244              		.equ	PCR90,0x00f4		# PF[10]
+ 245              		.equ	PCR91,0x00f6		# PF[11]
+ 246              		.equ	PCR92,0x00f8		# PF[12]
+ 247              		.equ	PCR93,0x00fa		# PF[13]
+ 248              		.equ	PCR94,0x00fc		# PF[14]
+ 249              		.equ	PCR95,0x00fe		# PF[15]
+ 250              		
+ 251              		.equ	PCR96,0x0100		# PG[0]
+ 252              		.equ	PCR97,0x0102		# PG[1]
+ 253              		.equ	PCR98,0x0104		# PG[2]
+ 254              		.equ	PCR99,0x0106		# PG[3]
+ 255              		.equ	PCR100,0x0108		# PG[4]
+ 256              		.equ	PCR101,0x010a		# PG[5]
+ 257              		.equ	PCR102,0x010c		# PG[6]
+ 258              		.equ	PCR103,0x010e		# PG[7]
+ 259              		.equ	PCR104,0x0110		# PG[8]
+ 260              		.equ	PCR105,0x0112		# PG[9]
+GAS LISTING boot_40.vleasm 			page 6
+
+
+ 261              		.equ	PCR106,0x0114		# PG[10]
+ 262              		.equ	PCR107,0x0116		# PG[11]
+ 263              		.equ	PCR108,0x0118		# PG[12]
+ 264              		.equ	PCR109,0x011a		# PG[13]
+ 265              		.equ	PCR110,0x011c		# PG[14]
+ 266              		.equ	PCR111,0x011e		# PG[15]
+ 267              	
+ 268              		.equ	PCR112,0x0120		# PH[0]
+ 269              		.equ	PCR113,0x0122		# PH[1]
+ 270              		.equ	PCR114,0x0124		# PH[2]
+ 271              		.equ	PCR115,0x0126		# PH[3]
+ 272              		.equ	PCR116,0x0128		# PH[4]
+ 273              		.equ	PCR117,0x012a		# PH[5]
+ 274              		.equ	PCR118,0x012c		# PH[6]
+ 275              		.equ	PCR119,0x012e		# PH[7]
+ 276              		.equ	PCR120,0x0130		# PH[8]
+ 277              		.equ	PCR121,0x0132		# PH[9]
+ 278              		.equ	PCR122,0x0134		# PH[10]
+ 279              	
+ 280              		#port config register defaults
+ 281              		.equ	PCR_UNCONNECT,0x0003
+ 282              		.equ	PCR_ANALOG,0x2000
+ 283              		.equ	PCR_INPUT,0x0100
+ 284              		.equ	PCR_INPUT_PU,0x0103
+ 285              		.equ	PCR_INPUT_PD,0x0102
+ 286              		.equ	PCR_OUTPUT,0x0300
+ 287              		.equ	PCR_OUTPUT_OD,0x0320
+ 288              	
+ 289              		.equ	SWT_BASE,0xFFF3
+ 290              		.equ	SWT_CR,0x8000
+ 291              		.equ	SWT_IR,0x8004
+ 292              		.equ	SWT_TO,0x8008
+ 293              		.equ	SWT_WN,0x800c
+ 294              		.equ	SWT_SR,0x8010
+ 295              		.equ	SWT_CO,0x8014
+ 296              	
+ 297              		.equ	ME_BASE,0xc3fd
+ 298              		.equ	ME_GS,0xc000
+ 299              		.equ	ME_MCTL,0xc004
+ 300              		.equ	ME_RUN_PC0,0xc080
+ 301              		.equ	ME_RUN_PC1,0xc084
+ 302              		.equ	ME_RUN_PC2,0xc088
+ 303              		.equ	ME_RUN_PC3,0xc08c
+ 304              		.equ	ME_RUN_PC4,0xc090
+ 305              		.equ	ME_RUN_PC5,0xc094
+ 306              		.equ	ME_RUN_PC6,0xc098
+ 307              		.equ	ME_RUN_PC7,0xc09c
+ 308              		.equ	ME_DRUN_MC,0xc02c
+ 309              	
+ 310              		.equ	FMPLL_BASE,0xc3fe
+ 311              		.equ	FMPLL0_CR,0x00a0
+ 312              		.equ	FMPLL1_CR,0x00c0
+ 313              	
+ 314              		.equ	LINFLEX0_BASE,0xffe4
+ 315              		.equ	LINFLEX0_LINCR1,0x0000
+ 316              		.equ	LINFLEX0_UARTCR,0x0010
+ 317              		.equ	LINFLEX0_UARTSR,0x0014
+GAS LISTING boot_40.vleasm 			page 7
+
+
+ 318              		.equ	LINFLEX0_LINBRR,0x0028
+ 319              		.equ	LINFLEX0_LINBFRR,0x002C
+ 320              		.equ	LINFLEX0_BRDL,0x0038
+ 321              		.equ	LINFLEX0_BRDM,0x003C
+ 322              		
+ 323              		.equ	PFLASH_BASE,0xc3f8
+ 324              		.equ	PFLASH_MCR,0x8000
+ 325              		.equ	PFLASH_LML,0x8004
+ 326              		.equ	PFLASH_LMS,0x8010
+ 327              	
+ 328              		.equ	PFLASH_BASE_N,0xc3f9
+ 329              		.equ	PFLASH_MCR_N,0xFFFF8000
+ 330              		.equ	PFLASH_LMS_N,0xFFFF8010
+ 331              	
+ 332              		.equ	DFLASH_BASE,0xc3f8
+ 333              		.equ	DFLASH_MCR,0xC000
+ 334              	
+ 335              		.equ	INTC_BASE,0xfff48000
+ 336              		.equ	INTC_IACKR,0xfff48010
+ 337              		.equ	INTC_EOIR,0xfff48018
+ 338              	
+  26              	
+  27              				.equ	block_size,2048
+  28              	
+  29              				.equ	shadow_unlock_lo,	0xffff
+  30              				.equ	shadow_unlock_hi,	0xffef
+  31              	
+  32              				.text
+  33 0000 00000000 				.org 0x00100
+  33      00000000 
+  33      00000000 
+  33      00000000 
+  33      00000000 
+  34              	
+  35              	main_start:
+  36              	
+  37              	################################################################################
+  38              	# set mode
+  39              	################################################################################
+  40 0100 7318E3FE 				e_lis		r24,FMPLL_BASE
+  41 0104 7384E640 				e_lis		r28,0x2640		#f / 10 * 64 / 8
+  42 0108 73A00100 				e_li		r29,0x100
+  43 010c 44DC     				se_or		r28,r29
+  44 010e 579800A0 				e_stw		r28,FMPLL0_CR(r24)
+  45              	
+  46              				.include "boot.vleasm"
+   1              	#################################################################################
+   2              	#										#
+   3              	# SPC560B-Bootcode for uprog2							#
+   4              	# version 1.10									#
+   5              	#										#
+   6              	# copyright (c) 2014-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+   7              	#										#
+   8              	# This program is free software; you can redistribute it and/or			#
+   9              	# modify it under the terms of the GNU General Public License			#
+  10              	# as published by the Free Software Foundation; either version 2		#
+  11              	# of the License, or (at your option) any later version.			#
+GAS LISTING boot_40.vleasm 			page 8
+
+
+  12              	#										#
+  13              	# This program is distributed in the hope that it will be useful,		#
+  14              	# but WITHOUT ANY WARRANTY; without even the implied warranty of		#
+  15              	# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU		#
+  16              	# General Public License for more details.					#
+  17              	#										#
+  18              	# You should have received a copy of the GNU General Public			#
+  19              	# License along with this library; if not, write to the				#
+  20              	# Free Software Foundation, Inc., 59 Temple Place - Suite 330,			#
+  21              	# Boston, MA 02111-1307, USA.							#
+  22              	#										#
+  23              	#################################################################################
+  24              	
+  25              				.include "/usr/local/toolchain/powerpc-vle-elf/include_asm/regs_spc560b.asm"
+   1              		.equ	r0,0
+   2              		.equ	r1,1
+   3              		.equ	rsp,1
+   4              		.equ	r2,2
+   5              		.equ	r3,3
+   6              		.equ	r4,4
+   7              		.equ	r5,5
+   8              		.equ	r6,6
+   9              		.equ	r7,7
+  10              		.equ	r8,8
+  11              		.equ	r9,9
+  12              		.equ	r10,10
+  13              		.equ	r11,11
+  14              		.equ	r12,12
+  15              		.equ	r13,13
+  16              		.equ	r14,14
+  17              		.equ	r15,15
+  18              		.equ	r16,16
+  19              		.equ	r17,17
+  20              		.equ	r18,18
+  21              		.equ	r19,19
+  22              		.equ	r20,20
+  23              		.equ	r21,21
+  24              		.equ	r22,22
+  25              		.equ	r23,23
+  26              		.equ	r24,24
+  27              		.equ	r25,25
+  28              		.equ	r26,26
+  29              		.equ	r27,27
+  30              		.equ	r28,28
+  31              		.equ	r29,29
+  32              		.equ	r30,30
+  33              		.equ	r31,31
+  34              		.equ	rsp,1
+  35              	
+  36              		.equ	SIUL_BASE,0xc3f9
+  37              		#port output (4 bits per WORD)
+  38              		.equ	GPDO0,0x0600	#PA 0-3
+  39              		.equ	GPDO1,0x0604	#PA 4-7
+  40              		.equ	GPDO2,0x0608	#PA 8-11
+  41              		.equ	GPDO3,0x060c	#PA 12-15
+  42              	
+  43              		.equ	GPDO4,0x0610	#PB 0-3
+GAS LISTING boot_40.vleasm 			page 9
+
+
+  44              		.equ	GPDO5,0x0614	#PB 4-7
+  45              		.equ	GPDO6,0x0618	#PB 8-11
+  46              		.equ	GPDO7,0x061c	#PB 12-15
+  47              	
+  48              		.equ	GPDO8,0x0620	#PC 0-3
+  49              		.equ	GPDO9,0x0624	#PC 4-7
+  50              		.equ	GPDO10,0x0628	#PC 8-11
+  51              		.equ	GPDO11,0x062c	#PC 12-15
+  52              	
+  53              		.equ	GPDO12,0x0630	#PD 0-3
+  54              		.equ	GPDO13,0x0634	#PD 4-7
+  55              		.equ	GPDO14,0x0638	#PD 8-11
+  56              		.equ	GPDO15,0x063c	#PD 12-15
+  57              	
+  58              		.equ	GPDO16,0x0640	#PE 0-3
+  59              		.equ	GPDO17,0x0644	#PE 4-7
+  60              		.equ	GPDO18,0x0648	#PE 8-11
+  61              		.equ	GPDO19,0x064c	#PE 12-15
+  62              	
+  63              		.equ	GPDO20,0x0650	#PF 0-3
+  64              		.equ	GPDO21,0x0654	#PF 4-7
+  65              		.equ	GPDO22,0x0658	#PF 8-11
+  66              		.equ	GPDO23,0x065c	#PF 12-15
+  67              	
+  68              		.equ	GPDO24,0x0660	#PG 0-3
+  69              		.equ	GPDO25,0x0664	#PG 4-7
+  70              		.equ	GPDO26,0x0668	#PG 8-11
+  71              		.equ	GPDO27,0x066c	#PG 12-15
+  72              	
+  73              		.equ	GPDO28,0x0670	#PH 0-3
+  74              		.equ	GPDO29,0x0674	#PH 4-7
+  75              		.equ	GPDO30,0x0678	#PH 8-11
+  76              		.equ	GPDO31,0x067c	#PH 12-15
+  77              	
+  78              		#port input (4 bits per WORD)
+  79              		.equ	PDI0,0x0800	#PA 0-3
+  80              		.equ	PDI1,0x0804	#PA 4-7
+  81              		.equ	PDI2,0x0808	#PA 8-11
+  82              		.equ	PDI3,0x080c	#PA 12-15
+  83              	
+  84              		.equ	PDI4,0x0810	#PB 0-3
+  85              		.equ	PDI5,0x0814	#PB 4-7
+  86              		.equ	PDI6,0x0818	#PB 8-11
+  87              		.equ	PDI7,0x081c	#PB 12-15
+  88              	
+  89              		.equ	PDI8,0x0820	#PC 0-3
+  90              		.equ	PDI9,0x0824	#PC 4-7
+  91              		.equ	PDI10,0x0828	#PC 8-11
+  92              		.equ	PDI11,0x082c	#PC 12-15
+  93              	
+  94              		.equ	PDI12,0x0830	#PD 0-3
+  95              		.equ	PDI13,0x0834	#PD 4-7
+  96              		.equ	PDI14,0x0838	#PD 8-11
+  97              		.equ	PDI15,0x083c	#PD 12-15
+  98              	
+  99              		.equ	PDI16,0x0840	#PE 0-3
+ 100              		.equ	PDI17,0x0844	#PE 4-7
+GAS LISTING boot_40.vleasm 			page 10
+
+
+ 101              		.equ	PDI18,0x0848	#PE 8-11
+ 102              		.equ	PDI19,0x084c	#PE 12-15
+ 103              	
+ 104              		.equ	PDI20,0x0850	#PF 0-3
+ 105              		.equ	PDI21,0x0854	#PF 4-7
+ 106              		.equ	PDI22,0x0858	#PF 8-11
+ 107              		.equ	PDI23,0x085c	#PF 12-15
+ 108              	
+ 109              		.equ	PDI24,0x0860	#PG 0-3
+ 110              		.equ	PDI25,0x0864	#PG 4-7
+ 111              		.equ	PDI26,0x0868	#PG 8-11
+ 112              		.equ	PDI27,0x086c	#PG 12-15
+ 113              	
+ 114              		.equ	PDI28,0x0870	#PH 0-3
+ 115              		.equ	PDI29,0x0874	#PH 4-7
+ 116              		.equ	PDI30,0x0878	#PH 8-11
+ 117              		.equ	PDI31,0x087c	#PH 12-15
+ 118              	
+ 119              		#port output (32 bits per WORD)
+ 120              		.equ	PGPDO0,0x0c00		# PORT A+B
+ 121              		.equ	PGPDO1,0x0c04		# PORT C+D
+ 122              		.equ	PGPDO2,0x0c08		# PORT E+F
+ 123              		.equ	PGPDO3,0x0c0c		# PORT G+H
+ 124              		.equ	POUT_A,PGPDO0		# PORT A
+ 125              		.equ	POUT_B,PGPDO0+2		# PORT B
+ 126              		.equ	POUT_C,PGPDO1		# PORT C
+ 127              		.equ	POUT_D,PGPDO1+2		# PORT D
+ 128              		.equ	POUT_E,PGPDO2		# PORT E
+ 129              		.equ	POUT_F,PGPDO2+2		# PORT F
+ 130              		.equ	POUT_G,PGPDO3		# PORT G
+ 131              		.equ	POUT_H,PGPDO3+2		# PORT H
+ 132              	
+ 133              	
+ 134              		#port input (32 bits per WORD)
+ 135              		.equ	PGPDI0,0x0c40		# PORT A+B
+ 136              		.equ	PGPDI1,0x0c44		# PORT C+D
+ 137              		.equ	PGPDI2,0x0c48		# PORT E+F
+ 138              		.equ	PGPDI3,0x0c4c		# PORT G+H
+ 139              		.equ	PIN_A,PGPDI0		# PORT A
+ 140              		.equ	PIN_B,PGPDI0+2		# PORT B
+ 141              		.equ	PIN_C,PGPDI1		# PORT C
+ 142              		.equ	PIN_D,PGPDI1+2		# PORT D
+ 143              		.equ	PIN_E,PGPDI2		# PORT E
+ 144              		.equ	PIN_F,PGPDI2+2		# PORT F
+ 145              		.equ	PIN_G,PGPDI3		# PORT G
+ 146              		.equ	PIN_H,PGPDI3+2		# PORT H
+ 147              	
+ 148              		#port config registers
+ 149              		.equ	PCR0,0x0040		# PA[0]
+ 150              		.equ	PCR1,0x0042		# PA[1]
+ 151              		.equ	PCR2,0x0044		# PA[2]
+ 152              		.equ	PCR3,0x0046		# PA[3]
+ 153              		.equ	PCR4,0x0048		# PA[4]
+ 154              		.equ	PCR5,0x004a		# PA[5]
+ 155              		.equ	PCR6,0x004c		# PA[6]
+ 156              		.equ	PCR7,0x004e		# PA[7]
+ 157              		.equ	PCR8,0x0050		# PA[8]
+GAS LISTING boot_40.vleasm 			page 11
+
+
+ 158              		.equ	PCR9,0x0052		# PA[9]
+ 159              		.equ	PCR10,0x0054		# PA[10]
+ 160              		.equ	PCR11,0x0056		# PA[11]
+ 161              		.equ	PCR12,0x0058		# PA[12]
+ 162              		.equ	PCR13,0x005a		# PA[13]
+ 163              		.equ	PCR14,0x005c		# PA[14]
+ 164              		.equ	PCR15,0x005e		# PA[15]
+ 165              	
+ 166              		.equ	PCR16,0x0060		# PB[0]
+ 167              		.equ	PCR17,0x0062		# PB[1]
+ 168              		.equ	PCR18,0x0064		# PB[2]
+ 169              		.equ	PCR19,0x0066		# PB[3]
+ 170              		.equ	PCR20,0x0068		# PB[4]
+ 171              		.equ	PCR21,0x006a		# PB[5]
+ 172              		.equ	PCR22,0x006c		# PB[6]
+ 173              		.equ	PCR23,0x006e		# PB[7]
+ 174              		.equ	PCR24,0x0070		# PB[8]
+ 175              		.equ	PCR25,0x0072		# PB[9]
+ 176              		.equ	PCR26,0x0074		# PB[10]
+ 177              		.equ	PCR27,0x0076		# PB[11]
+ 178              		.equ	PCR28,0x0078		# PB[12]
+ 179              		.equ	PCR29,0x007a		# PB[13]
+ 180              		.equ	PCR30,0x007c		# PB[14]
+ 181              		.equ	PCR31,0x007e		# PB[15]
+ 182              	
+ 183              		.equ	PCR32,0x0080		# PC[0]
+ 184              		.equ	PCR33,0x0082		# PC[1]
+ 185              		.equ	PCR34,0x0084		# PC[2]
+ 186              		.equ	PCR35,0x0086		# PC[3]
+ 187              		.equ	PCR36,0x0088		# PC[4]
+ 188              		.equ	PCR37,0x008a		# PC[5]
+ 189              		.equ	PCR38,0x008c		# PC[6]
+ 190              		.equ	PCR39,0x008e		# PC[7]
+ 191              		.equ	PCR40,0x0090		# PC[8]
+ 192              		.equ	PCR41,0x0092		# PC[9]
+ 193              		.equ	PCR42,0x0094		# PC[10]
+ 194              		.equ	PCR43,0x0096		# PC[11]
+ 195              		.equ	PCR44,0x0098		# PC[12]
+ 196              		.equ	PCR45,0x009a		# PC[13]
+ 197              		.equ	PCR46,0x009c		# PC[14]
+ 198              		.equ	PCR47,0x009e		# PC[15]
+ 199              	
+ 200              		.equ	PCR48,0x00a0		# PD[0]
+ 201              		.equ	PCR49,0x00a2		# PD[1]
+ 202              		.equ	PCR50,0x00a4		# PD[2]
+ 203              		.equ	PCR51,0x00a6		# PD[3]
+ 204              		.equ	PCR52,0x00a8		# PD[4]
+ 205              		.equ	PCR53,0x00aa		# PD[5]
+ 206              		.equ	PCR54,0x00ac		# PD[6]
+ 207              		.equ	PCR55,0x00ae		# PD[7]
+ 208              		.equ	PCR56,0x00b0		# PD[8]
+ 209              		.equ	PCR57,0x00b2		# PD[9]
+ 210              		.equ	PCR58,0x00b4		# PD[10]
+ 211              		.equ	PCR59,0x00b6		# PD[11]
+ 212              		.equ	PCR60,0x00b8		# PD[12]
+ 213              		.equ	PCR61,0x00ba		# PD[13]
+ 214              		.equ	PCR62,0x00bc		# PD[14]
+GAS LISTING boot_40.vleasm 			page 12
+
+
+ 215              		.equ	PCR63,0x00be		# PD[15]
+ 216              	
+ 217              		.equ	PCR64,0x00c0		# PE[0]
+ 218              		.equ	PCR65,0x00c2		# PE[1]
+ 219              		.equ	PCR66,0x00c4		# PE[2]
+ 220              		.equ	PCR67,0x00c6		# PE[3]
+ 221              		.equ	PCR68,0x00c8		# PE[4]
+ 222              		.equ	PCR69,0x00ca		# PE[5]
+ 223              		.equ	PCR70,0x00cc		# PE[6]
+ 224              		.equ	PCR71,0x00ce		# PE[7]
+ 225              		.equ	PCR72,0x00d0		# PE[8]
+ 226              		.equ	PCR73,0x00d2		# PE[9]
+ 227              		.equ	PCR74,0x00d4		# PE[10]
+ 228              		.equ	PCR75,0x00d6		# PE[11]
+ 229              		.equ	PCR76,0x00d8		# PE[12]
+ 230              		.equ	PCR77,0x00da		# PE[13]
+ 231              		.equ	PCR78,0x00dc		# PE[14]
+ 232              		.equ	PCR79,0x00de		# PE[15]
+ 233              	
+ 234              		.equ	PCR80,0x00e0		# PF[0]
+ 235              		.equ	PCR81,0x00e2		# PF[1]
+ 236              		.equ	PCR82,0x00e4		# PF[2]
+ 237              		.equ	PCR83,0x00e6		# PF[3]
+ 238              		.equ	PCR84,0x00e8		# PF[4]
+ 239              		.equ	PCR85,0x00ea		# PF[5]
+ 240              		.equ	PCR86,0x00ec		# PF[6]
+ 241              		.equ	PCR87,0x00ee		# PF[7]
+ 242              		.equ	PCR88,0x00f0		# PF[8]
+ 243              		.equ	PCR89,0x00f2		# PF[9]
+ 244              		.equ	PCR90,0x00f4		# PF[10]
+ 245              		.equ	PCR91,0x00f6		# PF[11]
+ 246              		.equ	PCR92,0x00f8		# PF[12]
+ 247              		.equ	PCR93,0x00fa		# PF[13]
+ 248              		.equ	PCR94,0x00fc		# PF[14]
+ 249              		.equ	PCR95,0x00fe		# PF[15]
+ 250              		
+ 251              		.equ	PCR96,0x0100		# PG[0]
+ 252              		.equ	PCR97,0x0102		# PG[1]
+ 253              		.equ	PCR98,0x0104		# PG[2]
+ 254              		.equ	PCR99,0x0106		# PG[3]
+ 255              		.equ	PCR100,0x0108		# PG[4]
+ 256              		.equ	PCR101,0x010a		# PG[5]
+ 257              		.equ	PCR102,0x010c		# PG[6]
+ 258              		.equ	PCR103,0x010e		# PG[7]
+ 259              		.equ	PCR104,0x0110		# PG[8]
+ 260              		.equ	PCR105,0x0112		# PG[9]
+ 261              		.equ	PCR106,0x0114		# PG[10]
+ 262              		.equ	PCR107,0x0116		# PG[11]
+ 263              		.equ	PCR108,0x0118		# PG[12]
+ 264              		.equ	PCR109,0x011a		# PG[13]
+ 265              		.equ	PCR110,0x011c		# PG[14]
+ 266              		.equ	PCR111,0x011e		# PG[15]
+ 267              	
+ 268              		.equ	PCR112,0x0120		# PH[0]
+ 269              		.equ	PCR113,0x0122		# PH[1]
+ 270              		.equ	PCR114,0x0124		# PH[2]
+ 271              		.equ	PCR115,0x0126		# PH[3]
+GAS LISTING boot_40.vleasm 			page 13
+
+
+ 272              		.equ	PCR116,0x0128		# PH[4]
+ 273              		.equ	PCR117,0x012a		# PH[5]
+ 274              		.equ	PCR118,0x012c		# PH[6]
+ 275              		.equ	PCR119,0x012e		# PH[7]
+ 276              		.equ	PCR120,0x0130		# PH[8]
+ 277              		.equ	PCR121,0x0132		# PH[9]
+ 278              		.equ	PCR122,0x0134		# PH[10]
+ 279              	
+ 280              		#port config register defaults
+ 281              		.equ	PCR_UNCONNECT,0x0003
+ 282              		.equ	PCR_ANALOG,0x2000
+ 283              		.equ	PCR_INPUT,0x0100
+ 284              		.equ	PCR_INPUT_PU,0x0103
+ 285              		.equ	PCR_INPUT_PD,0x0102
+ 286              		.equ	PCR_OUTPUT,0x0300
+ 287              		.equ	PCR_OUTPUT_OD,0x0320
+ 288              	
+ 289              		.equ	SWT_BASE,0xFFF3
+ 290              		.equ	SWT_CR,0x8000
+ 291              		.equ	SWT_IR,0x8004
+ 292              		.equ	SWT_TO,0x8008
+ 293              		.equ	SWT_WN,0x800c
+ 294              		.equ	SWT_SR,0x8010
+ 295              		.equ	SWT_CO,0x8014
+ 296              	
+ 297              		.equ	ME_BASE,0xc3fd
+ 298              		.equ	ME_GS,0xc000
+ 299              		.equ	ME_MCTL,0xc004
+ 300              		.equ	ME_RUN_PC0,0xc080
+ 301              		.equ	ME_RUN_PC1,0xc084
+ 302              		.equ	ME_RUN_PC2,0xc088
+ 303              		.equ	ME_RUN_PC3,0xc08c
+ 304              		.equ	ME_RUN_PC4,0xc090
+ 305              		.equ	ME_RUN_PC5,0xc094
+ 306              		.equ	ME_RUN_PC6,0xc098
+ 307              		.equ	ME_RUN_PC7,0xc09c
+ 308              		.equ	ME_DRUN_MC,0xc02c
+ 309              	
+ 310              		.equ	FMPLL_BASE,0xc3fe
+ 311              		.equ	FMPLL_CR,0x00a0
+ 312              	
+ 313              		.equ	LINFLEX0_BASE,0xffe4
+ 314              		.equ	LINFLEX0_LINCR1,0x0000
+ 315              		.equ	LINFLEX0_UARTCR,0x0010
+ 316              		.equ	LINFLEX0_UARTSR,0x0014
+ 317              		.equ	LINFLEX0_LINBRR,0x0028
+ 318              		.equ	LINFLEX0_LINBFRR,0x002C
+ 319              		.equ	LINFLEX0_BRDL,0x0038
+ 320              		.equ	LINFLEX0_BRDM,0x003C
+ 321              		
+ 322              		.equ	PFLASH_BASE,0xc3f8
+ 323              		.equ	PFLASH_MCR,0x8000
+ 324              		.equ	PFLASH_LML,0x8004
+ 325              		.equ	PFLASH_LMS,0x8010
+ 326              	
+ 327              		.equ	PFLASH_BASE_N,0xc3f9
+ 328              		.equ	PFLASH_MCR_N,0xFFFF8000
+GAS LISTING boot_40.vleasm 			page 14
+
+
+ 329              		.equ	PFLASH_LMS_N,0xFFFF8010
+ 330              	
+ 331              		.equ	DFLASH_BASE,0xc3f8
+ 332              		.equ	DFLASH_MCR,0xC000
+ 333              	
+ 334              		.equ	INTC_BASE,0xfff48000
+ 335              		.equ	INTC_IACKR,0xfff48010
+ 336              		.equ	INTC_EOIR,0xfff48018
+ 337              	
+  26              	
+  27              				.equ	block_size,2048
+  28              	
+  29              				.equ	shadow_unlock_lo,	0xffff
+  30              				.equ	shadow_unlock_hi,	0xffef
+  31              	
+  32              	
+  33              	
+  34 0112 7318E3FD 				e_lis		r24,ME_BASE
+  35 0116 7338002C 				e_li		r25,ME_DRUN_MC
+  36 011a 4489     				se_or		r25,r24
+  37 011c 73A0E09F 				e_lis		r29,0x009F		#DRUN
+  38 0120 73800074 				e_li		r28,0x0074
+  39 0124 44DC     				se_or		r28,r29
+  40 0126 D0C9     				se_stw		r28,0(r25)
+  41              	
+  42 0128 7028E000 				e_lis		rsp,0x4000		#set stack pointer
+  43 012c 73300000 				e_li		r25,0x8000
+  44 0130 4491     				se_or		rsp,r25
+  45              	
+  46 0132 7318E3FD 				e_lis		r24,ME_BASE
+  47 0136 73380080 				e_li		r25,ME_RUN_PC0
+  48 013a 4489     				se_or		r25,r24
+  49 013c 738000FE 				e_li		r28,0xfe
+  50 0140 57990000 				e_stw		r28,0(r25)
+  51              	
+  52 0144 73380004 				e_li		r25,ME_MCTL
+  53 0148 4489     				se_or		r25,r24
+  54 014a 73A6E000 				e_lis		r29,0x3000		#DRUN
+  55 014e 738B02F0 				e_li		r28,0x5af0
+  56 0152 44DC     				se_or		r28,r29
+  57 0154 D0C9     				se_stw		r28,0(r25)
+  58 0156 7394050F 				e_li		r28,0xa50f
+  59 015a 44DC     				se_or		r28,r29
+  60 015c D0C9     				se_stw		r28,0(r25)
+  61              	
+  62 015e 7388E000 				e_lis		r28,0x4000		#f * 4
+  63 0162 73A10000 				e_li		r29,0x0800
+  64 0166 44DC     				se_or		r28,r29
+  65 0168 73C00000 				e_li		r30,0x00
+  66 016c 73600000 				e_li		r27,0x00
+  67 0170 57DC0000 	rfill_1:		e_stw		r30,0(r28)
+  68 0174 1F9C0004 				e_add16i	r28,r28,4
+  69 0178 1F7B0001 				e_add16i	r27,r27,1
+  70 017c 707B9E00 				e_cmp16i	r27,0x1e00
+  71 0180 E2F8     				se_bne		rfill_1
+  72              	
+  73              	
+GAS LISTING boot_40.vleasm 			page 15
+
+
+  74              	################################################################################
+  75              	# set IO
+  76              	################################################################################
+  77 0182 7318E3F9 				e_lis		r24,SIUL_BASE
+  78 0186 73200060 				e_li		r25,PCR16
+  79 018a 4489     				se_or		r25,r24
+  80              	
+  81              	.if DEBUG_LED == 1
+  82              				e_li		r28,0x0204
+  83              				se_sth		r28,0x00(r25)
+  84              				se_sth		r28,0x02(r25)
+  85              	.endif
+  86 018c 73800400 				e_li		r28,0x0400		#LINFLEX 0 output
+  87 0190 B2C9     				se_sth		r28,0x04(r25)
+  88 0192 73800103 				e_li		r28,0x0103		#LINFLEX 0 input
+  89 0196 B3C9     				se_sth		r28,0x06(r25)
+  90              	
+  91              	
+  92              	################################################################################
+  93              	# set LINFLEX to UART mode
+  94              	################################################################################
+  95 0198 731FE7E4 				e_lis		r24,LINFLEX0_BASE
+  96 019c 481C     				se_li		r28,1
+  97 019e 57980000 				e_stw		r28,LINFLEX0_LINCR1(r24)
+  98 01a2 484C     				se_li		r28,4	#17
+  99 01a4 57980028 				e_stw		r28,LINFLEX0_LINBRR(r24)
+ 100 01a8 480C     				se_li		r28,0	#6
+ 101 01aa 57980000 				e_stw		r28,LINFLEX0_LINFBRR(r24)
+ 102 01ae 73800001 				e_li		r28,0x01
+ 103 01b2 57980010 				e_stw		r28,LINFLEX0_UARTCR(r24)
+ 104 01b6 73800033 				e_li		r28,0x33
+ 105 01ba 57980010 				e_stw		r28,LINFLEX0_UARTCR(r24)
+ 106 01be 480C     				se_li		r28,0
+ 107 01c0 57980000 				e_stw		r28,LINFLEX0_LINCR1(r24)
+ 108              	
+ 109              	
+ 110              	################################################################################
+ 111              	# prepare flash
+ 112              	# R26 = main flash base
+ 113              	# R25 = data flash base
+ 114              	################################################################################
+ 115 01c4 7358E3F8 				e_lis		r26,PFLASH_BASE		# MCR address
+ 116 01c8 70F00000 				e_li		r7,PFLASH_MCR
+ 117 01cc 447A     				se_or		r26,r7
+ 118              	
+ 119 01ce 7338E3F8 				e_lis		r25,DFLASH_BASE		# MCR address
+ 120 01d2 70F80000 				e_li		r7,DFLASH_MCR
+ 121 01d6 4479     				se_or		r25,r7
+ 122              	
+ 123 01d8 7374E1A1 				e_lis		r27,0xa1a1		# password LML
+ 124 01dc 70E20111 				e_li		r7,0x1111
+ 125 01e0 447B     				se_or		r27,r7
+ 126 01e2 D1BA     				se_stw		r27,4(r26)		# main flash
+ 127 01e4 D1B9     				se_stw		r27,4(r25)		# data flash
+ 128              	
+ 129 01e6 7376E2B2 				e_lis		r27,0xb2b2		# password HBL
+ 130 01ea 70E40222 				e_li		r7,0x2222
+GAS LISTING boot_40.vleasm 			page 16
+
+
+ 131 01ee 447B     				se_or		r27,r7
+ 132 01f0 D2BA     				se_stw		r27,8(r26)		# main flash
+ 133 01f2 D2B9     				se_stw		r27,8(r25)		# data flash
+ 134              	
+ 135 01f4 7378E3C3 				e_lis		r27,0xc3c3		# password SLL
+ 136 01f8 70E60333 				e_li		r7,0x3333
+ 137 01fc 447B     				se_or		r27,r7
+ 138 01fe D3BA     				se_stw		r27,12(r26)		# main flash
+ 139 0200 D3B9     				se_stw		r27,12(r25)		# data flash
+ 140              	
+ 141 0202 78000267 				e_bl		enable_none
+ 142 0206 70800400 				e_li		r4,0x0400		# DONE mask
+ 143              	
+ 144              	################################################################################
+ 145              	# the maon loop
+ 146              	################################################################################
+ 147              	main_xloop:
+ 148              	.if DEBUG_LED == 1
+ 149              				e_bl		led_green		# ready
+ 150              	.endif
+ 151 020a 78000139 				e_bl		uart_recv		# get cmd from UART
+ 152              	.if DEBUG_LED == 1
+ 153              				e_bl		led_red			# busy
+ 154              	.endif
+ 155              	
+ 156              	################################################################################
+ 157              	# 0x51 = readout
+ 158              	################################################################################
+ 159 020e 701D9851 				e_cmp16i	r29,0x51		# read code
+ 160 0212 E214     				se_bne		main_program
+ 161              	
+ 162 0214 78000177 				e_bl		get_word		# get addr byte
+ 163              	
+ 164              				#now read
+ 165 0218 78000159 				e_bl		wait1			# wait a little bit before sending
+ 166 021c 70A00000 				e_li		r5,0
+ 167              	
+ 168 0220 33BE0000 	main_read_1:		e_lbz		r29,0(r30)
+ 169 0224 1BDE8001 				e_addi		r30,r30,1
+ 170 0228 780000EF 				e_bl		uart_send
+ 171 022c 78000145 				e_bl		wait1
+ 172              	
+ 173 0230 2005     				se_addi		r5,1
+ 174 0232 70259800 				e_cmp16i	r5,block_size
+ 175 0236 E4F5     				se_blt		main_read_1
+ 176 0238 E8E9     				se_b		main_xloop
+ 177              	
+ 178              	
+ 179              	################################################################################
+ 180              	# 0x52 = program code
+ 181              	################################################################################
+ 182 023a 701D9852 	main_program:		e_cmp16i	r29,0x52		# program main flash code
+ 183 023e E205     				se_bne		main_erase
+ 184 0240 78000179 				e_bl		enable_main		# enable main flash
+ 185 0244 7800004A 				e_b		do_prog
+ 186              	
+ 187              	
+GAS LISTING boot_40.vleasm 			page 17
+
+
+ 188              	################################################################################
+ 189              	# 0x53 = erase
+ 190              	################################################################################
+ 191 0248 701D9853 	main_erase:		e_cmp16i	r29,0x53		# erase?
+ 192 024c E205     				se_bne		shadow_program
+ 193 024e 7800016B 				e_bl		enable_main		# enable shadow
+ 194 0252 780000A0 				e_b		do_erase
+ 195              	
+ 196              	
+ 197              	################################################################################
+ 198              	# 0x72 = program shadow
+ 199              	################################################################################
+ 200 0256 701D9872 	shadow_program:		e_cmp16i	r29,0x72		# shadow prog code
+ 201 025a E205     				se_bne		shadow_erase
+ 202 025c 780001A1 				e_bl		enable_shadow		# enable shadow
+ 203 0260 7800002E 				e_b		do_prog
+ 204              	
+ 205              	
+ 206              	################################################################################
+ 207              	# 0x73 = erase data
+ 208              	################################################################################
+ 209 0264 701D9873 	shadow_erase:		e_cmp16i	r29,0x73		# shadow erase code
+ 210 0268 E205     				se_bne		data_program
+ 211 026a 78000193 				e_bl		enable_shadow		# enable shadow
+ 212 026e 78000084 				e_b		do_erase
+ 213              	
+ 214              	
+ 215              	################################################################################
+ 216              	# 0x62 = program data
+ 217              	################################################################################
+ 218 0272 701D9862 	data_program:		e_cmp16i	r29,0x62		# data program?
+ 219 0276 E205     				se_bne		data_erase
+ 220 0278 780001AD 				e_bl		enable_dataflash	# enable DF
+ 221 027c 78000012 				e_b		do_prog			# program
+ 222              	
+ 223              	
+ 224              	################################################################################
+ 225              	# 0x63 = erase data
+ 226              	################################################################################
+ 227 0280 701D9863 	data_erase:		e_cmp16i	r29,0x63		# data erase
+ 228 0284 E2C3     				se_bne		main_xloop
+ 229 0286 7800019F 				e_bl		enable_dataflash	# enable DF
+ 230 028a 78000068 				e_b		do_erase
+ 231              	
+ 232              	
+ 233              	################################################################################
+ 234              	# program routine
+ 235              	################################################################################
+ 236 028e 780000FD 	do_prog:		e_bl		get_word		# get addr word
+ 237 0292 01E6     				se_mr		r6,r30			# copy address
+ 238              	
+ 239 0294 4805     				se_li		r5,0			# counter
+ 240 0296 7368E000 				e_lis		r27,0x4000		# RAM buffer pointer
+ 241 029a 70E20000 				e_li		r7,0x1000
+ 242 029e 447B     				se_or		r27,r7
+ 243              	
+ 244              				#copy data
+GAS LISTING boot_40.vleasm 			page 18
+
+
+ 245 02a0 780000A3 	do_prog_1:		e_bl		uart_recv		# get byte
+ 246 02a4 90DB     				se_stb		r29,0(r27)		# store
+ 247 02a6 1B7B8001 				e_addi		r27,r27,1		# next addr
+ 248 02aa 2005     				se_addi		r5,1
+ 249 02ac 70259800 				e_cmp16i	r5,block_size
+ 250 02b0 E2F8     				se_bne		do_prog_1
+ 251              	
+ 252              				#now prog
+ 253 02b2 4805     				se_li		r5,0			# counter
+ 254 02b4 7368E000 				e_lis		r27,0x4000		# RAM buffer pointer
+ 255 02b8 70E20000 				e_li		r7,0x1000
+ 256 02bc 447B     				se_or		r27,r7
+ 257              	
+ 258 02be 4907     				se_li		r7,0x10			#set PGM
+ 259 02c0 D07C     				se_stw		r7,0(r28)
+ 260              	
+ 261              	
+ 262 02c2 C0EB     	do_prog_2:		se_lwz		r30,0(r27)		# get from buffer
+ 263 02c4 D0E6     				se_stw		r30,0(r6)		# store
+ 264 02c6 C1EB     				se_lwz		r30,4(r27)		# get from buffer
+ 265 02c8 D1E6     				se_stw		r30,4(r6)		# store
+ 266              	
+ 267 02ca 4917     				se_li		r7,0x11			# set PGM + EHV
+ 268 02cc D07C     				se_stw		r7,0(r28)
+ 269              	
+ 270 02ce C07C     	wait_done_p:		se_lwz		r7,0(r28)		# get mcr
+ 271 02d0 4647     				se_and		r7,r4
+ 272 02d2 0C47     				se_cmp		r7,r4
+ 273 02d4 E4FD     				se_blt		wait_done_p
+ 274              	
+ 275 02d6 4907     				se_li		r7,0x10			# clear EHV
+ 276 02d8 D07C     				se_stw		r7,0(r28)
+ 277              	
+ 278 02da 207B     				se_addi		r27,8			# increment src addr
+ 279 02dc 2076     				se_addi		r6,8			# increment dst addr
+ 280              	
+ 281 02de 2075     				se_addi		r5,8			# counter
+ 282 02e0 70259800 				e_cmp16i	r5,block_size
+ 283 02e4 E4EF     				se_blt		do_prog_2
+ 284              	
+ 285 02e6 480B     				se_li		r27,0x00		#clear PGM
+ 286 02e8 D0BC     				se_stw		r27,0(r28)
+ 287              	
+ 288 02ea 480D     				se_li		r29,0x00		# OK
+ 289 02ec 7800002B 				e_bl		uart_send		# send
+ 290              	
+ 291 02f0 E88D     				se_b		main_xloop
+ 292              	
+ 293              	################################################################################
+ 294              	# erase routine
+ 295              	################################################################################
+ 296 02f2 4847     	do_erase:		se_li		r7,0x04			#set ERS
+ 297 02f4 D07C     				se_stw		r7,0(r28)
+ 298              	
+ 299 02f6 D066     				se_stw		r6,0(r6)		#dummy write
+ 300              	
+ 301 02f8 4857     				se_li		r7,0x05			#set EHV
+GAS LISTING boot_40.vleasm 			page 19
+
+
+ 302 02fa D07C     				se_stw		r7,0(r28)
+ 303              	
+ 304 02fc C07C     	wait_done_e:		se_lwz		r7,0(r28)		#get mcr
+ 305 02fe 4647     				se_and		r7,r4
+ 306 0300 0C47     				se_cmp		r7,r4
+ 307 0302 E4FD     				se_blt		wait_done_e
+ 308              	
+ 309 0304 4847     				se_li		r7,0x04			#clear EHV
+ 310 0306 D07C     				se_stw		r7,0(r28)
+ 311              	
+ 312 0308 4807     				se_li		r7,0x00			#clear ERS
+ 313 030a D07C     				se_stw		r7,0(r28)
+ 314              	
+ 315              				# send status
+ 316 030c 480D     				se_li		r29,0x00		# OK
+ 317 030e 78000009 				e_bl		uart_send		# send
+ 318              	
+ 319 0312 79FFFEF8 				e_b		main_xloop		#goto main loop
+ 320              	
+ 321              	
+ 322              	.if DEBUG_LED == 1
+ 323              	################################################################################
+ 324              	# set RED LED on and GREEN off
+ 325              	################################################################################
+ 326              	led_red:		e_stwu		rsp,-12(rsp)
+ 327              				se_stw		r24,0(rsp)
+ 328              				se_stw		r25,4(rsp)
+ 329              				se_stw		r28,8(rsp)
+ 330              				e_lis		r24,SIUL_BASE
+ 331              				e_li		r25,GPDO4
+ 332              				se_or		r25,r24
+ 333              				se_li		r28,0x01
+ 334              				se_stb		r28,0(r25)
+ 335              				se_li		r28,0x00
+ 336              				se_stb		r28,1(r25)
+ 337              				se_lwz		r28,8(rsp)
+ 338              				se_lwz		r25,4(rsp)
+ 339              				se_lwz		r24,0(rsp)
+ 340              				se_addi		rsp,12
+ 341              				se_blr
+ 342              	
+ 343              	################################################################################
+ 344              	# set RED LED off and GREEN on
+ 345              	################################################################################
+ 346              	led_green:		e_stwu		rsp,-12(rsp)
+ 347              				se_stw		r24,0(rsp)
+ 348              				se_stw		r25,4(rsp)
+ 349              				se_stw		r28,8(rsp)
+ 350              				e_lis		r24,SIUL_BASE
+ 351              				e_li		r25,GPDO4
+ 352              				se_or		r25,r24
+ 353              				se_li		r28,0x00
+ 354              				se_stb		r28,0(r25)
+ 355              				se_li		r28,0x01
+ 356              				se_stb		r28,1(r25)
+ 357              				se_lwz		r28,8(rsp)
+ 358              				se_lwz		r25,4(rsp)
+GAS LISTING boot_40.vleasm 			page 20
+
+
+ 359              				se_lwz		r24,0(rsp)
+ 360              				se_addi		rsp,12
+ 361              				se_blr
+ 362              	.endif
+ 363              	
+ 364              	################################################################################
+ 365              	# send UART byte (r29)
+ 366              	################################################################################
+ 367 0316 182106F8 	uart_send:		e_stwu		rsp,-8(rsp)
+ 368 031a D081     				se_stw		r24,0(rsp)
+ 369 031c 57810004 				e_stw		r28,4(rsp)
+ 370 0320 731FE7E4 				e_lis		r24,LINFLEX0_BASE
+ 371 0324 57B80038 				e_stw		r29,LINFLEX0_BRDL(r24)
+ 372 0328 33980017 	uart_send_1:		e_lbz		r28,LINFLEX0_UARTSR+3(r24)
+ 373 032c 2E2C     				se_andi		r28,2
+ 374 032e 701C9802 				e_cmp16i	r28,2
+ 375 0332 E4FB     				se_blt		uart_send_1
+ 376 0334 482C     				se_li		r28,2
+ 377 0336 37980017 				e_stb		r28,LINFLEX0_UARTSR+3(r24)
+ 378 033a C081     				se_lwz		r24,0(rsp)
+ 379 033c C1C1     				se_lwz		r28,4(rsp)
+ 380 033e 2071     				se_addi		rsp,8
+ 381 0340 0004     				se_blr
+ 382              	
+ 383              	################################################################################
+ 384              	# receive UART byte (r29)
+ 385              	################################################################################
+ 386 0342 182106F8 	uart_recv:		e_stwu		rsp,-8(rsp)
+ 387 0346 D081     				se_stw		r24,0(rsp)
+ 388 0348 57810004 				e_stw		r28,4(rsp)
+ 389 034c 731FE7E4 				e_lis		r24,LINFLEX0_BASE
+ 390 0350 53980014 	uart_recv_1:		e_lwz		r28,LINFLEX0_UARTSR(r24)
+ 391 0354 2E4C     				se_andi		r28,4
+ 392 0356 701C9804 				e_cmp16i	r28,4
+ 393 035a E2FB     				se_bne		uart_recv_1
+ 394 035c 73800204 				e_li		r28,0x204
+ 395 0360 57980014 				e_stw		r28,LINFLEX0_UARTSR(r24)
+ 396 0364 53B8003C 				e_lwz		r29,LINFLEX0_BRDM(r24)
+ 397 0368 C081     				se_lwz		r24,0(rsp)
+ 398 036a C1C1     				se_lwz		r28,4(rsp)
+ 399 036c 2071     				se_addi		rsp,8
+ 400 036e 0004     				se_blr
+ 401              	
+ 402              	################################################################################
+ 403              	# wait1 n
+ 404              	################################################################################
+ 405 0370 182106FC 	wait1:			e_stwu		rsp,-4(rsp)
+ 406 0374 D081     				se_stw		r24,0(rsp)
+ 407 0376 73000000 				e_li		r24,0
+ 408 037a 1F180001 	wait1_2:		e_add16i	r24,r24,1
+ 409 037e 7018980A 				e_cmp16i	r24,10
+ 410 0382 E4FC     				se_blt		wait1_2
+ 411 0384 C081     				se_lwz		r24,0(rsp)
+ 412 0386 2031     				se_addi		rsp,4
+ 413 0388 0004     				se_blr
+ 414              	
+ 415              	
+GAS LISTING boot_40.vleasm 			page 21
+
+
+ 416              	################################################################################
+ 417              	# get a 32 bit value to R30
+ 418              	################################################################################
+ 419 038a 182106F8 	get_word:		e_stwu		rsp,-8(rsp)
+ 420 038e D061     				se_stw		r6,0(rsp)
+ 421 0390 D171     				se_stw		r7,4(rsp)
+ 422 0392 0083     				se_mflr		r3
+ 423 0394 480E     				se_li		r30,0			# initial value
+ 424 0396 70C000FF 				e_li		r6,0xff
+ 425 039a 4807     				se_li		r7,0
+ 426 039c E9D3     	get_word_1:		se_bl		uart_recv		# get addr byte
+ 427 039e 466D     				se_and		r29,r6			# limit to byte range
+ 428 03a0 6C8E     				se_slwi		r30,8			# shift left 8 bits
+ 429 03a2 04DE     				se_add		r30,r29			# add new byte
+ 430 03a4 1CE70001 				e_add16i	r7,r7,1			# loop counter + 1
+ 431 03a8 70079804 				e_cmp16i	r7,4			# all done?
+ 432 03ac E4F8     				se_blt		get_word_1		# branch if not
+ 433 03ae C171     				se_lwz		r7,4(rsp)
+ 434 03b0 C061     				se_lwz		r6,0(rsp)
+ 435 03b2 2071     				se_addi		rsp,8
+ 436 03b4 0093     				se_mtlr		r3
+ 437 03b6 0004     				se_blr
+ 438              	
+ 439              	
+ 440              	################################################################################
+ 441              	# enable main flash
+ 442              	################################################################################
+ 443 03b8 737FE7FC 	enable_main:		e_lis		r27,0xfffc		#unlock blocks in main flash
+ 444 03bc 70E00000 				e_li		r7,0x0000
+ 445 03c0 447B     				se_or		r27,r7
+ 446 03c2 D1BA     				se_stw		r27,4(r26)		# LML
+ 447 03c4 D3BA     				se_stw		r27,12(r26)		# SLL
+ 448              	
+ 449 03c6 7360E000 				e_lis		r27,0x0000		#unlock all blocks in main flash
+ 450 03ca 70E00000 				e_li		r7,0x0000
+ 451 03ce 447B     				se_or		r27,r7
+ 452 03d0 D2BA     				se_stw		r27,8(r26)		# HBL
+ 453              	
+ 454              	
+ 455 03d2 737FE7FF 				e_lis		r27,0xffff		#lock all blocks in data flash
+ 456 03d6 70FF07FF 				e_li		r7,0xffff
+ 457 03da 447B     				se_or		r27,r7
+ 458 03dc D1B9     				se_stw		r27,4(r25)		# LML
+ 459 03de D2B9     				se_stw		r27,8(r25)		# HBL
+ 460 03e0 D3B9     				se_stw		r27,12(r25)		# SLL
+ 461              	
+ 462 03e2 7360E003 				e_lis		r27,0x0003		# set LMS
+ 463 03e6 70FF07FF 				e_li		r7,0xffff
+ 464 03ea 447B     				se_or		r27,r7
+ 465 03ec D4BA     				se_stw		r27,0x10(r26)
+ 466              	
+ 467 03ee 70E0003F 				e_li		r7,0x003f		# set HBS
+ 468 03f2 D5BA     				se_stw		r27,0x14(r26)
+ 469              	
+ 470 03f4 70C0E000 				e_lis		r6,0x0000		#base address
+ 471 03f8 01AC     				se_mr		r28,r26			# set pointer
+ 472 03fa 0004     				se_blr
+GAS LISTING boot_40.vleasm 			page 22
+
+
+ 473              	
+ 474              	
+ 475              	################################################################################
+ 476              	# enable shadow flash
+ 477              	################################################################################
+ 478 03fc 737FE7EF 	enable_shadow:		e_lis		r27,shadow_unlock_hi	#unlock shadow block
+ 479 0400 70FF07FF 				e_li		r7,shadow_unlock_lo
+ 480 0404 447B     				se_or		r27,r7
+ 481 0406 D1BA     				se_stw		r27,4(r26)		# LML
+ 482 0408 D3BA     				se_stw		r27,12(r26)		# SLL
+ 483              	
+ 484 040a 737FE7FF 				e_lis		r27,0xffff		#lock all blocks in data flash
+ 485 040e 70FF07FF 				e_li		r7,0xffff
+ 486 0412 447B     				se_or		r27,r7
+ 487 0414 D1B9     				se_stw		r27,4(r25)		# LML
+ 488 0416 D2B9     				se_stw		r27,8(r25)		# HBL
+ 489 0418 D3B9     				se_stw		r27,12(r25)		# SLL
+ 490 041a D2BA     				se_stw		r27,8(r26)		# HBL (main)
+ 491              	
+ 492 041c 70C0E020 				e_lis		r6,0x0020		#base address
+ 493 0420 01AC     				se_mr		r28,r26			# set pointer
+ 494 0422 0004     				se_blr
+ 495              	
+ 496              	
+ 497              	################################################################################
+ 498              	# enable shadow flash
+ 499              	################################################################################
+ 500 0424 737FE7FF 	enable_dataflash:	e_lis		r27,0xffff		#lock shadow + main blocks
+ 501 0428 70FF07FF 				e_li		r7,0xffff
+ 502 042c 447B     				se_or		r27,r7
+ 503 042e D1BA     				se_stw		r27,4(r26)		# LML
+ 504 0430 D2BA     				se_stw		r27,8(r26)		# HBL
+ 505 0432 D3BA     				se_stw		r27,12(r26)		# SLL
+ 506              	
+ 507 0434 737FE7FF 				e_lis		r27,0xffff		# unlock all blocks in data flash
+ 508 0438 70E00000 				e_li		r7,0x0000
+ 509 043c 447B     				se_or		r27,r7
+ 510 043e D1B9     				se_stw		r27,4(r25)		# LML
+ 511 0440 D3B9     				se_stw		r27,12(r25)		# SLL
+ 512              	
+ 513 0442 7360E000 				e_lis		r27,0x0000		# unlock all blocks in data flash
+ 514 0446 70E0003F 				e_li		r7,0x003F
+ 515 044a 447B     				se_or		r27,r7
+ 516 044c D2B9     				se_stw		r27,8(r25)		# HBL
+ 517              	
+ 518 044e 7360E003 				e_lis		r27,0x0003		# set LMS
+ 519 0452 70FF07FF 				e_li		r7,0xffff
+ 520 0456 447B     				se_or		r27,r7
+ 521 0458 D4B9     				se_stw		r27,0x10(r25)
+ 522              	
+ 523 045a 70E0003F 				e_li		r7,0x003f		# set HBS
+ 524 045e D5B9     				se_stw		r27,0x14(r25)
+ 525              	
+ 526 0460 70C0E080 				e_lis		r6,0x0080		# base address
+ 527 0464 019C     				se_mr		r28,r25			# set pointer
+ 528 0466 0004     				se_blr
+ 529              	
+GAS LISTING boot_40.vleasm 			page 23
+
+
+ 530              	
+ 531              	################################################################################
+ 532              	# disbale all flash
+ 533              	################################################################################
+ 534 0468 737FE7FF 	enable_none:		e_lis		r27,0xffff		# lock all blocks
+ 535 046c 70FF07FF 				e_li		r7,0xffff
+ 536 0470 447B     				se_or		r27,r7
+ 537 0472 D1BA     				se_stw		r27,4(r26)		# LML
+ 538 0474 D2BA     				se_stw		r27,8(r26)		# HBL
+ 539 0476 D3BA     				se_stw		r27,12(r26)		# SLL
+ 540 0478 D1B9     				se_stw		r27,4(r25)		# LML
+ 541 047a D2B9     				se_stw		r27,8(r25)		# HBL
+ 542 047c D3B9     				se_stw		r27,12(r25)		# SLL
+ 543              	
+ 544 047e 70C0E080 				e_lis		r6,0x0080		# base address
+ 545 0482 019C     				se_mr		r28,r25			# set pointer
+ 546 0484 0004     				se_blr
+ 547              	

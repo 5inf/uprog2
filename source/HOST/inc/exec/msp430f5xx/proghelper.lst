@@ -1,0 +1,458 @@
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 1 - 9/15/2017 7:42:24
+
+
+       1/       0 :                     ;################################################################################
+       2/       0 :                     ;#										#
+       3/       0 :                     ;# JTAG-Proghelper fÃ¼r MSP430F5xxx						#
+       4/       0 :                     ;#										#
+       5/       0 :                     ;# copyright (c) 2017 Joerg Wolfram (joerg@jcwolfram.de)			#
+       6/       0 :                     ;#										#
+       7/       0 :                     ;#										#
+       8/       0 :                     ;# This program is free software; you can redistribute it and/or		#
+       9/       0 :                     ;# modify it under the terms of the GNU General Public License			#
+      10/       0 :                     ;# as published by the Free Software Foundation; either version 2		#
+      11/       0 :                     ;# of the License, or (at your option) any later version.			#
+      12/       0 :                     ;#										#
+      13/       0 :                     ;# This program is distributed in the hope that it will be useful,		#
+      14/       0 :                     ;# but WITHOUT ANY WARRANTY; without even the implied warranty of		#
+      15/       0 :                     ;# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU		#
+      16/       0 :                     ;# General Public License for more details.					#
+      17/       0 :                     ;#										#
+      18/       0 :                     ;# You should have received a copy of the GNU General Public			#
+      19/       0 :                     ;# License along with this library; if not, write to the			#
+      20/       0 :                     ;# Free Software Foundation, Inc., 59 Temple Place - Suite 330,			#
+      21/       0 :                     ;# Boston, MA 02111-1307, USA.							#
+      22/       0 :                     ;#										#
+      23/       0 :                     ;################################################################################
+      24/       0 :                     ;-------------------------------------------------------------------------------
+      25/       0 :                     ; commands
+      26/       0 :                     ; --------
+      27/       0 :                     ; A153		addr		command			erase
+      28/       0 :                     ; A152		addr		len(words)		program
+      29/       0 :                     ; A151		addr		len(words)		readout
+      30/       0 :                     ; A161		7955					protect BSL
+      31/       0 :                     
+      32/       0 :                     		cpu msp430
+      33/       0 :                     		include	regmsp.inc
+(1)    1/       0 :                                     save
+(1)  562/       0 :                     		restore                 ; wieder erlauben
+(1)  563/       0 :                     
+      34/       0 :                     
+      35/       0 :                     ;-------------------------------------------------------------------------------
+      36/       0 :                     ; I/O settings
+      37/       0 :                     ;-------------------------------------------------------------------------------
+      38/       0 : =1C00H              RAM_START	equ	01c00H
+      39/       0 : =C000H              FLASH_START	equ	0c000H
+      40/       0 : =2000H              FLASH_WORDS	equ	02000H
+      41/       0 : =1800H              INFO_START	equ	01800H
+      42/       0 :                     
+      43/       0 : =140H               FCTL1X		equ	00140H
+      44/       0 : =144H               FCTL3X		equ	00144H
+      45/       0 : =146H               FCTL4X		equ	00146H
+      46/       0 : =120H               PMMCTL0X	equ	00120H
+      47/       0 : =182H               SYSBSLCX	equ	00182H
+      48/       0 : =186H               SYSJMBC		equ	00186H
+      49/       0 : =188H               SYSJMBI0	equ	00188H
+      50/       0 : =18CH               SYSJMBO0	equ	0018CH
+      51/       0 :                     
+      52/       0 :                     ;SYSJMBC
+      53/       0 : =4H                 JMB0_OUTFLAG	equ	004H		;1 = ready to write
+      54/       0 : =1H                 JMB0_INFLAG	equ	001H		;1 = ready to read
+      55/       0 :                     
+      56/       0 :                     ;-------------------------------------------------------------------------------
+      57/       0 :                     ; code starts here
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 2 - 9/15/2017 7:42:24
+
+
+      58/       0 :                     ;-------------------------------------------------------------------------------
+      59/    1C00 :                     		org	RAM_START		;RAM start
+      60/    1C00 : (MACRO)             start:		nop
+      60/    1C00 : 4303                                .word   04303h         ; den symbolischen Befehl würde AS zurückweisen
+      61/    1C02 : (MACRO)             		nop
+      61/    1C02 : 4303                                .word   04303h         ; den symbolischen Befehl würde AS zurückweisen
+      62/    1C04 :                     		;we dont need to disable watchdog, this is done by SBW-WRITEIO
+      63/    1C04 : 40B2 5A80 0158      		mov.w	#05a80H,&0158H		;disable watchdog
+      64/    1C0A :                     
+      65/    1C0A : 4031 1EFF           start1:		mov.w	#01effH,sp		;set stack pointer to end of RAM
+      66/    1C0E :                     
+      67/    1C0E :                     		;unlock INFO A segment
+      68/    1C0E : 40B2 A500 0146      		mov.w	#0a500H,&FCTL4X
+      69/    1C14 : B0B2 0040 0144      		bit	#040H,&FCTL3X		;check locka
+      70/    1C1A : 2403                		jz	unlock_1
+      71/    1C1C : 40B2 A540 0144      		mov.w	#0a540H,&FCTL3X
+      72/    1C22 :                     
+      73/    1C22 :                     unlock_1:
+      74/    1C22 :                     
+      75/    1C22 :                     ;-------------------------------------------------------------------------------
+      76/    1C22 :                     ; the main loop
+      77/    1C22 :                     ;-------------------------------------------------------------------------------
+      78/    1C22 : 4037 ABCD           loop:		mov	#0ABCDH,r7
+      79/    1C26 : 1290 00F4           		call	put_word		;write 0xABCD in mailbox
+      80/    1C2A : 1290 00E4           		call	get_word		;get word from spx
+      81/    1C2E :                     
+      82/    1C2E :                     ;-------------------------------------------------------------------------------
+      83/    1C2E :                     ; erase flash segments
+      84/    1C2E :                     ; W0	0x7853
+      85/    1C2E :                     ; W1	Address
+      86/    1C2E :                     ; W2	type (0x502 segment, 0x504 sector)
+      87/    1C2E :                     ;-------------------------------------------------------------------------------
+      88/    1C2E : 9037 A153           erase:		cmp.w	#0A153H,r7
+      89/    1C32 : 2016                		jnz	program
+      90/    1C34 : 1290 00DA           		call	get_word		;get address
+      91/    1C38 : 4706                		mov.w	r7,r6			;addr
+      92/    1C3A : 1290 00D4           		call	get_word		;get command
+      93/    1C3E :                     
+      94/    1C3E : B3D2 0144           erase_w0:	bit.b	#1,&FCTL3X
+      95/    1C42 : 23FD                		jnz	erase_w0
+      96/    1C44 : 40B2 A500 0144      		mov.w	#0a500H,&FCTL3X		;unlock
+      97/    1C4A : 4582 0140           		mov.w	r5,&FCTL1X		;erase command
+      98/    1C4E : 4786 0000           		mov.w	r7,0(r6)		;dummy write
+      99/    1C52 : B3D2 0144           erase_w1:	bit.b	#1,&FCTL3X		;wait for ready
+     100/    1C56 : 23FD                		jnz	erase_w1
+     101/    1C58 : 40B2 A510 0144      erae_goloop:	mov.w	#0a510H,&FCTL3X		;lock
+     102/    1C5E : 3FE1                		jmp	loop			;jump to main loop
+     103/    1C60 :                     
+     104/    1C60 :                     ;-------------------------------------------------------------------------------
+     105/    1C60 :                     ; program main flash
+     106/    1C60 :                     ; W0 = 0x7852
+     107/    1C60 :                     ; W1 = address
+     108/    1C60 :                     ; W2 = length (words)
+     109/    1C60 :                     ; W3+ data
+     110/    1C60 :                     ;-------------------------------------------------------------------------------
+     111/    1C60 : 9037 A152           program:	cmp.w	#0A152H,r7
+     112/    1C64 : 201D                		jnz	readout
+     113/    1C66 : 1290 00A8           		call	get_word		;get address
+     114/    1C6A : 4706                		mov.w	r7,r6			;flash start address
+     115/    1C6C : 1290 00A2           		call	get_word		;get length
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 3 - 9/15/2017 7:42:24
+
+
+     116/    1C70 : 4705                		mov.w	r7,r5			;flash words
+     117/    1C72 :                     prog_loop:
+     118/    1C72 : B3D2 0144           prog_w1:	bit.b	#1,&FCTL3X		;wait for ready
+     119/    1C76 : 23FD                		jnz	prog_w1
+     120/    1C78 :                     		; write flash word, r6=pointer, r7=data
+     121/    1C78 : 40B2 A500 0144      		mov.w	#0a500H,&FCTL3X		;unlock
+     122/    1C7E : 40B2 A540 0140      		mov.w	#0a540H,&FCTL1X		;WRT = 1
+     123/    1C84 : 1290 008A           		call	get_word		;get Word to r7
+     124/    1C88 : 4786 0000           		mov.w	r7,0(r6)		;dummy write
+     125/    1C8C : B3D2 0144           prog_w2:	bit.b	#1,&FCTL3X		;wait for ready
+     126/    1C90 : 23FD                		jnz	prog_w2
+     127/    1C92 : 40B2 A510 0144      		mov.w	#0a510H,&FCTL3X		;lock
+     128/    1C98 : 5326                		add	#2,r6			;increment address
+     129/    1C9A : 8315                		sub.w	#1,r5			;decrement loop counter
+     130/    1C9C : 23EA                		jnz	prog_loop		;do the word loop
+     131/    1C9E : 3FC1                		jmp	loop			;jump to main loop
+     132/    1CA0 :                     
+     133/    1CA0 :                     ;-------------------------------------------------------------------------------
+     134/    1CA0 :                     ; readout main flash
+     135/    1CA0 :                     ; W0 = 0x7851
+     136/    1CA0 :                     ; W1 = address
+     137/    1CA0 :                     ; W2 = length (words)
+     138/    1CA0 :                     ; W3+ data
+     139/    1CA0 :                     ;-------------------------------------------------------------------------------
+     140/    1CA0 : 9037 A151           readout:	cmp.w	#0A151H,r7
+     141/    1CA4 : 200D                		jnz	bsl_protect
+     142/    1CA6 : 1290 0068           		call	get_word		;get address
+     143/    1CAA : 4706                		mov.w	r7,r6			;flash start address
+     144/    1CAC : 1290 0062           		call	get_word		;get address
+     145/    1CB0 : 4705                		mov.w	r7,r5			;flash words
+     146/    1CB2 :                     
+     147/    1CB2 : 4627                read_loop:	mov.w	0(r6),r7		;read
+     148/    1CB4 : 1290 0066           		call	put_word		;send via spx
+     149/    1CB8 : 5326                		add	#2,r6			;increment address
+     150/    1CBA : 8315                		sub	#1,r5			;loop counter
+     151/    1CBC : 23FA                		jnz	read_loop		;do the loop
+     152/    1CBE : 3FB1                		jmp	loop
+     153/    1CC0 :                     
+     154/    1CC0 :                     ;-------------------------------------------------------------------------------
+     155/    1CC0 :                     ; unprotect and protect BSL memeory area
+     156/    1CC0 :                     ;-------------------------------------------------------------------------------
+     157/    1CC0 : 9037 A161           bsl_protect:	cmp.w	#0A161H,r7
+     158/    1CC4 : 2024                		jnz	bsl_nofu
+     159/    1CC6 : 1290 0048           		call	get_word
+     160/    1CCA : 9037 7955           		cmp.w	#07955H,r7		;this is for security
+     161/    1CCE : 201F                		jnz	bsl_nofu
+     162/    1CD0 : 40B2 0003 0182      		mov.w	#00003,&SYSBSLCX
+     163/    1CD6 : 4036 17FC           		mov.w	#017FCH,r6
+     164/    1CDA : 4037 5555           		mov.w	#05555H,r7
+     165/    1CDE : 4325                		mov.w	#2,r5
+     166/    1CE0 :                     
+     167/    1CE0 : B3D2 0144           prot_loop:	bit.b	#1,&FCTL3X		;wait for ready
+     168/    1CE4 : 23FD                		jnz	prot_loop
+     169/    1CE6 :                     		; write flash word, r6=pointer, r7=data
+     170/    1CE6 : 40B2 A500 0144      		mov.w	#0a500H,&FCTL3X		;unlock
+     171/    1CEC : 40B2 A540 0140      		mov.w	#0a540H,&FCTL1X		;WRT = 1
+     172/    1CF2 : 4786 0000           		mov.w	r7,0(r6)		;dummy write
+     173/    1CF6 : B3D2 0144           prot_w2:	bit.b	#1,&FCTL3X		;wait for ready
+     174/    1CFA : 23FD                		jnz	prot_w2
+     175/    1CFC : 40B2 A510 0144      		mov.w	#0a510H,&FCTL3X		;lock
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 4 - 9/15/2017 7:42:24
+
+
+     176/    1D02 : 5326                		add	#2,r6			;increment address
+     177/    1D04 : 8315                		sub.w	#1,r5			;decrement loop counter
+     178/    1D06 : 23EC                		jnz	prot_loop		;do the word loop
+     179/    1D08 : 40B2 1F43 0182      		mov.w	#08003,&SYSBSLCX
+     180/    1D0E :                     
+     181/    1D0E : 3F89                bsl_nofu:	jmp	loop			;jump to main loop
+     182/    1D10 :                     
+     183/    1D10 :                     
+     184/    1D10 :                     ;-------------------------------------------------------------------------------
+     185/    1D10 :                     ; get a word (r7) msb first
+     186/    1D10 :                     ;-------------------------------------------------------------------------------
+     187/    1D10 : B3D0 E474           get_word:	bit.b	#JMB0_INFLAG,SYSJMBC		
+     188/    1D14 : 27FD                		jz	get_word
+     189/    1D16 :                     		
+     190/    1D16 : 4017 E470           		mov.w	SYSJMBI0,r7		
+     191/    1D1A : (MACRO)             		ret
+     191/    1D1A : 4130                                mov     @sp+,pc
+     192/    1D1C :                     
+     193/    1D1C :                     ;-------------------------------------------------------------------------------
+     194/    1D1C :                     ; put a word (r7) msb first
+     195/    1D1C :                     ;-------------------------------------------------------------------------------
+     196/    1D1C : B2E0 E468           put_word:	bit.b	#JMB0_OUTFLAG,SYSJMBC		
+     197/    1D20 : 27FD                		jz	put_word
+     198/    1D22 :                     	
+     199/    1D22 : 4780 E468           		mov.w	r7,SYSJMBO0		
+     200/    1D26 : (MACRO)             		ret
+     200/    1D26 : 4130                                mov     @sp+,pc
+     201/    1D28 :                     end
+     202/    1D28 :                     
+     203/    1D28 :                     
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 5 - 9/15/2017 7:42:24
+
+
+  symbol table (* = unused):
+  ------------------------
+
+*ACCVIE :                        20 - | *ACTL :                         114 - |
+*ADAT :                         118 - | *ADC12CTL0 :                    1A0 - |
+*ADC12CTL1 :                    1A2 - | *ADC12FG :                      1A4 - |
+*ADC12IE :                      1A6 - | *ADC12MCTL0 :                    80 - |
+*ADC12MCTL1 :                    81 - | *ADC12MCTL10 :                   8A - |
+*ADC12MCTL11 :                   8B - | *ADC12MCTL12 :                   8C - |
+*ADC12MCTL13 :                   8D - | *ADC12MCTL14 :                   8E - |
+*ADC12MCTL15 :                   8F - | *ADC12MCTL2 :                    82 - |
+*ADC12MCTL3 :                    83 - | *ADC12MCTL4 :                    84 - |
+*ADC12MCTL5 :                    85 - | *ADC12MCTL6 :                    86 - |
+*ADC12MCTL7 :                    87 - | *ADC12MCTL8 :                    88 - |
+*ADC12MCTL9 :                    89 - | *ADC12MEM0 :                    140 - |
+*ADC12MEM1 :                    142 - | *ADC12MEM10 :                   154 - |
+*ADC12MEM11 :                   156 - | *ADC12MEM12 :                   158 - |
+*ADC12MEM13 :                   15A - | *ADC12MEM14 :                   15C - |
+*ADC12MEM15 :                   15E - | *ADC12MEM2 :                    144 - |
+*ADC12MEM3 :                    146 - | *ADC12MEM4 :                    148 - |
+*ADC12MEM5 :                    14A - | *ADC12MEM6 :                    14C - |
+*ADC12MEM7 :                    14E - | *ADC12MEM8 :                    150 - |
+*ADC12MEM9 :                    152 - | *AEN :                          112 - |
+*AIN :                          110 - | *ARCHITECTURE :  i386-unknown-linux - |
+*BCSCTL1 :                       57 - | *BCSCTL2 :                       58 - |
+*BIGENDIAN :                      0 - | *BRANCHEXT :                      0 - |
+*BRK :                           10 - |  BSL_NOFU :                    1D0E C |
+ BSL_PROTECT :                 1CC0 C | *BTCNT1 :                        46 - |
+*BTCNT2 :                        47 - | *BTCTL :                         40 - |
+*CACTL1 :                        59 - | *CACTL2 :                        5A - |
+*CAPD :                          5B - | *CASESENSITIVE :                  0 - |
+*CBCTL :                         53 - | *CCR0 :                         172 - |
+*CCR1 :                         174 - | *CCR2 :                         176 - |
+*CCR3 :                         178 - | *CCR4 :                         17A - |
+*CCTL0 :                        162 - | *CCTL1 :                        164 - |
+*CCTL2 :                        166 - | *CCTL3 :                        168 - |
+*CCTL4 :                        16A - | *CHAR :                          10 - |
+*CKPL :                          40 - | *CONSTPI :        3.141592653589793 - |
+*CPUOFF :                        10 - | *DATE :                   9/15/2017 - |
+*DCO0 :                          20 - | *DCO1 :                          40 - |
+*DCO2 :                          80 - | *DCOCTL :                        56 - |
+*DCOR :                           1 - | *DIVA0 :                         10 - |
+*DIVA1 :                         20 - | *DIVM0 :                         10 - |
+*DIVM1 :                         20 - | *DIVS0 :                          2 - |
+*DIVS1 :                          4 - | *END :                         1D28 C |
+*EPCTL :                         54 - | *ERAE_GOLOOP :                 1C58 C |
+*ERASE :                       1C2E C |  ERASE_W0 :                    1C3E C |
+ ERASE_W1 :                    1C52 C | *FALSE :                          0 - |
+*FCTL1 :                        128 - |  FCTL1X :                       140 - |
+*FCTL2 :                        12A - | *FCTL3 :                        12C - |
+ FCTL3X :                       144 - |  FCTL4X :                       146 - |
+*FE :                            80 - | *FLASH_START :                 C000 - |
+*FLASH_WORDS :                 2000 - | *FULLPMMU :                       1 - |
+ GET_WORD :                    1D10 C | *GIE :                            8 - |
+*HAS64 :                          1 - | *HASDSP :                         0 - |
+*HASFPU :                         0 - | *HASPMMU :                        0 - |
+*IE1 :                            0 - | *IE2 :                            1 - |
+*IFG1 :                           2 - | *IFG2 :                           3 - |
+*INEXTMODE :                      0 - | *INFO_START :                  1800 - |
+*INLWORDMODE :                    0 - | *INMAXMODE :                      0 - |
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 6 - 9/15/2017 7:42:24
+
+
+*INSRCMODE :                      0 - | *INSUPMODE :                      0 - |
+ JMB0_INFLAG :                    1 - |  JMB0_OUTFLAG :                   4 - |
+*LCD1 :                          31 - | *LCD10 :                         3A - |
+*LCD11 :                         3B - | *LCD12 :                         3C - |
+*LCD13 :                         3D - | *LCD14 :                         3E - |
+*LCD15 :                         3F - | *LCD2 :                          32 - |
+*LCD3 :                          33 - | *LCD4 :                          34 - |
+*LCD5 :                          35 - | *LCD6 :                          36 - |
+*LCD7 :                          37 - | *LCD8 :                          38 - |
+*LCD9 :                          39 - |  LCDC :                          90 - |
+*LCDCTL :                        30 - | *LCDMEMORY1 :                    91 - |
+*LCDMEMORY10 :                   A0 - | *LCDMEMORY11 :                   A1 - |
+*LCDMEMORY12 :                   A2 - | *LCDMEMORY13 :                   A3 - |
+*LCDMEMORY2 :                    92 - | *LCDMEMORY3 :                    93 - |
+*LCDMEMORY4 :                    94 - | *LCDMEMORY5 :                    95 - |
+*LCDMEMORY6 :                    96 - | *LCDMEMORY7 :                    97 - |
+*LCDMEMORY8 :                    98 - | *LCDMEMORY9 :                    99 - |
+*LCDMEMORYA :                    9A - | *LCDMEMORYB :                    9B - |
+*LCDMEMORYC :                    9C - | *LCDMEMORYD :                    9D - |
+*LCDMEMORYE :                    9E - | *LCDMEMORYF :                    9F - |
+*LCD_START :                     31 - | *LCD_STOP :                      3F - |
+*LISTEN :                         8 - | *LISTON :                         1 - |
+ LOOP :                        1C22 C | *MAC :                          134 - |
+*MACEXP :                         1 - | *MACS :                         136 - |
+*ME1 :                            4 - | *ME2 :                            5 - |
+*MM :                             2 - | *MOD0 :                           1 - |
+*MOD1 :                           2 - | *MOD2 :                           4 - |
+*MOD3 :                           8 - | *MOD4 :                          10 - |
+*MOMCPU :                       430 - |  MOMCPUNAME :                MSP430 - |
+*MPY :                          130 - | *MPYS :                         132 - |
+*NESTMAX :                      100 - | *NMIIE :                         10 - |
+*NMIIFG :                        10 - | *OE :                            20 - |
+*OFIE :                           2 - | *OFIFG :                          2 - |
+*OP2 :                          138 - | *OSCOFF :                        20 - |
+*P0DIR :                         12 - | *P0IE :                          15 - |
+*P0IES :                         14 - | *P0IFG :                         13 - |
+*P0IN :                          10 - | *P0OUT :                         11 - |
+*P1DIR :                         22 - | *P1IE :                          25 - |
+*P1IES :                         24 - | *P1IFG :                         23 - |
+*P1IN :                          20 - | *P1OUT :                         21 - |
+*P1SEL :                         26 - | *P2DIR :                         2A - |
+*P2IE :                          2D - | *P2IES :                         2C - |
+*P2IFG :                         2B - | *P2IN :                          28 - |
+*P2OUT :                         29 - | *P2SEL :                         2E - |
+*P3DIR :                         1A - | *P3IN :                          18 - |
+*P3OUT :                         19 - | *P3SEL :                         1B - |
+*P4DIR :                         1E - | *P4IN :                          1C - |
+*P4OUT :                         1D - | *P4SEL :                         1F - |
+*P5DIR :                         32 - | *P5IN :                          30 - |
+*P5OUT :                         31 - | *P5SEL :                         33 - |
+*P6DIR :                         36 - | *P6IN :                          34 - |
+*P6OUT :                         35 - | *P6SEL :                         37 - |
+*PACKING :                        0 - | *PADDING :                        1 - |
+*PE :                            40 - | *PENA :                          80 - |
+*PEV :                           40 - | *PMMCTL0X :                     120 - |
+*PORIFG :                         4 - |  PROGRAM :                     1C60 C |
+ PROG_LOOP :                   1C72 C |  PROG_W1 :                     1C72 C |
+ PROG_W2 :                     1C8C C |  PROT_LOOP :                   1CE0 C |
+ PROT_W2 :                     1CF6 C |  PUT_WORD :                    1D1C C |
+*PWMCNT :                        5B - | *PWMCTL :                        58 - |
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 7 - 9/15/2017 7:42:24
+
+
+*PWMDTB :                        59 - | *PWMDTR :                        5A - |
+ RAM_START :                   1C00 - |  READOUT :                     1CA0 C |
+ READ_LOOP :                   1CB2 C | *REGMSPINC :                      1 - |
+*RELAXED :                        0 - | *RESHI :                        13C - |
+*RESLO :                        13A - | *RSEL0 :                          1 - |
+*RSEL1 :                          2 - | *RSEL2 :                          4 - |
+*RSEL_0 :                         0 - | *RSEL_1 :                         1 - |
+*RSEL_2 :                         2 - | *RSEL_3 :                         3 - |
+*RSEL_4 :                         4 - | *RSEL_5 :                         5 - |
+*RSEL_6 :                         6 - | *RSEL_7 :                         7 - |
+*RSTIFG :                         8 - | *RXERR :                          1 - |
+*RXWAKE :                         2 - | *SCFI0 :                         50 - |
+*SCFI1 :                         51 - | *SCFQCTL :                       52 - |
+*SCG0 :                          40 - | *SCG1 :                          80 - |
+*SELM0 :                         40 - | *SELM1 :                         80 - |
+*SELM_0 :                         0 - | *SELM_1 :                        40 - |
+*SELM_2 :                        80 - | *SELM_3 :                        C0 - |
+*SELS :                           8 - | *SPB :                           20 - |
+*SSEL0 :                         10 - | *SSEL1 :                         20 - |
+*START :                       1C00 C | *START1 :                      1C0A C |
+*SUMEXT :                       13E - | *SWRST :                          1 - |
+*SYNC :                           4 - |  SYSBSLCX :                     182 - |
+ SYSJMBC :                      186 - |  SYSJMBI0 :                     188 - |
+ SYSJMBO0 :                     18C - | *TACTL :                        160 - |
+*TAIV :                         12E - | *TAR :                          170 - |
+*TBCCR0 :                       192 - | *TBCCR1 :                       194 - |
+*TBCCR2 :                       196 - | *TBCCR3 :                       198 - |
+*TBCCR4 :                       19A - | *TBCCR5 :                       19C - |
+*TBCCR6 :                       19E - | *TBCCTL0 :                      182 - |
+*TBCCTL1 :                      184 - | *TBCCTL2 :                      186 - |
+*TBCCTL3 :                      188 - | *TBCCTL4 :                      18A - |
+*TBCCTL5 :                      18C - | *TBCCTL6 :                      18E - |
+*TBCTL :                        180 - | *TBIV :                         11E - |
+*TBR :                          190 - | *TCCTL :                         42 - |
+*TCDAT :                         44 - | *TCPLD :                         43 - |
+*TIME :                     7:42:24 - | *TPCNT1 :                        4C - |
+*TPCNT2 :                        4D - | *TPCTL :                         4B - |
+*TPD :                           4E - | *TPE :                           4F - |
+*TRUE :                           1 - | *TXEPT :                          1 - |
+*TXWAKE :                         4 - | *U0BR0 :                         74 - |
+*U0BR1 :                         75 - | *U0CTL :                         70 - |
+*U0MCTL :                        73 - | *U0RCTL :                        72 - |
+*U0RXBUF :                       76 - | *U0TCTL :                        71 - |
+*U0TXBUF :                       77 - | *U1BR0 :                         7C - |
+*U1BR1 :                         7D - | *U1CTL :                         78 - |
+*U1MCTL :                        7B - | *U1RCTL :                        7A - |
+*U1RXBUF :                       7E - | *U1TCTL :                        79 - |
+*U1TXBUF :                       7F - |  UNLOCK_1 :                    1C22 C |
+*URXE0 :                          1 - | *URXEIE :                         8 - |
+*URXIE0 :                         1 - | *URXIFG0 :                        1 - |
+*URXSE :                          8 - | *URXWIE :                         4 - |
+*USPIE0 :                         1 - | *UTXE0 :                          2 - |
+*UTXIE0 :                         2 - | *UTXIFG0 :                        2 - |
+*VERSION :                     142F - | *WDTCNTCL :                       8 - |
+*WDTCTL :                       120 - | *WDTHOLD :                       80 - |
+*WDTIE :                          1 - | *WDTIFG :                         1 - |
+*WDTIS0 :                         1 - | *WDTIS1 :                         2 - |
+*WDTNMI :                        20 - | *WDTNMIES :                      40 - |
+*WDTSSEL :                        4 - | *WDTTMSEL :                      10 - |
+*XT2OFF :                        80 - | *XT5V :                           8 - |
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 8 - 9/15/2017 7:42:24
+
+
+*XTS :                           40 - |  __TMP :                         14 - |
+
+    356 symbols
+    327 unused symbols
+
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 9 - 9/15/2017 7:42:24
+
+
+  defined macros:
+  ---------------
+
+ADC                                   | BR                                   
+CLR                                   | CLRC                                 
+CLRN                                  | CLRZ                                 
+DADC                                  | DEC                                  
+DECD                                  | DINT                                 
+EINT                                  | INC                                  
+INCD                                  | INV                                  
+JEQ                                   | JHS                                  
+JLO                                   | NOP                                  
+POP                                   | RET                                  
+RLA                                   | RLC                                  
+SBC                                   | SETC                                 
+SETN                                  | SETZ                                 
+TST                                   |
+
+     27 macros
+
+ AS V1.42 Beta [Bld 86] - source file proghelper.asm - page 10 - 9/15/2017 7:42:24
+
+
+  codepages:
+  ----------
+
+STANDARD (0 changed characters)
+
+
+0.02 seconds assembly time
+
+    766 lines source file
+    838 lines incl. macro expansions
+      2 passes
+      0 errors
+      0 warnings

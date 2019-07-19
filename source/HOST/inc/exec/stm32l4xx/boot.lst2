@@ -1,0 +1,192 @@
+
+a.out:     file format elf32-littlearm
+a.out
+architecture: armv4t, flags 0x00000010:
+HAS_SYMS
+start address 0x00000000
+private flags = 5000000: [Version5 EABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000cc  00000000  00000000  00000034  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00000000  00000000  00000100  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000000  00000000  00000000  00000100  2**0
+                  ALLOC
+  3 .ARM.attributes 00000014  00000000  00000000  00000100  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+00000000 l    d  .text	00000000 .text
+00000000 l    d  .data	00000000 .data
+00000000 l    d  .bss	00000000 .bss
+40022000 l       *ABS*	00000000 FLASH_BASE
+00000000 l       *ABS*	00000000 FLASH_ACR
+00000004 l       *ABS*	00000000 FLASH_PDKEYR
+00000008 l       *ABS*	00000000 FLASH_KEYR
+0000000c l       *ABS*	00000000 FLASH_OPTKEYR
+00000010 l       *ABS*	00000000 FLASH_SR
+00000014 l       *ABS*	00000000 FLASH_CR
+00000018 l       *ABS*	00000000 FLASH_ECCR
+00000020 l       *ABS*	00000000 FLASH_OPTR
+00000024 l       *ABS*	00000000 FLASH_PCROP1SR
+00000028 l       *ABS*	00000000 FLASH_PCROP1ER
+0000002c l       *ABS*	00000000 FLASH_WRP1AR
+00000030 l       *ABS*	00000000 FLASH_WRP1BR
+00000044 l       *ABS*	00000000 FLASH_PCROP2SR
+00000048 l       *ABS*	00000000 FLASH_PCROP2ER
+0000004c l       *ABS*	00000000 FLASH_WRP2AR
+00000050 l       *ABS*	00000000 FLASH_WRP2BR
+40021000 l       *ABS*	00000000 RCC_BASE
+0000004c l       *ABS*	00000000 RCC_AHB2ENR
+48000800 l       *ABS*	00000000 PORTC_BASE
+00000000 l       *ABS*	00000000 PORTC_MODER
+00000010 l       *ABS*	00000000 PORTC_IDR
+00000014 l       *ABS*	00000000 PORTC_ODR
+00000000 l       .text	00000000 reset_vector
+00000008 l       .text	00000000 main_start
+00000008 l       .text	00000000 main_loop
+0000000e l       .text	00000000 main_loop_wait
+00000030 l       .text	00000000 prog_flash
+00000028 l       .text	00000000 tloop
+0000002a l       .text	00000000 x_prog_opt
+0000005a l       .text	00000000 prog_opt
+0000002e l       .text	00000000 opt_erase
+00000082 l       .text	00000000 main_unlock
+0000003c l       .text	00000000 prog_flash_1
+0000004a l       .text	00000000 prog_flash_3
+00000050 l       .text	00000000 prog_flash_4
+0000006a l       .text	00000000 prog_opt_1
+0000007a l       .text	00000000 prog_opt_3
+00000096 l       .text	00000000 main_unlock_1
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+
+
+
+Disassembly of section .text:
+
+00000000 <reset_vector>:
+   0:	20008000 	andcs	r8, r0, r0
+   4:	20000009 	andcs	r0, r0, r9
+
+00000008 <main_loop>:
+   8:	4924      	ldr	r1, [pc, #144]	; (9c <main_unlock_1+0x6>)
+   a:	2200      	movs	r2, #0
+   c:	600a      	str	r2, [r1, #0]
+
+0000000e <main_loop_wait>:
+   e:	6808      	ldr	r0, [r1, #0]
+  10:	4290      	cmp	r0, r2
+  12:	d0fc      	beq.n	e <main_loop_wait>
+  14:	4c22      	ldr	r4, [pc, #136]	; (a0 <main_unlock_1+0xa>)
+  16:	1c07      	adds	r7, r0, #0
+  18:	4a22      	ldr	r2, [pc, #136]	; (a4 <main_unlock_1+0xe>)
+  1a:	4017      	ands	r7, r2
+  1c:	22ff      	movs	r2, #255	; 0xff
+  1e:	4010      	ands	r0, r2
+  20:	2852      	cmp	r0, #82	; 0x52
+  22:	d005      	beq.n	30 <prog_flash>
+  24:	2872      	cmp	r0, #114	; 0x72
+  26:	2873      	cmp	r0, #115	; 0x73
+
+00000028 <tloop>:
+  28:	e7ee      	b.n	8 <main_loop>
+
+0000002a <x_prog_opt>:
+  2a:	e016      	b.n	5a <prog_opt>
+  2c:	e7ec      	b.n	8 <main_loop>
+
+0000002e <opt_erase>:
+  2e:	e7eb      	b.n	8 <main_loop>
+
+00000030 <prog_flash>:
+  30:	f000 f827 	bl	82 <main_unlock>
+  34:	491c      	ldr	r1, [pc, #112]	; (a8 <main_unlock_1+0x12>)
+  36:	4e1d      	ldr	r6, [pc, #116]	; (ac <main_unlock_1+0x16>)
+  38:	2201      	movs	r2, #1
+  3a:	6162      	str	r2, [r4, #20]
+
+0000003c <prog_flash_1>:
+  3c:	6808      	ldr	r0, [r1, #0]
+  3e:	6038      	str	r0, [r7, #0]
+  40:	3704      	adds	r7, #4
+  42:	3104      	adds	r1, #4
+  44:	6808      	ldr	r0, [r1, #0]
+  46:	6038      	str	r0, [r7, #0]
+  48:	4b19      	ldr	r3, [pc, #100]	; (b0 <main_unlock_1+0x1a>)
+
+0000004a <prog_flash_3>:
+  4a:	6922      	ldr	r2, [r4, #16]
+  4c:	421a      	tst	r2, r3
+  4e:	d1fc      	bne.n	4a <prog_flash_3>
+
+00000050 <prog_flash_4>:
+  50:	3704      	adds	r7, #4
+  52:	3104      	adds	r1, #4
+  54:	3e01      	subs	r6, #1
+  56:	d1f1      	bne.n	3c <prog_flash_1>
+  58:	e7d6      	b.n	8 <main_loop>
+
+0000005a <prog_opt>:
+  5a:	4a16      	ldr	r2, [pc, #88]	; (b4 <main_unlock_1+0x1e>)
+  5c:	4b16      	ldr	r3, [pc, #88]	; (b8 <main_unlock_1+0x22>)
+  5e:	60e2      	str	r2, [r4, #12]
+  60:	60e3      	str	r3, [r4, #12]
+  62:	4911      	ldr	r1, [pc, #68]	; (a8 <main_unlock_1+0x12>)
+  64:	4c0e      	ldr	r4, [pc, #56]	; (a0 <main_unlock_1+0xa>)
+  66:	2300      	movs	r3, #0
+  68:	6163      	str	r3, [r4, #20]
+
+0000006a <prog_opt_1>:
+  6a:	6808      	ldr	r0, [r1, #0]
+  6c:	4a13      	ldr	r2, [pc, #76]	; (bc <main_unlock_1+0x26>)
+  6e:	4010      	ands	r0, r2
+  70:	6160      	str	r0, [r4, #20]
+  72:	2202      	movs	r2, #2
+  74:	4310      	orrs	r0, r2
+  76:	6160      	str	r0, [r4, #20]
+  78:	4b0d      	ldr	r3, [pc, #52]	; (b0 <main_unlock_1+0x1a>)
+
+0000007a <prog_opt_3>:
+  7a:	6922      	ldr	r2, [r4, #16]
+  7c:	421a      	tst	r2, r3
+  7e:	d1fc      	bne.n	7a <prog_opt_3>
+  80:	e7c2      	b.n	8 <main_loop>
+
+00000082 <main_unlock>:
+  82:	4c07      	ldr	r4, [pc, #28]	; (a0 <main_unlock_1+0xa>)
+  84:	6962      	ldr	r2, [r4, #20]
+  86:	4b0e      	ldr	r3, [pc, #56]	; (c0 <main_unlock_1+0x2a>)
+  88:	401a      	ands	r2, r3
+  8a:	4293      	cmp	r3, r2
+  8c:	d103      	bne.n	96 <main_unlock_1>
+  8e:	4a0d      	ldr	r2, [pc, #52]	; (c4 <main_unlock_1+0x2e>)
+  90:	4b0d      	ldr	r3, [pc, #52]	; (c8 <main_unlock_1+0x32>)
+  92:	60a2      	str	r2, [r4, #8]
+  94:	60a3      	str	r3, [r4, #8]
+
+00000096 <main_unlock_1>:
+  96:	2300      	movs	r3, #0
+  98:	6163      	str	r3, [r4, #20]
+  9a:	4770      	bx	lr
+  9c:	20000c00 	andcs	r0, r0, r0, lsl #24
+  a0:	40022000 	andmi	r2, r2, r0
+  a4:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
+  a8:	20000400 	andcs	r0, r0, r0, lsl #8
+  ac:	00000100 	andeq	r0, r0, r0, lsl #2
+  b0:	00010000 	andeq	r0, r1, r0
+  b4:	08192a3b 	ldmdaeq	r9, {r0, r1, r3, r4, r5, r9, fp, sp}
+  b8:	4c5d6e7f 	mrrcmi	14, 7, r6, sp, cr15
+  bc:	80ffffec 	rscshi	pc, pc, ip, ror #31
+  c0:	80000000 	andhi	r0, r0, r0
+  c4:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
+  c8:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 37c <main_unlock_1+0x2e6>
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00001341 	andeq	r1, r0, r1, asr #6
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000009 	andeq	r0, r0, r9
+  10:	01090206 	tsteq	r9, r6, lsl #4
