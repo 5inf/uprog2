@@ -8,6 +8,8 @@ The software and schematic are licensed by Jörg Wolfram as "GPL (GNU General Pu
 
 This repository tries to mirror the software releases from jcwolfram.de and adds additional stuff such as a PCB layout and a 3d printable housing to allow building actual hardware.
 
+## Supported devices
+
 Currently the following devices are supported for programming
 
 * Atmel AVR (SPI)
@@ -40,3 +42,25 @@ Currently the following devices are supported for programming
 * SPI-EEPROM (250xx)
 * I2C-EEPROM (24xx)
 * Magnetsensoren (Melexis)
+
+## Building
+
+The build consist of two parts. The uprog2 device firmware (for ATMEGA644P-20AU) and the host firmware on the PC.
+
+### Host
+
+    apt-get install libusb-1.0-0 libusb-1.0-0-dev libftdi1 libftdi1-dev
+    git clone https://github.com/5inf/uprog2.git
+    cd uprog2
+    cd source/HOST
+    make
+
+### Adapter device
+
+    apt-get install gcc-avr
+
+### Initial adapter device programming
+
+chicken, egg, ...
+
+    apt-get install avrdude
