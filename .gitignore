@@ -1,1 +1,2 @@
-*.FCStd*
+/source/HOST/build
+*.out
