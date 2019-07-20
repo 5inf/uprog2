@@ -82,7 +82,15 @@ or b)
     
 avra knows the correct dialect, but m644def.inc is not found in /usr/local/include/avr/m644def.inc.
 The avra installation locates it's include files at /usr/share/avra/ but also there is no m644def.inc.
-One can get the file e.g. from here (https://github.com/DarkSector/AVR/blob/master/asm/include/m644def.inc) or from a local AVR Studio (Windows) installation. Even then avra seem to be lacking support for the ATmega644 at the moment (https://github.com/hsoft/avra/issues/2).
+One can get the file e.g. from here (https://github.com/DarkSector/AVR/blob/master/asm/include/m644def.inc) or from a local AVR Studio (Windows) installation.
+~~Even then avra seem to be lacking support for the ATmega644 at the moment (https://github.com/hsoft/avra/issues/2).~~~
+The issue is fixed in https://github.com/5inf/avra and waiting to be pulled into https://github.com/hsoft/avra.
+
+In main-usb.asm currently the lines with .include devices_no_public/... need to be commented out and then 
+
+    avra main-usb.asm 
+    
+successfully builds the AVR binary.
     
 #### Initial adapter device programming
 
