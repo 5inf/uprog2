@@ -112,14 +112,14 @@ There are two Linux tools called ftdi-eeprom. One available from the Debian pack
 
 Below is the description for the ftdi-eeprom tool packaged in Debian. More information can be found using man ftdi-eeprom.
 
-   apt-get install ftdi-eeprom
-   cd uprog2/config
-   sudo rmmod ftdi_sio
-   sudo ftdi_eeprom --device i:0x0403:0x6001 --read-eeprom ftdi.conf
-   cp eeprom.new eeprom.bak
-   sudo ftdi_eeprom --device i:0x0403:0x6001 --build-eeprom ftdi.conf
-   sudo ftdi_eeprom --device i:0x0403:0x6001 --flash-eeprom ftdi.conf
-   sudo insmod ftdi_sio
+    apt-get install ftdi-eeprom
+    cd uprog2/config
+    sudo rmmod ftdi_sio
+    sudo ftdi_eeprom --device i:0x0403:0x6001 --read-eeprom ftdi.conf
+    cp eeprom.new eeprom.bak
+    sudo ftdi_eeprom --device i:0x0403:0x6001 --build-eeprom ftdi.conf
+    sudo ftdi_eeprom --device i:0x0403:0x6001 --flash-eeprom ftdi.conf
+    sudo insmod ftdi_sio
    
 After this your FTDI device has its manufacturer string changed to 5inf and the device name changed to USBPROG2 (and currently the serial number set to 0815 as well as some other settings are also modified. Use with caution!).
 
