@@ -100,8 +100,27 @@ With a programmer programming can be done using e.g. AVRdude (https://www.nongnu
     
 ##### Setting USB device strings on the FTDI USB Serial interface
 
+! WARNING: This changes the configuration of the FTDI chip on your uprog2 board. Use with caution!
+
 Currently uprog2 has problems when multiple FTDI USB serial converter are connected to the machine, as uprog2 will simply open the first one and then fails if that one is not the actual uprog2 hardware.
 
 In the future it is desired to have uprog2 check the USB device strings (manufacturer, device name and/or serial number) to find a matching programmer.
 
 To adjust the USB device strings (manufacturer name and device name) the FT_PROG utility from FTDI (FT_PROG 3.3.88.402 - EEPROM Programming Utility, https://www.ftdichip.com/Support/Utilities.htm#FT_PROG) is needed. Unfortunately this utility is Windows only.
+
+There are two Linux tools called ftdi-eeprom. One available from the Debian package repository, which seems to be written by Intra2net AG, the maintainer of libftdi. A second one written by Evan Nemerson (https://github.com/nemequ/ftdi-eeprom). Both tools can change the desired settings in the FTDI chip. 
+
+Below is the description for the ftdi-eeprom tool packaged in Debian. More information can be found using man ftdi-eeprom.
+
+   apt-get install ftdi-eeprom
+   cd uprog2/config
+   sudo rmmod ftdi_sio
+   sudo ftdi_eeprom --device i:0x0403:0x6001 --read-eeprom ftdi.conf
+   cp eeprom.new eeprom.bak
+   sudo ftdi_eeprom --device i:0x0403:0x6001 --build-eeprom ftdi.conf
+   sudo ftdi_eeprom --device i:0x0403:0x6001 --flash-eeprom ftdi.conf
+   sudo insmod ftdi_sio
+   
+After this your FTDI device has its manufacturer string changed to 5inf and the device name changed to USBPROG2 (and currently the serial number set to 0815 as well as some other settings are also modified. Use with caution!).
+
+
