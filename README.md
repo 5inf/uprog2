@@ -59,6 +59,23 @@ The following parts describe building both parts on a RaspberryPi 3B+ running ra
     make 
     sudo make install
     /usr/local/bin/uprog2
+    
+#### Access to the uprog USB adapter as non root
+
+if the uprog in its default configuration (vid0403, pid:0601) is plugged into the RaspberryPi the usbcore automatically loads the usbserial kernel module, which in turn automatically loads the ftdi_sio module. This creates a character device entry as /dev/ttyUSBx, where x is the next free number. (There is probably already udev and the systemd hwdb involved somewhere.) By default only the user root and the groupt dialout has access to this device. So to run uprog2 and get access to the hardware we either need to be root or belong to the group dialout.
+
+Another way to get access to to the hardware is by adding to following udev rule to the udev configuration, e.g. via /etc/udev/rules.d/uprog2.rules
+
+    ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0666"
+    
+ More options to filter for the uprog2 serial port in the udev rule could be used from the following list. These might come handy later.
+ 
+    ATTRS{manufacturer}=="<your device name here>"
+    ATTRS{product}=="<your product name here>"
+    ATTRS{serial}=="<your device serial number here>"
+
+/lib/udev/rules.d/60-serial.rules
+
 
 ### Adapter device
 
@@ -129,6 +146,6 @@ Below is the description for the ftdi-eeprom tool packaged in Debian. More infor
     sudo ftdi_eeprom --device i:0x0403:0x6001 --flash-eeprom ftdi.conf
     sudo insmod ftdi_sio
    
-After this your FTDI device has its manufacturer string changed to 5inf and the device name changed to USBPROG2 (and currently the serial number set to 0815 as well as some other settings are also modified. Use with caution!).
+After this your FTDI device has its manufacturer string changed to 5inf and the device name changed to USBPROG2 (and currently the serial number set to 0815 as well as some other settings are also modified. Save the eeprom config read with --read-eeprom for restoring later and use with caution!).
 
-
+After changing the strings any udev rules eventually in place might also need to be adapted (see above).
