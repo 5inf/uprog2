@@ -147,7 +147,7 @@ int daemon_task(void)
 		interface_type=1;
 	}
 
-	if((interface_type == 2) && ((usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6001)) != 0))
+	if((interface_type == 2) && ((usb_stat = ftdi_usb_open(&ftdic,0x2763,0xffff)) != 0))
 	{
 #if DEBUG_OUTPUT == 1
 		printf("NO FTDI DEVICE (%s)\n",ftdi_get_error_string(&ftdic));

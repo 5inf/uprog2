@@ -376,6 +376,7 @@ int main(int argc, char *argv[])
 		prg_comm(0xfa,0,0,0,0,0,0,0,0);	//set back to 3,3V mode
 	}
 
+	printf("Errorcode: %i\n",errcode);
 	if(errcode == 0x9f)
 	{
 		printf("FATAL: CONNECTION TO PROGRAMMER LOST!\n");
@@ -383,5 +384,5 @@ int main(int argc, char *argv[])
 	}
 
 	free(memory);
-	return 0;
+	return errcode;
 }
