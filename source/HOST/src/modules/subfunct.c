@@ -129,9 +129,9 @@ int read_info()
 		ver=blver & 0x3f;
 		ver=ver/10;
 		max_blocksize=2048;			//fixed from v1.20
-		printf("Version = %4.1f\n",ver);
+		printf("SYS-Ver = %4.1f\n",ver);
 		sysversion=265*memory[2]+memory[3];
-		printf("Sysver  =  %04d\n",memory[2]*256+memory[3]);
+		printf("PRG-Ver =  %04d\n",memory[2]*256+memory[3]);
 	}
 	else
 	{
@@ -308,7 +308,11 @@ int check_cmd_prog(char *cptr,char *tptr)
 		}
 		else
 		{
-			printf("## Action: %s program using %s\n",tptr,sfile);
+			printf("## Action: %s program using %s",tptr,sfile);
+			if(file2_found ==2) printf(", %s",sfile2);
+			if(file3_found ==2) printf(", %s",sfile3);
+			if(file4_found ==2) printf(", %s",sfile4);
+			printf("\n");
 			return 1;
 		}
 	}
@@ -326,7 +330,11 @@ int check_cmd_verify(char *cptr,char *tptr)
 		}
 		else
 		{
-			printf("## Action: %s verify using %s\n",tptr,sfile);
+			printf("## Action: %s verify using %s",tptr,sfile);
+			if(file2_found ==2) printf(", %s",sfile2);
+			if(file3_found ==2) printf(", %s",sfile3);
+			if(file4_found ==2) printf(", %s",sfile4);
+			printf("\n");
 			return 1;
 		}
 	}
@@ -389,7 +397,11 @@ int check_cmd_run(char *cptr)
 		}
 		else
 		{
-			printf("## Action: run code using %s\n",sfile);
+			printf("## Action: run code using %s",sfile);
+			if(file2_found ==2) printf(", %s",sfile2);
+			if(file3_found ==2) printf(", %s",sfile3);
+			if(file4_found ==2) printf(", %s",sfile4);
+			printf("\n");
 			return 1;
 		}
 	}

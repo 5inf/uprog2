@@ -174,14 +174,14 @@ const char * const cables[]=
 	// 57 PIC16 
 	"(1=VSS  2=VDD  3=PGD  4=PGC  9=MCLR)",
 	
-	// 58 
-	"no connections",
+	// 58 RF430
+	"(1=VSS  2=VDD  3=TEST  4=RESET  5=TEN  6=TCLK  7=TDAT)",
 
-	// 59 
-	"no connections"
+	// 59 SICI 
+	"(1=VSS  2=VDD  3=IFB)",
 
-	// 60 
-	"no connections",
+	// 60 AVR0
+	"(1=VSS  2=VDD  3=UPDI)",
 	
 	// 61 
 	"no connections",

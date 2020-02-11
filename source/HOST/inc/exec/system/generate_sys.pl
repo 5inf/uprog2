@@ -23,15 +23,9 @@
 use POSIX;
 use Fcntl;
 
-$hexfile="main-bt.hex";
+$hexfile="main.hex";
 $datfile=">system.h";
-$head="system_b644";
-
-&gencode;
-
-$hexfile="main-usb.hex";
-$datfile=">>system.h";
-$head="system_u644";
+$head="system_644";
 
 &gencode;
 

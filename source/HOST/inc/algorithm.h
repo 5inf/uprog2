@@ -43,12 +43,14 @@
 
 
 
+
 #include <algorithm/algo_fgen.h>
 #include <algorithm/algo_la.h>
 #include <algorithm/algo_lps25h.h>
 
 #include <algorithm/algo_s32kswd.h>
 #include <algorithm/algo_kea64swd.h>
+#include <algorithm/algo_sici.h>
 
 
 #include <algorithm/algo_xc9500.h>

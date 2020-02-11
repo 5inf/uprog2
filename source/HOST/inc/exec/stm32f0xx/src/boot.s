@@ -45,40 +45,7 @@ main_loop_wait:		ldr	r0, [r1,#0]
 			cmp	r0, #0x72		// prog option bytes
 			beq	prog_opt
 
-			cmp	r0, #0x73		// option bytes erase
-			beq	opt_erase			
-			
 tloop:			b	main_loop
-
-################################################################################
-# option bytes erase
-################################################################################
-opt_erase:		//unlock flash
-			ldr	r4, =FLASH_BASE
-			mov	r3,#0
-			str	r3,[r4,#FLASH_CR]	//disable all PROG signals
-			ldr	r2, =0x45670123		//key 1
-			ldr	r3, =0xCDEF89AB		//key 2
-			str	r2,[r4,#FLASH_KEYR]	//write key 1	
-			str	r3,[r4,#FLASH_KEYR]	//write key 2	
-			str	r2,[r4,#FLASH_OPTKEYR]	//write key 1	
-			str	r3,[r4,#FLASH_OPTKEYR]	//write key 2	
-
-			ldr	r2, [r4,#FLASH_CR]
-			mov	r3,#0x20		//OPTER
-			orr	r2,r3
-			str	r2, [r4,#FLASH_CR]
-
-			mov	r3,#0x40		//STRT
-			orr	r2,r3
-			str	r2, [r4,#FLASH_CR]
-
-			mov	r3,#0x01		//wait for BUSY LOW
-opt_erase_1:		ldr	r2, [r4,#FLASH_SR]
-			tst	r2,r3
-			bne	opt_erase_1
-			b	main_loop		//done
-
 
 		
 ################################################################################

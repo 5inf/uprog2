@@ -56,6 +56,7 @@ void list4group(int index1,int index2,int index3,char *dname)
 void list4_devices(void)
 {
 	list4group(3,0,0,"Atmel AVR");
+	list4group(60,0,0,"Atmel AVR0");
 	list4group(40,0,0,"Atmel ATxmega");
 	list4group(38,0,0,"Microchip PIC12");
 	list4group(14,15,0,"Microchip PIC16");
@@ -82,6 +83,7 @@ void list4_devices(void)
 	list4group(36,0,0,"STMicro STM32F3xx");
 	list4group(37,0,0,"STMicro STM32F4xx");
 	list4group(52,0,0,"STMicro STM32L4xx");
+	list4group(56,0,0,"NXP S9KEA");
 	list4group(53,0,0,"NXP S32K");
 	list4group(32,0,0,"Cypress PSoC4");
 	list4group(21,0,0,"I2C EEPROM");

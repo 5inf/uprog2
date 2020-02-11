@@ -8,13 +8,13 @@ private flags = 5000000: [Version5 EABI]
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000cc  00000000  00000000  00000034  2**2
+  0 .text         000000c8  00000000  00000000  00000034  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00000000  00000000  00000100  2**0
+  1 .data         00000000  00000000  00000000  000000fc  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          00000000  00000000  00000000  00000100  2**0
+  2 .bss          00000000  00000000  00000000  000000fc  2**0
                   ALLOC
-  3 .ARM.attributes 00000014  00000000  00000000  00000100  2**0
+  3 .ARM.attributes 00000014  00000000  00000000  000000fc  2**0
                   CONTENTS, READONLY
 SYMBOL TABLE:
 00000000 l    d  .text	00000000 .text
@@ -47,18 +47,17 @@ SYMBOL TABLE:
 00000008 l       .text	00000000 main_start
 00000008 l       .text	00000000 main_loop
 0000000e l       .text	00000000 main_loop_wait
-00000030 l       .text	00000000 prog_flash
-00000028 l       .text	00000000 tloop
-0000002a l       .text	00000000 x_prog_opt
-0000005a l       .text	00000000 prog_opt
-0000002e l       .text	00000000 opt_erase
-00000082 l       .text	00000000 main_unlock
-0000003c l       .text	00000000 prog_flash_1
-0000004a l       .text	00000000 prog_flash_3
-00000050 l       .text	00000000 prog_flash_4
-0000006a l       .text	00000000 prog_opt_1
-0000007a l       .text	00000000 prog_opt_3
-00000096 l       .text	00000000 main_unlock_1
+0000002c l       .text	00000000 prog_flash
+00000026 l       .text	00000000 tloop
+00000028 l       .text	00000000 x_prog_opt
+00000056 l       .text	00000000 prog_opt
+0000007e l       .text	00000000 main_unlock
+00000038 l       .text	00000000 prog_flash_1
+00000046 l       .text	00000000 prog_flash_3
+0000004c l       .text	00000000 prog_flash_4
+00000066 l       .text	00000000 prog_opt_1
+00000076 l       .text	00000000 prog_opt_3
+00000092 l       .text	00000000 main_unlock_1
 00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
 
 
@@ -70,7 +69,7 @@ Disassembly of section .text:
    4:	20000009 	andcs	r0, r0, r9
 
 00000008 <main_loop>:
-   8:	4924      	ldr	r1, [pc, #144]	; (9c <main_unlock_1+0x6>)
+   8:	4923      	ldr	r1, [pc, #140]	; (98 <main_unlock_1+0x6>)
    a:	2200      	movs	r2, #0
    c:	600a      	str	r2, [r1, #0]
 
@@ -78,109 +77,105 @@ Disassembly of section .text:
    e:	6808      	ldr	r0, [r1, #0]
   10:	4290      	cmp	r0, r2
   12:	d0fc      	beq.n	e <main_loop_wait>
-  14:	4c22      	ldr	r4, [pc, #136]	; (a0 <main_unlock_1+0xa>)
+  14:	4c21      	ldr	r4, [pc, #132]	; (9c <main_unlock_1+0xa>)
   16:	1c07      	adds	r7, r0, #0
-  18:	4a22      	ldr	r2, [pc, #136]	; (a4 <main_unlock_1+0xe>)
+  18:	4a21      	ldr	r2, [pc, #132]	; (a0 <main_unlock_1+0xe>)
   1a:	4017      	ands	r7, r2
   1c:	22ff      	movs	r2, #255	; 0xff
   1e:	4010      	ands	r0, r2
   20:	2852      	cmp	r0, #82	; 0x52
-  22:	d005      	beq.n	30 <prog_flash>
+  22:	d003      	beq.n	2c <prog_flash>
   24:	2872      	cmp	r0, #114	; 0x72
-  26:	2873      	cmp	r0, #115	; 0x73
 
-00000028 <tloop>:
-  28:	e7ee      	b.n	8 <main_loop>
+00000026 <tloop>:
+  26:	e7ef      	b.n	8 <main_loop>
 
-0000002a <x_prog_opt>:
-  2a:	e016      	b.n	5a <prog_opt>
-  2c:	e7ec      	b.n	8 <main_loop>
+00000028 <x_prog_opt>:
+  28:	e015      	b.n	56 <prog_opt>
+  2a:	e7ed      	b.n	8 <main_loop>
 
-0000002e <opt_erase>:
-  2e:	e7eb      	b.n	8 <main_loop>
+0000002c <prog_flash>:
+  2c:	f000 f827 	bl	7e <main_unlock>
+  30:	491c      	ldr	r1, [pc, #112]	; (a4 <main_unlock_1+0x12>)
+  32:	4e1d      	ldr	r6, [pc, #116]	; (a8 <main_unlock_1+0x16>)
+  34:	2201      	movs	r2, #1
+  36:	6162      	str	r2, [r4, #20]
 
-00000030 <prog_flash>:
-  30:	f000 f827 	bl	82 <main_unlock>
-  34:	491c      	ldr	r1, [pc, #112]	; (a8 <main_unlock_1+0x12>)
-  36:	4e1d      	ldr	r6, [pc, #116]	; (ac <main_unlock_1+0x16>)
-  38:	2201      	movs	r2, #1
-  3a:	6162      	str	r2, [r4, #20]
+00000038 <prog_flash_1>:
+  38:	6808      	ldr	r0, [r1, #0]
+  3a:	6038      	str	r0, [r7, #0]
+  3c:	3704      	adds	r7, #4
+  3e:	3104      	adds	r1, #4
+  40:	6808      	ldr	r0, [r1, #0]
+  42:	6038      	str	r0, [r7, #0]
+  44:	4b19      	ldr	r3, [pc, #100]	; (ac <main_unlock_1+0x1a>)
 
-0000003c <prog_flash_1>:
-  3c:	6808      	ldr	r0, [r1, #0]
-  3e:	6038      	str	r0, [r7, #0]
-  40:	3704      	adds	r7, #4
-  42:	3104      	adds	r1, #4
-  44:	6808      	ldr	r0, [r1, #0]
-  46:	6038      	str	r0, [r7, #0]
-  48:	4b19      	ldr	r3, [pc, #100]	; (b0 <main_unlock_1+0x1a>)
+00000046 <prog_flash_3>:
+  46:	6922      	ldr	r2, [r4, #16]
+  48:	421a      	tst	r2, r3
+  4a:	d1fc      	bne.n	46 <prog_flash_3>
 
-0000004a <prog_flash_3>:
-  4a:	6922      	ldr	r2, [r4, #16]
-  4c:	421a      	tst	r2, r3
-  4e:	d1fc      	bne.n	4a <prog_flash_3>
+0000004c <prog_flash_4>:
+  4c:	3704      	adds	r7, #4
+  4e:	3104      	adds	r1, #4
+  50:	3e01      	subs	r6, #1
+  52:	d1f1      	bne.n	38 <prog_flash_1>
+  54:	e7d8      	b.n	8 <main_loop>
 
-00000050 <prog_flash_4>:
-  50:	3704      	adds	r7, #4
-  52:	3104      	adds	r1, #4
-  54:	3e01      	subs	r6, #1
-  56:	d1f1      	bne.n	3c <prog_flash_1>
-  58:	e7d6      	b.n	8 <main_loop>
+00000056 <prog_opt>:
+  56:	4a16      	ldr	r2, [pc, #88]	; (b0 <main_unlock_1+0x1e>)
+  58:	4b16      	ldr	r3, [pc, #88]	; (b4 <main_unlock_1+0x22>)
+  5a:	60e2      	str	r2, [r4, #12]
+  5c:	60e3      	str	r3, [r4, #12]
+  5e:	4911      	ldr	r1, [pc, #68]	; (a4 <main_unlock_1+0x12>)
+  60:	4c0e      	ldr	r4, [pc, #56]	; (9c <main_unlock_1+0xa>)
+  62:	2300      	movs	r3, #0
+  64:	6163      	str	r3, [r4, #20]
 
-0000005a <prog_opt>:
-  5a:	4a16      	ldr	r2, [pc, #88]	; (b4 <main_unlock_1+0x1e>)
-  5c:	4b16      	ldr	r3, [pc, #88]	; (b8 <main_unlock_1+0x22>)
-  5e:	60e2      	str	r2, [r4, #12]
-  60:	60e3      	str	r3, [r4, #12]
-  62:	4911      	ldr	r1, [pc, #68]	; (a8 <main_unlock_1+0x12>)
-  64:	4c0e      	ldr	r4, [pc, #56]	; (a0 <main_unlock_1+0xa>)
-  66:	2300      	movs	r3, #0
-  68:	6163      	str	r3, [r4, #20]
+00000066 <prog_opt_1>:
+  66:	6808      	ldr	r0, [r1, #0]
+  68:	4a13      	ldr	r2, [pc, #76]	; (b8 <main_unlock_1+0x26>)
+  6a:	4010      	ands	r0, r2
+  6c:	6160      	str	r0, [r4, #20]
+  6e:	2202      	movs	r2, #2
+  70:	4310      	orrs	r0, r2
+  72:	6160      	str	r0, [r4, #20]
+  74:	4b0d      	ldr	r3, [pc, #52]	; (ac <main_unlock_1+0x1a>)
 
-0000006a <prog_opt_1>:
-  6a:	6808      	ldr	r0, [r1, #0]
-  6c:	4a13      	ldr	r2, [pc, #76]	; (bc <main_unlock_1+0x26>)
-  6e:	4010      	ands	r0, r2
-  70:	6160      	str	r0, [r4, #20]
-  72:	2202      	movs	r2, #2
-  74:	4310      	orrs	r0, r2
-  76:	6160      	str	r0, [r4, #20]
-  78:	4b0d      	ldr	r3, [pc, #52]	; (b0 <main_unlock_1+0x1a>)
+00000076 <prog_opt_3>:
+  76:	6922      	ldr	r2, [r4, #16]
+  78:	421a      	tst	r2, r3
+  7a:	d1fc      	bne.n	76 <prog_opt_3>
+  7c:	e7c4      	b.n	8 <main_loop>
 
-0000007a <prog_opt_3>:
-  7a:	6922      	ldr	r2, [r4, #16]
-  7c:	421a      	tst	r2, r3
-  7e:	d1fc      	bne.n	7a <prog_opt_3>
-  80:	e7c2      	b.n	8 <main_loop>
+0000007e <main_unlock>:
+  7e:	4c07      	ldr	r4, [pc, #28]	; (9c <main_unlock_1+0xa>)
+  80:	6962      	ldr	r2, [r4, #20]
+  82:	4b0e      	ldr	r3, [pc, #56]	; (bc <main_unlock_1+0x2a>)
+  84:	401a      	ands	r2, r3
+  86:	4293      	cmp	r3, r2
+  88:	d103      	bne.n	92 <main_unlock_1>
+  8a:	4a0d      	ldr	r2, [pc, #52]	; (c0 <main_unlock_1+0x2e>)
+  8c:	4b0d      	ldr	r3, [pc, #52]	; (c4 <main_unlock_1+0x32>)
+  8e:	60a2      	str	r2, [r4, #8]
+  90:	60a3      	str	r3, [r4, #8]
 
-00000082 <main_unlock>:
-  82:	4c07      	ldr	r4, [pc, #28]	; (a0 <main_unlock_1+0xa>)
-  84:	6962      	ldr	r2, [r4, #20]
-  86:	4b0e      	ldr	r3, [pc, #56]	; (c0 <main_unlock_1+0x2a>)
-  88:	401a      	ands	r2, r3
-  8a:	4293      	cmp	r3, r2
-  8c:	d103      	bne.n	96 <main_unlock_1>
-  8e:	4a0d      	ldr	r2, [pc, #52]	; (c4 <main_unlock_1+0x2e>)
-  90:	4b0d      	ldr	r3, [pc, #52]	; (c8 <main_unlock_1+0x32>)
-  92:	60a2      	str	r2, [r4, #8]
-  94:	60a3      	str	r3, [r4, #8]
-
-00000096 <main_unlock_1>:
-  96:	2300      	movs	r3, #0
-  98:	6163      	str	r3, [r4, #20]
-  9a:	4770      	bx	lr
-  9c:	20000c00 	andcs	r0, r0, r0, lsl #24
-  a0:	40022000 	andmi	r2, r2, r0
-  a4:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
-  a8:	20000400 	andcs	r0, r0, r0, lsl #8
-  ac:	00000100 	andeq	r0, r0, r0, lsl #2
-  b0:	00010000 	andeq	r0, r1, r0
-  b4:	08192a3b 	ldmdaeq	r9, {r0, r1, r3, r4, r5, r9, fp, sp}
-  b8:	4c5d6e7f 	mrrcmi	14, 7, r6, sp, cr15
-  bc:	80ffffec 	rscshi	pc, pc, ip, ror #31
-  c0:	80000000 	andhi	r0, r0, r0
-  c4:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
-  c8:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 37c <main_unlock_1+0x2e6>
+00000092 <main_unlock_1>:
+  92:	2300      	movs	r3, #0
+  94:	6163      	str	r3, [r4, #20]
+  96:	4770      	bx	lr
+  98:	20000c00 	andcs	r0, r0, r0, lsl #24
+  9c:	40022000 	andmi	r2, r2, r0
+  a0:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
+  a4:	20000400 	andcs	r0, r0, r0, lsl #8
+  a8:	00000100 	andeq	r0, r0, r0, lsl #2
+  ac:	00010000 	andeq	r0, r1, r0
+  b0:	08192a3b 	ldmdaeq	r9, {r0, r1, r3, r4, r5, r9, fp, sp}
+  b4:	4c5d6e7f 	mrrcmi	14, 7, r6, sp, cr15
+  b8:	80ffffec 	rscshi	pc, pc, ip, ror #31
+  bc:	80000000 	andhi	r0, r0, r0
+  c0:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
+  c4:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 378 <main_unlock_1+0x2e6>
 
 Disassembly of section .ARM.attributes:
 

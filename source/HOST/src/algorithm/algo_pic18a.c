@@ -474,6 +474,7 @@ int prog_pic18a()
 
 	if(eeprom_readout == 1)
 	{
+		printf("EER\n");
 		writeblock_data(0,param[3],param[2]);
 	}
 

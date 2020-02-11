@@ -138,6 +138,7 @@ int writeblock_data(unsigned long start_addr, unsigned long block_len,unsigned l
 
 		else if(file_mode == 2)	//S28
 		{
+			if(daddr >= 0x01000000) range_err=1;			
 			while((blen > 0) && (daddr < 0x01000000))
 			{
 				//write data
@@ -156,6 +157,7 @@ int writeblock_data(unsigned long start_addr, unsigned long block_len,unsigned l
 				}
 				csum=255-(csum & 255);
 				fprintf(datei,"%02X\n",csum);
+				if((daddr+llen-1) >= 0x01000000) range_err=1;			
 				addr+=llen;
 				daddr+=llen;
 				blen-=llen;
@@ -164,6 +166,8 @@ int writeblock_data(unsigned long start_addr, unsigned long block_len,unsigned l
 
 		else if(file_mode == 3)	//S19
 		{
+
+			if(daddr >= 0x010000) range_err=1;			
 			while((blen > 0) && (daddr < 0x010000))
 			{
 				//write data
@@ -181,6 +185,7 @@ int writeblock_data(unsigned long start_addr, unsigned long block_len,unsigned l
 				}
 				csum=255-(csum & 255);
 				fprintf(datei,"%02X\n",csum);
+				if((daddr+llen-1) >= 0x010000) range_err=1;			
 				addr+=llen;
 				daddr+=llen;
 				blen-=llen;
@@ -223,6 +228,151 @@ int writeblock_data(unsigned long start_addr, unsigned long block_len,unsigned l
 		return 1;	//write failed
 	}
 }
+
+//------------------------------------------------------------------------------
+// write block
+//------------------------------------------------------------------------------
+int writeblock_data16(unsigned long start_addr, unsigned long block_len,unsigned long dest_addr)
+{
+	int csum,j;
+	unsigned int llen;
+	unsigned long blen=block_len;
+	unsigned long daddr=dest_addr;
+	unsigned long addr=start_addr;	
+	long offset=-1;
+	
+	if (datei != NULL)
+	{
+		if(file_mode == 1)	//ihex 
+		{
+			while(blen > 0)
+			{
+				//set extended linear address record
+				if(((daddr >> 16) & 0xffff) != offset)
+				{
+					csum=6;
+					offset=(daddr >> 16) & 0xffff;		//our new offset
+					fprintf(datei,":02000004");
+					csum=csum+(offset & 0xff)+((offset >> 8) & 0xff);
+					fprintf(datei,"%04lX",offset & 0xffff);
+					csum=256-(csum & 255);
+					fprintf(datei,"%02X\n",csum & 0xff);
+				}
+				//write data
+				llen=16;
+				if(blen < llen) llen=blen;
+				
+				csum=llen+(daddr & 0xff)+((daddr >> 8) & 0xff);
+				fprintf(datei,":%02X%04lX00",llen,daddr & 0xffff);
+
+				for(j=0;j<llen;j++)
+				{
+					fprintf(datei,"%02X",memory[addr+j+ROFFSET]);
+					csum+=memory[addr+j+ROFFSET];
+				}
+				csum=256-(csum & 255);
+				fprintf(datei,"%02X\n",csum & 0xff);
+				addr+=llen;
+				daddr+=llen;
+				blen-=llen;		
+			}		
+		
+		}
+
+		else if(file_mode == 2)	//S28
+		{
+			if(daddr >= 0x01000000) range_err=1;			
+			while((blen > 0) && (daddr < 0x01000000))
+			{
+				//write data
+				llen=16;
+				if(blen < llen) llen=blen;
+				
+				csum=llen+4;		//byte count
+				csum+=((daddr >> 16) & 0xff);
+				csum+=((daddr >> 8) & 0xff);
+				csum+=((daddr >> 0) & 0xff);
+				fprintf(datei,"S2%02X%06lX",llen+4,daddr);
+				for(j=0;j<llen;j++)
+				{
+					fprintf(datei,"%02X",memory[addr+j+ROFFSET]);
+					csum+=memory[addr+j+ROFFSET] & 0xff;
+				}
+				csum=255-(csum & 255);
+				fprintf(datei,"%02X\n",csum);
+				if((daddr+llen-1) >= 0x01000000) range_err=1;			
+				addr+=llen;
+				daddr+=llen;
+				blen-=llen;
+			}		
+		}
+
+		else if(file_mode == 3)	//S19
+		{
+
+			if(daddr >= 0x010000) range_err=1;			
+			while((blen > 0) && (daddr < 0x010000))
+			{
+				//write data
+				llen=16;
+				if(blen < llen) llen=blen;
+				
+				csum=llen+3;		//byte count
+				csum+=((daddr >> 8) & 0xff);
+				csum+=((daddr >> 0) & 0xff);
+				fprintf(datei,"S1%02X%04lX",llen+3,daddr);
+				for(j=0;j<llen;j++)
+				{
+					fprintf(datei,"%02X",memory[addr+j+ROFFSET]);
+					csum+=memory[addr+j+ROFFSET] & 0xff;
+				}
+				csum=255-(csum & 255);
+				fprintf(datei,"%02X\n",csum);
+				if((daddr+llen-1) >= 0x010000) range_err=1;			
+				addr+=llen;
+				daddr+=llen;
+				blen-=llen;
+			}		
+		}
+
+		else
+		{
+			while(blen > 0)
+			{
+				//write data
+				llen=16;
+				if(blen < llen) llen=blen;
+				
+				csum=llen+5;		//byte count
+				csum+=((daddr >> 24) & 0xff);
+				csum+=((daddr >> 16) & 0xff);
+				csum+=((daddr >> 8) & 0xff);
+				csum+=((daddr >> 0) & 0xff);
+				fprintf(datei,"S3%02X%08lX",llen+5,daddr);
+				for(j=0;j<llen;j++)
+				{
+					fprintf(datei,"%02X",memory[addr+j+ROFFSET]);
+					csum+=memory[addr+j+ROFFSET] & 0xff;
+				}
+				csum=255-(csum & 255);
+				fprintf(datei,"%02X\n",csum);
+				addr+=llen;
+				daddr+=llen;
+				blen-=llen;
+			}		
+		
+		
+		}
+
+		return 0;	//write OK
+	}
+	else
+	{
+		return 1;	//write failed
+	}
+}
+
+
 
 
 //------------------------------------------------------------------------------

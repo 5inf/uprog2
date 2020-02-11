@@ -108,6 +108,7 @@ int prog_rh850(void)
 	int main_prog=0;
 	int main_verify=0;
 	int main_readout=0;
+	int main_crc=0;
 	int dev_start=0;
 	int run_ram=0;
 	int dflash_blank=0;
@@ -115,12 +116,16 @@ int prog_rh850(void)
 	int dflash_prog=0;
 	int dflash_verify=0;
 	int dflash_readout=0;
+	int dflash_crc=0;
 	int extended_blank=0;
 	int extended_erase=0;
 	int extended_prog=0;
 	int extended_verify=0;
 	int extended_readout=0;
+	int extended_crc=0;
 	int opt_read=0;
+	int get_prot=0xff;
+	int set_prot=0xff;
 	int opt0_write=0;
 	int opt1_write=0;
 	int opt2_write=0;
@@ -129,6 +134,7 @@ int prog_rh850(void)
 	int opt5_write=0;
 	int opt6_write=0;
 	int opt7_write=0;
+	int sb_write=0;
 	int osc_sel=0;
 	char hexbyte[5];
 	char *parptr;
@@ -150,24 +156,34 @@ int prog_rh850(void)
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
 		printf("-- rm -- main flash readout\n");
+		printf("-- cm -- main flash CRC\n");
 
 		printf("-- ed -- data flash erase\n");
-		printf("-- bd -- data flash blanb check\n");
+		printf("-- bd -- data flash blank check\n");
 		printf("-- pd -- data flash program\n");
 		printf("-- vd -- data flash verify\n");
 		printf("-- rd -- data flash readout\n");
+		printf("-- cd -- data flash CRC\n");
+	
 
 		printf("-- ex -- ext user area erase\n");
 		printf("-- bx -- ext user area blank check\n");
 		printf("-- px -- ext user area program\n");
 		printf("-- vx -- ext user area verify\n");
 		printf("-- rx -- ext user area readout\n");
+		printf("-- cx -- ext user area CRC\n");
 
 		printf("-- ro -- read option bytes\n");
 		printf("-- wopt0 write option byte 0\n");
 		printf("-- wopt1 write option byte 1\n");
 		printf("-- wopt2 write option byte 2\n");
 		printf("-- wopt3 write option byte 3\n");
+		
+		printf("-- gp -- get protection status\n");
+		printf("-- nr -- protect readout\n");
+		printf("-- nw -- protect write\n");
+		printf("-- ne -- protect erase\n");
+		
 //		printf("-- wopt4 write option byte 4\n");
 //		printf("-- wopt5 write option byte 5\n");
 //		printf("-- wopt6 write option byte 6\n");
@@ -221,6 +237,12 @@ int prog_rh850(void)
 		{
 			osc_sel=5;		
 			printf("## using internal oscillator\n");
+		}
+
+		if(find_cmd("sb"))
+		{
+			sb_write=1;		
+			printf("## write single byte\n");
 		}
 
 
@@ -331,6 +353,25 @@ int prog_rh850(void)
 		}
 
 
+		if(find_cmd("cm"))
+		{
+			main_crc=1;
+			printf("## Action: code flash CRC calculation\n");
+		}
+
+
+		if(find_cmd("cd"))
+		{
+			dflash_crc=1;
+			printf("## Action: data flash CRC calculation\n");
+		}
+
+		if(find_cmd("cx"))
+		{
+			extended_crc=1;
+			printf("## Action: extended user area CRC calculation\n");
+		}
+
 		main_prog=check_cmd_prog("pm","code flash");
 		dflash_prog=check_cmd_prog("pd","data flash");
 		extended_prog=check_cmd_prog("px","extended user area");
@@ -342,6 +383,25 @@ int prog_rh850(void)
 		main_readout=check_cmd_read("rm","code flash",&main_prog,&main_verify);
 		dflash_readout=check_cmd_read("rd","data flash",&dflash_prog,&dflash_verify);
 		extended_readout=check_cmd_read("rx","extended user area",&extended_prog,&extended_verify);
+
+		if(find_cmd("nr"))
+		{
+			set_prot &= 0x7F;
+			printf("## Action: set readout protection\n");
+		}
+
+		if(find_cmd("nw"))
+		{
+			set_prot &= 0xBF;
+			printf("## Action: set write protection\n");
+		}
+
+		if(find_cmd("ne"))
+		{
+			set_prot &= 0xDF;
+			printf("## Action: set erase protection\n");
+		}
+
 
 		if(find_cmd("st"))
 		if(strstr(cmd,"st") && ((strstr(cmd,"st") - cmd) %2 == 1))
@@ -427,6 +487,7 @@ RH850_INIT:
 
 		errc=prg_comm(0x146,0,100,0,ROFFSET,0,0,0,0);				//Inquiry
 		if(errc!=0) goto RH850_END;
+		
 
 goto ZZRO;
 
@@ -500,6 +561,25 @@ goto ZZRO;
 
 //		waitkey();
 ZZRO:
+
+	errc=prg_comm(0x15c,0,2,0,ROFFSET,0,0,0,0);				//get prot status
+	printf(">> PROT STATUS  = 0x%02X\n",memory[ROFFSET]);
+	if(memory[ROFFSET] & 0x80)
+		printf("   * READ ENABLED\n");
+	else
+		printf("   * READ DISABLED\n");
+
+	if(memory[ROFFSET] & 0x40)
+		printf("   * WRITE ENABLED\n");
+	else
+		printf("   * WRITE DISABLED\n");
+	
+	if(memory[ROFFSET] & 0x20)
+		printf("   * ERASE ENABLED\n\n");
+	else
+		printf("   * ERASE DISABLED\n\n");
+		
+	get_prot=memory[ROFFSET];
 
 	if((run_ram == 0) && (errc == 0) && (dev_start == 0))
 	{
@@ -630,6 +710,7 @@ ZZRO:
 			}
 		
 		}
+
 
 		if((main_erase == 1) && (errc == 0))
 		{
@@ -1180,9 +1261,31 @@ ZZRO:
 	}
 
 
+		if((sb_write == 1) && (errc == 0))
+		{
+			waitkey();
+			addr=0xFF200000;
+			memory[0]=0xAA;
+			memory[1]=0x11;
+			memory[2]=0x22;
+			memory[3]=0x33;
+
+//			errc=prg_comm(0x159,0,0,0,0,0,0,0,0x20);
+
+			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
+			addr+=1;
+			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
+			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0,0);				//prog
+			errc=prg_comm(0x158,4,0,0,0,4,0,0,0x03);
+
+			printf("\n");
+		}
+
+
 
 		if(((dflash_readout == 1) || (dflash_verify == 1)) && (errc == 0) && (param[7]>0))
 		{
+//			waitkey();
 			addr=param[6];
 			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			addr=param[6]+param[7]-1;
@@ -1232,10 +1335,103 @@ ZZRO:
 				}
 			}
 		}
+		
+		
+		
+		
 	if((main_readout == 1) || (dflash_readout == 1) || (extended_readout == 1))
 	{
 		i=writeblock_close();
 	}
+
+	if(main_crc==1)
+	{
+		addr=param[0];
+		memory[0]=(addr>>24) & 0xff;
+		memory[1]=(addr>>16) & 0xff;
+		memory[2]=(addr>>8) & 0xff;
+		memory[3]=addr & 0xff;
+
+		addr=param[0]+param[1]-1;
+		memory[4]=(addr>>24) & 0xff;
+		memory[5]=(addr>>16) & 0xff;
+		memory[6]=(addr>>8) & 0xff;
+		memory[7]=addr & 0xff;
+		
+		errc=prg_comm(0x14c,8,16,0,ROFFSET,0,0,0,0);
+		addr=(memory[ROFFSET+4] << 24) | (memory[ROFFSET+5] << 16) | (memory[ROFFSET+6] << 8) | memory[ROFFSET+7];		
+		printf("CRC BANK A = 0x%08lX\n",addr & 0xFFFFFFFF);
+//		showframe_rh850(0);
+	
+		if(param[2] != 0)
+		{
+			addr=param[2];
+			memory[0]=(addr>>24) & 0xff;
+			memory[1]=(addr>>16) & 0xff;
+			memory[2]=(addr>>8) & 0xff;
+			memory[3]=addr & 0xff;
+
+			addr=param[2]+param[3]-1;
+			memory[4]=(addr>>24) & 0xff;
+			memory[5]=(addr>>16) & 0xff;
+			memory[6]=(addr>>8) & 0xff;
+			memory[7]=addr & 0xff;
+		
+			errc=prg_comm(0x14c,8,16,0,ROFFSET,0,0,0,0);
+			addr=(memory[ROFFSET+4] << 24) | (memory[ROFFSET+5] << 16) | (memory[ROFFSET+6] << 8) | memory[ROFFSET+7];		
+			printf("CRC BANK B = 0x%08lX\n",addr & 0xFFFFFFFF);
+//			showframe_rh850(0);
+		
+		}
+
+	}
+
+	if((extended_crc==1) && (param[4] != 0))
+	{
+		addr=param[4];
+		memory[0]=(addr>>24) & 0xff;
+		memory[1]=(addr>>16) & 0xff;
+		memory[2]=(addr>>8) & 0xff;
+		memory[3]=addr & 0xff;
+
+		addr=param[4]+param[5]-1;
+		memory[4]=(addr>>24) & 0xff;
+		memory[5]=(addr>>16) & 0xff;
+		memory[6]=(addr>>8) & 0xff;
+		memory[7]=addr & 0xff;
+		
+		errc=prg_comm(0x14c,8,16,0,ROFFSET,0,0,0,0);
+		addr=(memory[ROFFSET+4] << 24) | (memory[ROFFSET+5] << 16) | (memory[ROFFSET+6] << 8) | memory[ROFFSET+7];		
+		printf("CRC EXTEND = 0x%08lX\n",addr & 0xFFFFFFFF);
+//		showframe_rh850(0);
+	}
+
+	if((dflash_crc==1) && (param[6] != 0))
+	{
+		addr=param[6];
+		memory[0]=(addr>>24) & 0xff;
+		memory[1]=(addr>>16) & 0xff;
+		memory[2]=(addr>>8) & 0xff;
+		memory[3]=addr & 0xff;
+
+		addr=param[6]+param[7]-1;
+		memory[4]=(addr>>24) & 0xff;
+		memory[5]=(addr>>16) & 0xff;
+		memory[6]=(addr>>8) & 0xff;
+		memory[7]=addr & 0xff;
+		
+		errc=prg_comm(0x14c,8,16,0,ROFFSET,0,0,0,0);
+		addr=(memory[ROFFSET+4] << 24) | (memory[ROFFSET+5] << 16) | (memory[ROFFSET+6] << 8) | memory[ROFFSET+7];		
+		printf("CRC DFLASH = 0x%08lX\n",addr & 0xFFFFFFFF);
+//		showframe_rh850(0);
+	}
+
+	if((set_prot != 0xff) & (errc == 0))
+	{
+		printf("SET PROTECTION TO 0x%02X\n",(set_prot & get_prot));
+		errc=prg_comm(0x159,0,0,0,0,0,0,0,(set_prot & get_prot));
+	}	
+
 
 	if(dev_start == 1)
 	{

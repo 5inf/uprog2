@@ -74,7 +74,7 @@ ARM GAS  boot.asm 			page 1
   34              	################################################################################
   35              	# the main loop
   36              	################################################################################
-  37 0008 2449     	main_loop:		ldr	r1, =0x20000c00		//cmd word
+  37 0008 2349     	main_loop:		ldr	r1, =0x20000c00		//cmd word
   38 000a 0022     				mov	r2,#0		
   39 000c 0A60     				str	r2,[r1,#0]		//set to zero
   40              	#			ldr	r3, =0x0100		//PORTC set
@@ -85,131 +85,123 @@ ARM GAS  boot.asm 			page 1
   45 0010 9042     				cmp	r0, r2
   46 0012 FCD0     				beq	main_loop_wait
   47              				
-  48 0014 224C     				ldr	r4, =FLASH_BASE
+  48 0014 214C     				ldr	r4, =FLASH_BASE
   49              	#			ldr	r3, =0x0200		//PORTC set
   50              	#			str	r3,[r5,#PORTC_ODR]
   51              				
   52 0016 071C     				mov	r7,r0			//address
-  53 0018 224A     				ldr	r2,=0xFFFFFF00
+  53 0018 214A     				ldr	r2,=0xFFFFFF00
   54 001a 1740     				and	r7,r2
   55 001c FF22     				mov	r2,#0xff
   56 001e 1040     				and	r0,r2			
   57              	
   58 0020 5228     				cmp	r0, #0x52		// prog main flash
-  59 0022 05D0     				beq	prog_flash
+  59 0022 03D0     				beq	prog_flash
   60              	
   61 0024 7228     				cmp	r0, #0x72		// prog option bytes
   62              	//			beq	x_prog_opt
   63              	
-  64 0026 7328     				cmp	r0, #0x73		// option bytes erase
-  65              	//			beq	opt_erase			
-  66              				
-  67 0028 EEE7     	tloop:			b	main_loop
+  64 0026 EFE7     	tloop:			b	main_loop
+  65              	
+  66 0028 15E0     	x_prog_opt:		b	prog_opt			
+  67 002a EDE7     				b	main_loop
   68              	
-  69 002a 16E0     	x_prog_opt:		b	prog_opt			
-  70 002c ECE7     				b	main_loop
-  71              	
+  69              	
+  70              	################################################################################
+  71              	# program 2K flash
   72              	################################################################################
-  73              	# option bytes erase is not available
-  74              	################################################################################
-  75 002e EBE7     	opt_erase:		b	main_loop		//done
-  76              	
+  73 002c 00F027F8 	prog_flash:		bl	main_unlock		//unlock
+  74              	
+  75 0030 1C49     				ldr	r1, =0x20000400		//buffer base
+  76 0032 1D4E     				ldr	r6, =0x100		//lwords to do			
   77              	
-  78              	################################################################################
-  79              	# program 2K flash
-  80              	################################################################################
+  78 0034 0122     				mov	r2,#0x01		//set PG
+  79 0036 6261     				str	r2, [r4,#FLASH_CR]
+  80              				
 ARM GAS  boot.asm 			page 3
 
 
-  81 0030 00F027F8 	prog_flash:		bl	main_unlock		//unlock
-  82              	
-  83 0034 1C49     				ldr	r1, =0x20000400		//buffer base
-  84 0036 1D4E     				ldr	r6, =0x100		//lwords to do			
-  85              	
-  86 0038 0122     				mov	r2,#0x01		//set PG
-  87 003a 6261     				str	r2, [r4,#FLASH_CR]
-  88              				
-  89 003c 0868     	prog_flash_1:		ldr	r0,[r1,#0]		//get data 1
-  90 003e 3860     				str	r0,[r7,#0]		//store word 1
-  91              	
-  92 0040 0437     				add	r7,#4			//flash addr
-  93 0042 0431     				add	r1,#4			//buffer addr
+  81 0038 0868     	prog_flash_1:		ldr	r0,[r1,#0]		//get data 1
+  82 003a 3860     				str	r0,[r7,#0]		//store word 1
+  83              	
+  84 003c 0437     				add	r7,#4			//flash addr
+  85 003e 0431     				add	r1,#4			//buffer addr
+  86              	
+  87 0040 0868     				ldr	r0,[r1,#0]		//get data 1
+  88 0042 3860     				str	r0,[r7,#0]		//store word 2
+  89              	
+  90 0044 194B     				ldr	r3, =0x010000		//BSY
+  91 0046 2269     	prog_flash_3:		ldr	r2, [r4,#FLASH_SR]
+  92 0048 1A42     				tst	r2,r3
+  93 004a FCD1     				bne	prog_flash_3		//BNE
   94              	
-  95 0044 0868     				ldr	r0,[r1,#0]		//get data 1
-  96 0046 3860     				str	r0,[r7,#0]		//store word 2
+  95 004c 0437     	prog_flash_4:		add	r7,#4			//flash addr
+  96 004e 0431     				add	r1,#4			//buffer addr
   97              	
-  98 0048 194B     				ldr	r3, =0x010000		//BSY
-  99 004a 2269     	prog_flash_3:		ldr	r2, [r4,#FLASH_SR]
- 100 004c 1A42     				tst	r2,r3
- 101 004e FCD1     				bne	prog_flash_3		//BNE
+  98 0050 013E     				sub	r6,#1
+  99 0052 F1D1     				bne	prog_flash_1			
+ 100              				
+ 101 0054 D8E7     				b	main_loop
  102              	
- 103 0050 0437     	prog_flash_4:		add	r7,#4			//flash addr
- 104 0052 0431     				add	r1,#4			//buffer addr
- 105              	
- 106 0054 013E     				sub	r6,#1
- 107 0056 F1D1     				bne	prog_flash_1			
- 108              				
- 109 0058 D6E7     				b	main_loop
- 110              	
- 111              	
- 112              	################################################################################
- 113              	# program option bytes
- 114              	################################################################################
- 115 005a 164A     	prog_opt:		ldr	r2, =0x08192A3B		//key 1
- 116 005c 164B     				ldr	r3, =0x4C5D6E7F		//key 2
- 117              	//			str	r2,[r4,#FLASH_KEYR]	//write key 1	
- 118              	//			str	r3,[r4,#FLASH_KEYR]	//write key 2	
- 119 005e E260     				str	r2,[r4,#FLASH_OPTKEYR]	//write key 1	
- 120 0060 E360     				str	r3,[r4,#FLASH_OPTKEYR]	//write key 2	
- 121              		
- 122 0062 1149     				ldr	r1, =0x20000400		//buffer base
- 123              	
- 124 0064 0E4C     				ldr	r4, =FLASH_BASE
- 125 0066 0023     				mov	r3,#0
- 126 0068 6361     				str	r3,[r4,#FLASH_CR]
- 127              	
- 128 006a 0868     	prog_opt_1:		ldr	r0,[r1,#0]		//get data
- 129 006c 134A     				ldr	r2, = 0x80FFFFEC
- 130 006e 1040     				and	r0,r2
- 131 0070 6061     				str	r0,[r4,#FLASH_CR]
- 132 0072 0222     				mov	r2,#0x02
- 133 0074 1043     				orr	r0,r2
- 134 0076 6061     				str	r0,[r4,#FLASH_CR]
- 135              				
- 136 0078 0D4B     				ldr	r3, =0x010000		//BSY
- 137 007a 2269     	prog_opt_3:		ldr	r2, [r4,#FLASH_SR]
+ 103              	
+ 104              	################################################################################
+ 105              	# program option bytes
+ 106              	################################################################################
+ 107 0056 164A     	prog_opt:		ldr	r2, =0x08192A3B		//key 1
+ 108 0058 164B     				ldr	r3, =0x4C5D6E7F		//key 2
+ 109              	//			str	r2,[r4,#FLASH_KEYR]	//write key 1	
+ 110              	//			str	r3,[r4,#FLASH_KEYR]	//write key 2	
+ 111 005a E260     				str	r2,[r4,#FLASH_OPTKEYR]	//write key 1	
+ 112 005c E360     				str	r3,[r4,#FLASH_OPTKEYR]	//write key 2	
+ 113              		
+ 114 005e 1149     				ldr	r1, =0x20000400		//buffer base
+ 115              	
+ 116 0060 0E4C     				ldr	r4, =FLASH_BASE
+ 117 0062 0023     				mov	r3,#0
+ 118 0064 6361     				str	r3,[r4,#FLASH_CR]
+ 119              	
+ 120 0066 0868     	prog_opt_1:		ldr	r0,[r1,#0]		//get data
+ 121 0068 134A     				ldr	r2, = 0x80FFFFEC
+ 122 006a 1040     				and	r0,r2
+ 123 006c 6061     				str	r0,[r4,#FLASH_CR]
+ 124 006e 0222     				mov	r2,#0x02
+ 125 0070 1043     				orr	r0,r2
+ 126 0072 6061     				str	r0,[r4,#FLASH_CR]
+ 127              				
+ 128 0074 0D4B     				ldr	r3, =0x010000		//BSY
+ 129 0076 2269     	prog_opt_3:		ldr	r2, [r4,#FLASH_SR]
+ 130 0078 1A42     				tst	r2,r3
+ 131 007a FCD1     				bne	prog_opt_3
+ 132              				
+ 133 007c C4E7     				b	main_loop
+ 134              	
+ 135              	
+ 136              	################################################################################
+ 137              	# unlock main flash
 ARM GAS  boot.asm 			page 4
 
 
- 138 007c 1A42     				tst	r2,r3
- 139 007e FCD1     				bne	prog_opt_3
- 140              				
- 141 0080 C2E7     				b	main_loop
- 142              	
- 143              	
- 144              	################################################################################
- 145              	# unlock main flash
- 146              	################################################################################
- 147 0082 074C     	main_unlock:		ldr	r4, =FLASH_BASE
- 148 0084 6269     				ldr	r2,[r4,#FLASH_CR]
- 149 0086 0E4B     				ldr	r3,=0x80000000
- 150 0088 1A40     				and	r2,r3
- 151 008a 9342     				cmp	r3,r2
- 152 008c 03D1     				bne	main_unlock_1		//is already unlocked
- 153              				
- 154 008e 0D4A     				ldr	r2, =0x45670123		//key 1
- 155 0090 0D4B     				ldr	r3, =0xCDEF89AB		//key 2
- 156 0092 A260     				str	r2,[r4,#FLASH_KEYR]	//write key 1	
- 157 0094 A360     				str	r3,[r4,#FLASH_KEYR]	//write key 2	
- 158 0096 0023     	main_unlock_1:		mov	r3,#0
- 159 0098 6361     				str	r3,[r4,#FLASH_CR]
- 160              	
- 161 009a 7047     				bx	lr
- 162              						
- 163              				.align 2
- 164              			
- 165 009c 000C0020 	
- 165      00200240 
- 165      00FFFFFF 
- 165      00040020 
- 165      00010000 
+ 138              	################################################################################
+ 139 007e 074C     	main_unlock:		ldr	r4, =FLASH_BASE
+ 140 0080 6269     				ldr	r2,[r4,#FLASH_CR]
+ 141 0082 0E4B     				ldr	r3,=0x80000000
+ 142 0084 1A40     				and	r2,r3
+ 143 0086 9342     				cmp	r3,r2
+ 144 0088 03D1     				bne	main_unlock_1		//is already unlocked
+ 145              				
+ 146 008a 0D4A     				ldr	r2, =0x45670123		//key 1
+ 147 008c 0D4B     				ldr	r3, =0xCDEF89AB		//key 2
+ 148 008e A260     				str	r2,[r4,#FLASH_KEYR]	//write key 1	
+ 149 0090 A360     				str	r3,[r4,#FLASH_KEYR]	//write key 2	
+ 150 0092 0023     	main_unlock_1:		mov	r3,#0
+ 151 0094 6361     				str	r3,[r4,#FLASH_CR]
+ 152              	
+ 153 0096 7047     				bx	lr
+ 154              						
+ 155              				.align 2
+ 156              			
+ 157 0098 000C0020 	
+ 157      00200240 
+ 157      00FFFFFF 
+ 157      00040020 
+ 157      00010000 

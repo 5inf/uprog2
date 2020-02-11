@@ -133,9 +133,9 @@ void init_mem(void)
 }	
 
 
-unsigned long read_block(unsigned long start_addr,unsigned long block_len,unsigned long dest_addr)
+unsigned long read_blockx(char * fname,unsigned long start_addr,unsigned long block_len,unsigned long dest_addr)
 {
-	char line[120];
+	char line[210];
 	int bytes,index,rtype,ii;
 	unsigned long addr,ioffset;
 	unsigned long rbytes,end_addr;
@@ -154,7 +154,7 @@ unsigned long read_block(unsigned long start_addr,unsigned long block_len,unsign
 	if(servermode == 0)
 	{
 		//printf("READ DAT FROM %s\n",sfile);
-		datei = fopen (sfile, "r");
+		datei = fopen (fname, "r");
 
 		addr=0;
 		loaddr=0xffffffff;
@@ -164,7 +164,7 @@ unsigned long read_block(unsigned long start_addr,unsigned long block_len,unsign
 		if (datei != NULL)
 		{
 //			while((fscanf(datei,"%s\n",&line[0])) != EOF )
-			while(fgets(line,100,datei))
+			while(fgets(line,200,datei))
 			{
 				if(!(strncmp(line,"S1", 2)))
 				{
@@ -385,7 +385,22 @@ unsigned long read_block(unsigned long start_addr,unsigned long block_len,unsign
 	else return 0;
 }
 
-unsigned long read_block_zfill(unsigned long start_addr,unsigned long block_len,unsigned long dest_addr)
+
+unsigned long read_block(unsigned long start_addr,unsigned long block_len,unsigned long dest_addr)
+{
+	unsigned long res;
+	
+	res=0;
+	
+	if(file_found==2) res+=read_blockx(sfile,start_addr,block_len,dest_addr);
+	if(file2_found==2) res+=read_blockx(sfile2,start_addr,block_len,dest_addr);
+	if(file3_found==2) res+=read_blockx(sfile3,start_addr,block_len,dest_addr);
+	if(file4_found==2) res+=read_blockx(sfile4,start_addr,block_len,dest_addr);
+	return res;
+}
+
+
+unsigned long read_blockx_zfill(char* fname,unsigned long start_addr,unsigned long block_len,unsigned long dest_addr)
 {
 	char line[120];
 	int bytes,index,rtype,ii;
@@ -406,7 +421,7 @@ unsigned long read_block_zfill(unsigned long start_addr,unsigned long block_len,
 	if(servermode == 0)
 	{
 		//printf("READ DAT FROM %s\n",sfile);
-		datei = fopen (sfile, "r");
+		datei = fopen (fname, "r");
 
 		addr=0;
 		loaddr=0xffffffff;
@@ -635,4 +650,18 @@ unsigned long read_block_zfill(unsigned long start_addr,unsigned long block_len,
 	
 	if(hiaddr > loaddr) return (hiaddr-loaddr+1);
 	else return 0;
+}
+
+
+unsigned long read_block_zfill(unsigned long start_addr,unsigned long block_len,unsigned long dest_addr)
+{
+	unsigned long res;
+	
+	res=0;
+	
+	if(file_found==2) res+=read_blockx_zfill(sfile,start_addr,block_len,dest_addr);
+	if(file2_found==2) res+=read_blockx_zfill(sfile2,start_addr,block_len,dest_addr);
+	if(file3_found==2) res+=read_blockx_zfill(sfile3,start_addr,block_len,dest_addr);
+	if(file4_found==2) res+=read_blockx_zfill(sfile4,start_addr,block_len,dest_addr);
+	return res;
 }

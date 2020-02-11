@@ -35,11 +35,43 @@ void print_spiflash_error(int errc)
 		case 0x41:	set_error("(TIMEOUT)",errc);
 				break;
 
+		case 0x43:	set_error("(wrong size)",errc);
+				break;
+
+		case 0x59:	set_error("(cannot set/reset quad mode)",errc);
+				break;
+
 		default:	set_error("(unexpected error)",errc);
 	}
 	print_error();
 }
 
+int show_quadmode(void)
+{
+	prg_comm(0x1e8,0,4,0,0,0,0,0,0);		//get info
+
+	if(param[15] == 0)
+	{
+		printf(" QUAD MODE IS NOT AVAILABLE\n");
+		return -1;
+	}
+	else
+	{
+		printf(" config/status: %02X  %02X\n",memory[0],memory[1]);
+
+	 	if(	((param[17]==0) && (memory[1] & 0x02)) ||
+			((param[17]==1) && (memory[0] & 0x40)))
+		{		
+			printf(" QUAD MODE IS ENABLED\n");
+			return 1;
+		}
+		else
+		{		
+			printf(" QUAD MODE IS DISABLED\n");
+			return 0;
+		}
+	}			
+}
 
 int prog_spiflash(void)
 {
@@ -53,7 +85,12 @@ int prog_spiflash(void)
 	int unprotect=0;
 	int protect=0;
 	int quadmode=0;
-
+	int ignore_size=0;
+	int conf_read=0;
+	int res_quad=0;
+	int set_quad=0;
+	int is_quad=0;
+	int qm_result;
 	errc=0;
 
 
@@ -65,7 +102,11 @@ int prog_spiflash(void)
 		printf("-- pm -- memory program\n");
 		printf("-- vm -- memory verify\n");
 		printf("-- rm -- memory read\n");
-		printf("-- q4 -- use quad mode\n");
+		printf("-- rc -- config bytes read\n");
+		printf("-- qm -- use quad mode\n");
+		printf("-- qr -- reset quad mode (non-volatile)\n");
+		printf("-- qs -- set quad mode (non-volatile)\n");
+		printf("-- is -- ignore size\n");
  		printf("-- d2 -- switch to device 2\n");
 
 		return 0;
@@ -75,6 +116,12 @@ int prog_spiflash(void)
 	{
 		errc=prg_comm(0x2ee,0,0,0,0,0,0,0,0);	//dev 2
 		printf("## switch to device 2\n");
+	}
+
+	if(find_cmd("is"))
+	{
+		ignore_size=1;
+		printf("## ignore size identifier\n");
 	}
 
 	if(find_cmd("ea"))
@@ -89,10 +136,43 @@ int prog_spiflash(void)
 		printf("## Action: disable all write protection\n");
 	}
 
-	if(find_cmd("q4"))
+	if(find_cmd("qr"))
 	{
-		quadmode=1;
-		printf("## use quad mode\n");
+		if(param[15]==0)
+		{
+			printf("## quad mode is not supported\n");		
+		}
+		else
+		{
+			res_quad=1;
+			printf("## clear quad mode non-volatile\n");
+		}
+	}
+
+	if(find_cmd("qs"))
+	{
+		if(param[15]==0)
+		{
+			printf("## quad mode is not supported\n");		
+		}
+		else
+		{
+			set_quad=1;
+			printf("## set quad mode non-volatile\n");
+		}
+	}
+
+	if(find_cmd("qm"))
+	{
+		if(param[15]==0)
+		{
+			printf("## quad mode is not supported\n");		
+		}
+		else
+		{
+			quadmode=1;
+			printf("## use quad mode\n");
+		}
 	}
 
 	if(find_cmd("pr"))
@@ -101,11 +181,9 @@ int prog_spiflash(void)
 		printf("## Action: enable all write protection\n");
 	}
 
-
 	main_prog=check_cmd_prog("pm","memory");
 	main_verify=check_cmd_verify("vm","memory");
 	main_readout=check_cmd_read("rm","memory",&main_prog,&main_verify);
-
 	
 	if(main_readout > 0)
 	{
@@ -134,15 +212,48 @@ int prog_spiflash(void)
 			
 			case 0xBF:	printf(" (SST)\n");break;
 			case 0xC2:	printf(" (Macronix)\n");break;
+
+			case 0x9D:
 			case 0xD5:	printf(" (ISSI)\n");break;
+
 			case 0xCE:	printf(" (Samsung)\n");break;
+			case 0xC8:	printf(" (Giga)\n");break;
 			
 			default:	printf(" (unknown vendor)\n");
 		}
 		printf(" Memory type:   %02X\n",memory[1]);
-		printf(" Memory size:   %02X, should be %02X\n\n",memory[2],(unsigned char)(param[5] >> 8) & 0xff);
+		printf(" Memory size:   %02X",memory[2]);
+		switch(memory[02])
+		{
+			case 0x14:	printf(" (1M, 25x80)\n");break;
+			case 0x15:	printf(" (2M, 25x16)\n");break;
+			case 0x16:	printf(" (4M, 25x32)\n");break;
+			case 0x17:	printf(" (8M, 25x64)\n");break;
+			case 0x18:	printf(" (16M, 25x128)\n");break;
+			case 0x19:	printf(" (32M, 25x256)\n");break;
+			case 0x1A:	printf(" (64M, 25x512)\n");break;
+			case 0x20:	printf(" (64M, 25x512)\n");break;
+			default:	printf(" (unknown size)\n");
+		}
+
+
 	}
 
+	if((memory[2] != (unsigned char)(param[5] >> 8) & 0xff) && (ignore_size == 0))
+	{
+		printf(" Memory size:   %02X, should be %02X\n\n",memory[2],(unsigned char)(param[5] >> 8) & 0xff);
+		errc=0x43;
+		goto SPIF_FEXIT;
+	}
+
+	if((memory[0] != (unsigned char)(param[5] >> 24) & 0xff) && (ignore_size == 0) && (param[18]==1))
+	{
+		printf(" Vendor:        %02X, should be %02X\n\n",memory[0],(unsigned char)(param[5] >> 24) & 0xff);
+		errc=0x43;
+		goto SPIF_FEXIT;
+	}
+	
+	is_quad=show_quadmode();
 	
 	if((unprotect == 1) && (errc == 0))
 	{
@@ -176,6 +287,23 @@ int prog_spiflash(void)
 		if(loops==maxloops) errc=0x41;
 		printf("\n");
 	}	
+
+	//store current quad mode status and enable quad mode
+	if((quadmode == 1) || (set_quad == 1))
+	{
+		if(is_quad == 0)
+		{
+			printf("ENABLE QUAD MODE\n");
+//			waitkey();
+			errc=prg_comm(0x125,0,0,0,0,0,0,0,param[17]);
+			if(errc != 0) goto SPIF_FEXIT;
+			if(show_quadmode() != 1)
+			{
+				errc=0x59;
+				goto SPIF_FEXIT;
+			}
+		}
+	}
 
 
 	if((main_prog == 1) && (errc == 0))
@@ -318,7 +446,25 @@ int prog_spiflash(void)
 	}
 
 	if(errc==0x9f) goto SPIF_FEXIT;
-	
+
+
+
+	if(((quadmode == 1) && (is_quad == 0)) || (res_quad == 1))
+	{
+		if(is_quad == 1)
+		{
+			printf("DISABLE QUAD MODE\n");
+//			waitkey();
+			errc=prg_comm(0x12D,0,0,0,0,0,0,0,param[17]);
+			if(errc != 0) goto SPIF_FEXIT;
+			is_quad=show_quadmode();
+			if(is_quad != 0)
+			{
+				errc=0x59;
+				goto SPIF_FEXIT;
+			}
+		}
+	}
 	
 	if((protect == 1) && (errc == 0))
 	{
@@ -335,11 +481,12 @@ int prog_spiflash(void)
 				0);
 	}	
 
+SPIF_FEXIT:
+
 	i=prg_comm(0x101,0,0,0,0,0,0,0,0);					//spiflash exit
 
 	prg_comm(0x2ef,0,0,0,0,0,0,0,0);	//dev 1
 
-SPIF_FEXIT:
 	print_spiflash_error(errc);
 
 	return errc;
