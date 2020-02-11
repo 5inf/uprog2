@@ -46,6 +46,8 @@ unsigned long read_svf(unsigned long m_devid)
 				}
 			}
 
+			f_devid &= 0x0FFFFFFF;
+
 			if((pdata == 1) && (!(strncmp(line,"SDR ", 4))))
 			{
 				index=4;psize=0;
@@ -69,9 +71,10 @@ unsigned long read_svf(unsigned long m_devid)
 					if(c>9) c-=0x27;
 					dbyte+=(c*16);
 					memory[addr++]=dbyte;
+//					printf("%02X ",dbyte);
 				}		
 				chunks++;		
-//				printf("%d %c %d\n",psize,line[index],bytes);
+//				printf(" -> %d %c %d\n",psize,line[index],bytes);
 			}	
 			
 		}

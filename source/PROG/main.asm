@@ -28,7 +28,7 @@
 .def		const_1		= r3
 
 .equ		sysver_high	= 0x00	
-.equ		sysver_low	= 0x0D
+.equ		sysver_low	= 0x0E
 
 .equ		buffer		= 0x100		;data buffer
 .equ		stack		= 0x10ff	;system/return stack
@@ -139,6 +139,7 @@
 .include	"devices/cc2640.asm"
 .include	"devices/sici.asm"
 .include	"devices/updi.asm"
+.include	"devices/at89s8252.asm"
 
 ;tables
 bdm_ctab:

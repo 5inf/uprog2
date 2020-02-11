@@ -344,9 +344,9 @@ prg_exec_jtab2:
 		jmp	prg_exec_e1		;code 139 pdi usersig erase
 		jmp	pdi_prog_main		;code 13a pdi prog appl. flash
 		jmp	pdi_prog_boot		;code 13b pdi prog boot section
-		jmp	pdi_prog_eeprom		;code 13c unknown
+		jmp	pdi_prog_eeprom		;code 13c pdi prog EEPROM
 		jmp	prg_exec_e1		;code 13d unknown
-		jmp	pdi_prog_fuse		;code 13e unknown
+		jmp	pdi_prog_fuse		;code 13e pdi program fuses
 		jmp	prg_exec_e1		;code 13f unknown
 
 		jmp	rh850_init		;code 140 RH850 init
@@ -362,14 +362,14 @@ prg_exec_jtab2:
 		jmp	rh850_read_opt		;code 14a RH850 get option bytes
 		jmp	rh850_write_opt		;code 14b RH850 write option bytes
 		jmp	rh850_get_crc		;code 14c RH850 get CRC
-		jmp	prg_exec_e1		;code 14d unknown
+		jmp	prg_exec_e1		;code 14d RH850 unknown
 		jmp	rh850_set_addr1		;code 14e RH850 set start address
 		jmp	rh850_set_addr2		;code 14f RH850 set end address
 
 		jmp	rh850_bcheck		;code 150 RH850 blank check
 		jmp	rh850_erase		;code 151 RH850 erase
 		jmp	rh850_prog_start	;code 152 RH850 start programming
-		jmp	rh850_prog_block	;code 153 RH850 program 1K block
+		jmp	rh850_prog_block	;code 153 RH850 program/verify 1K block
 		jmp	rh850_skip_block	;code 154 RH850 skip 1K block
 		jmp	rh850_read_start	;code 155 RH850 start reading
 		jmp	rh850_read_block	;code 156 RH850 read 2 blocks
@@ -553,19 +553,19 @@ prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
 		jmp	prg_exec_e1		;code 209 unknown
 		jmp	prg_exec_e1		;code 20a unknown
 		jmp	prg_exec_e1		;code 20b unknown
-		jmp	prg_exec_e1		;code 20c unknown
-		jmp	prg_exec_e1		;code 20d unknown
-		jmp	prg_exec_e1		;code 20e unknown
-		jmp	prg_exec_e1		;code 20f unknown
+		jmp	rh850_bst_start		;code 20c unknown
+		jmp	rh850_bst_block		;code 20d unknown
+		jmp	rh850_vfy_start		;code 20e RH850 verify start
+		jmp	rh850_vfy_block		;code 20f RH850 verify block
 
-		jmp	prg_exec_e1		;code 210 unknown
-		jmp	prg_exec_e1		;code 211 unknown
-		jmp	prg_exec_e1		;code 212 unknown
-		jmp	prg_exec_e1		;code 213 unknown
-		jmp	prg_exec_e1		;code 214 unknown
-		jmp	prg_exec_e1		;code 215 unknown
-		jmp	prg_exec_e1		;code 216 unknown
-		jmp	prg_exec_e1		;code 217 unknown
+		jmp	at8252_init		;code 210 AT89S8252 init 
+		jmp	at8252_exit		;code 211 AT89S8252 exit
+		jmp	at8252_cerase		;code 212 AT89S8252 chip erase
+		jmp	at8252_fprog		;code 213 AT89S8252 flash program
+		jmp	at8252_fread		;code 214 AT89S8252 flash read
+		jmp	at8252_eprog		;code 215 AT89S8252 eeprom program
+		jmp	at8252_eread		;code 216 AT89S8252 eeprom read
+		jmp	at8252_wlock		;code 217 AT89S8252 write lockbits
 		jmp	prg_exec_e1		;code 218 unknown
 		jmp	prg_exec_e1		;code 219 unknown
 		jmp	prg_exec_e1		;code 21a unknown

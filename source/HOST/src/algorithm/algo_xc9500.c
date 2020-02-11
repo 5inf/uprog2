@@ -116,6 +116,9 @@ int prog_xc9500(void)
 	errc=prg_comm(0x10D,0,8,0,0,0,0,0,0);		//init and get ID
 	
 	devid=memory[0]+(memory[1] << 8)+(memory[2] << 16)+(memory[3] << 24);
+	
+//	if((devid & 0xF0000000) == 0x50000000) devid |= 0xF0000000;
+
 
 	if(devid != param[10])
 	{
@@ -149,7 +152,7 @@ int prog_xc9500(void)
 	{	
 		printf("ERASE LOGIC\n");
 		errc=prg_comm(0x109,0,2,0,0,param[4] & 0xff,param[4] >> 8,param[5] & 0xff,param[5] >> 8);	//erase XC9500XL
-		if(errc != 0) printf("ERRCODE = %02X / %02X\n",memory[0],memory[1]);
+		if(errc != 0) printf("ERRCODE = %02X%02X%02X\n",memory[2],memory[1],memory[0]);
 	}
 	
 	if((program==1) && (errc==0) && (param[3]==1))
@@ -202,9 +205,12 @@ int prog_xc9500(void)
 	{	
 		
 //		printf("PROGRAM LOGIC\n");
+//		waitkey();
 		chunks=read_svf(param[10]);		//get chunks to shift
 		chunksize=(cpld_datasize+7)/8;		//bytes per chunk
-		
+
+//		printf("%d chunks a %d bytes (%d bits)\n",chunks,chunksize,cpld_datasize);
+
 		bsize=max_blocksize;
 		chunks_per_block=bsize/chunksize;	//maximal chunks per block
 		chunks_per_block &= 0xfff0;		//		
@@ -214,12 +220,15 @@ int prog_xc9500(void)
 		maddr=0;				//memory addr
 
 //		show_data(0,16);
+//		printf("%d blocks a %d bytes  (%d ms wait time)\n",blocks,bsize,param[6]);
 
 		errc=prg_comm(0x11a,0,0,0,0,0,0,0,0);		//start PRG
+		if(errc != 0) goto XC9500_END;
 
 		progress("PROG ",blocks,0);
 		for(i=0;i<blocks;i++)
 		{
+//			printf("%d chunks  %d bisze  %d errc\n",chunks,bsize,errc);
 			if(bsize > chunksize*chunks) bsize=chunksize*chunks;
 			if((errc==0) && (bsize > 0)) errc=prg_comm(0x11b,bsize,0,maddr,0,
 			cpld_datasize,			//bits to shift
@@ -231,12 +240,13 @@ int prog_xc9500(void)
 			progress("PROG ",blocks,i+1);
 		}
 
-		errc=prg_comm(0x11c,0,0,0,0,0,0,0,0);		//end PRG
+		if(errc== 0) errc=prg_comm(0x11c,0,0,0,0,0,0,0,0);		//end PRG
 		printf("\n");
 	}
 	
+XC9500_END:
 
-	prg_comm(0x10E,0,0,0,0,0,0,0,0);		//exit
+	prg_comm(0x10E,0,0,0,0,0,0,0,0);	//exit
 
 	prg_comm(0x2ef,0,0,0,0,0,0,0,0);	//dev 1
 

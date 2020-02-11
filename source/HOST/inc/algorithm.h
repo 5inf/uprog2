@@ -51,6 +51,7 @@
 #include <algorithm/algo_s32kswd.h>
 #include <algorithm/algo_kea64swd.h>
 #include <algorithm/algo_sici.h>
+#include <algorithm/algo_at89s8252.h>
 
 
 #include <algorithm/algo_xc9500.h>

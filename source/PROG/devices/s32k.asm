@@ -318,8 +318,8 @@ s32k_erase_0:		rcall		s32k_write_dap_table
 			brne		s32k_erase_0
 
 			rcall		s32k_read_drwx			;read IDR and check for 0x1C0020
-			cpi		r20,0x20
-			brne		s32_erase_err
+;			cpi		r20,0x00
+;			brne		s32_erase_err
 			cpi		r21,0x00
 			brne		s32_erase_err
 			cpi		r22,0x1c

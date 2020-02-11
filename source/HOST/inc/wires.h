@@ -183,8 +183,8 @@ const char * const cables[]=
 	// 60 AVR0
 	"(1=VSS  2=VDD  3=UPDI)",
 	
-	// 61 
-	"no connections",
+	// 61 AT89S8252
+	"(1=VSS  2=VDD  3=RST  4=SCK  5=MOSI  6=MISO)",
 	
 	// 62 
 	"no connections",

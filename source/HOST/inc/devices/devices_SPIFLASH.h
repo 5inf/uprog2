@@ -1,5 +1,5 @@
 
-	"25x80",
+	"F25x80",
 	22,
 	0x00000000,0x00001000,		//addr, size in 256B blocks
 	0x1000,0,			//mass erase time
@@ -12,7 +12,7 @@
 	0x0001,0x0000,
 	0x0000,0x0000,
 
-	"25x16",
+	"F25x16",
 	22,
 	0x00000000,0x00002000,		//addr, size in 256B blocks
 	0x1000,0,			//mass erase time
@@ -25,7 +25,7 @@
 	0x0001,0x0000,
 	0x0000,0x0000,
 
-	"25x32",
+	"F25x32",
 	22,
 	0x00000000,0x00004000,		//addr, size in 256B blocks
 	0x1000,0,			//mass erase time
@@ -38,7 +38,7 @@
 	0x0001,0x0000,
 	0x0000,0x0000,
 
-	"25x64",
+	"F25x64",
 	22,
 	0x00000000,0x00008000,		//addr, size in 256B blocks
 	0x4000,0,			//mass erase time
@@ -51,7 +51,7 @@
 	0x0001,0x0000,
 	0x0000,0x0000,
 
-	"25x128",
+	"F25x128",
 	22,
 	0x00000000,0x00010000,		//addr, size in 256B blocks
 	0xA000,0,			//mass erase time
@@ -64,7 +64,7 @@
 	0x0001,0x0000,
 	0x0000,0x0000,
 
-	"25x256",
+	"F25x256",
 	22,
 	0x00000000,0x00020000,		//addr, size in 256B blocks
 	0xA000,1,			//mass erase time, banked
@@ -77,7 +77,7 @@
 	0x0001,0x0000,
 	0x0000,0x0000,
 
-	"25x512",
+	"F25x512",
 	22,
 	0x00000000,0x00040000,		//addr, size in 256B blocks
 	0xC000,3,			//mass erase time, banked

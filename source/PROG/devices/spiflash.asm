@@ -214,6 +214,8 @@ spiflash_read_conf:	rcall	spiflash_wready
 			sts	0x100,XL
 			rcall	read_config2
 			sts	0x101,XL
+			rcall	read_config3
+			sts	0x102,XL
 			jmp	main_loop_ok		;quad bit is already set
 
 ;------------------------------------------------------------------------------
@@ -570,15 +572,18 @@ spiflash_nwren:		ldi	XL,0x50			;WREN cmd
 ; enable quad mode
 ;------------------------------------------------------------------------------
 read_config:		ldi	XL,0x05
-			sbrs	XL,0			;skip next
-read_config2:		ldi	XL,0x35			;read config
-			SPIFL_ACT
+read_confign:		SPIFL_ACT
 			call	spi_byte
 			ldi	XL,0x00			;status reg 1
 			call	spi_byte
 			SPIFL_INH
 			ret
 
+read_config2:		ldi	XL,0x35
+			rjmp	read_confign
+
+read_config3:		ldi	XL,0x15
+			rjmp	read_confign
 
 
 ;------------------------------------------------------------------------------

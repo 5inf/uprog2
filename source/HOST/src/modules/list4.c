@@ -58,6 +58,7 @@ void list4_devices(void)
 	list4group(3,0,0,"Atmel AVR");
 	list4group(60,0,0,"Atmel AVR0");
 	list4group(40,0,0,"Atmel ATxmega");
+	list4group(61,0,0,"Atmel AT98xxxx");
 	list4group(38,0,0,"Microchip PIC12");
 	list4group(14,15,0,"Microchip PIC16");
 	list4group(17,0,0,"Microchip PIC18");

@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.35                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.36                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  (c) 2012-2019 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");
@@ -470,6 +470,7 @@ int main(int argc, char *argv[])
 
 			case 59:	errcode=prog_sici();		break;
 			case 60:	errcode=prog_avr0();		break;
+			case 61:	errcode=prog_at89s8252();	break;
 			case 89:	errcode=prog_dgen();		break;
 			case 97:	errcode=prog_fgen();		break;
 

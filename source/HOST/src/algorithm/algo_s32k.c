@@ -212,6 +212,7 @@ int prog_s32kswd(void)
 			if(errc > 0) goto ERR_EXIT;
 //			show_data(0,4);
 			printf("RE-INIT\n");
+			errc=prg_comm(0x91,0,0,0,0,0,0,0,0);					//SWIM exit
 			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0);		//re-init
 		}
 		else
@@ -525,7 +526,7 @@ int prog_s32kswd(void)
 		(addr >> 24) & 0xff,
 		1);
 
-		show_data(ROFFSET,16);
+//		show_data(ROFFSET,16);
 		
 
 	}

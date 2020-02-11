@@ -146,8 +146,13 @@ int read_info()
 //----------------------------------------------------------------------------------
 void progress(char *mystring, int v_max, int v_act)
 {
+	char funct[22];
 	char fill[52];
 	int i;
+	strncpy(funct,mystring,20);
+	for(i=strlen(mystring);i<21;i++) funct[i]=0x20;
+	funct[i]=0;
+	
 	for(i=0;i<50;i++)
 	{
 		if(i<=((v_act*50)/v_max))
@@ -156,7 +161,7 @@ void progress(char *mystring, int v_max, int v_act)
 			fill[i]='.';
 	}
 	fill[50]=0;
-	printf("%s |%s|\r",mystring,fill);
+	printf("%s |%s|\r",funct,fill);
 	fflush(stdout);
 }
 
@@ -419,7 +424,7 @@ void set_error(char *emessage,int errnum)
 	}
 	else
 	{
-		sprintf(error_line,"ERROR: %d  %s",errnum,emessage);
+		sprintf(error_line,"ERROR %02X (%d):  %s",errnum,errnum,emessage);
 	}
 	
 	l=strlen(error_line);
@@ -437,7 +442,7 @@ void set_error2(char *emessage,int errnum,unsigned long addr)
 	}
 	else
 	{
-		sprintf(error_line,"ERROR: %d  %s AT 0x%08lX",errnum,emessage,addr);
+		sprintf(error_line,"ERROR %02X (%d):  %s AT 0x%08lX",errnum,errnum,emessage,addr);
 	}
 	
 	l=strlen(error_line);

@@ -67,6 +67,7 @@ xc9500_init_2:		rcall	xc9500_stck
 			clt				;DR shift
 			rcall	xc9500_shift		
 			
+			andi	r23,0x0f
 			sts	0x100,r20
 			sts	0x101,r21
 			sts	0x102,r22
@@ -206,7 +207,11 @@ xc9500xl_erase:		movw	r4,r16
 			ldi	r18,0x03
 			rcall	xc9500_shift		
 
-			movw	ZL,r4
+			ldi	XL,8
+			mov	r12,XL
+
+xc9500xl_erase_wait:	ldi	ZL,0
+			ldi	ZH,2
 			call	api_wait_ms
 			
 			ldi	r24,18			;18 bits
@@ -214,15 +219,24 @@ xc9500xl_erase:		movw	r4,r16
 			ldi	r16,0xfd
 			ldi	r17,0xff
 			ldi	r18,0x03
-			rcall	xc9500_shift		
+			rcall	xc9500_shift
+			sts	0x100,r20		
+			sts	0x101,r21		
+			sts	0x102,r22				
 			andi	r20,0x03
 			cpi	r20,0x01
-			brne	xc9500_erase_err
+			breq	xc9500xl_erase_end
+			dec	r12
+			breq	xc9500_erase_err
+			rjmp	xc9500xl_erase_wait	
 
-			ldi	r24,8			;8 bits
+xc9500xl_erase_end:	ldi	r24,8			;8 bits
 			set				;IR shift
 			ldi	r16,0xf0		;"conld"
 			rcall	xc9500_shift		
+
+			ldi	r17,1			;1000 additional clocks
+			rcall	xc9500xl_prog_time
 
 			jmp	main_loop_ok
 						
@@ -336,30 +350,49 @@ xc9500xl_prog_start:	ldi	r24,8			;8 bits
 
 
 xc9500xl_prog:		movw	r4,r16			;copy parameters
-			movw	r6,r18
+			movw	r6,r18			;copy count of chunks
 			call	api_resetptr		;set pointer to start
 
-xc9500xl_prog_1:	rcall	xc9500_mshift		;shift 1	
-			rcall	xc9500_mshift		;shift 2	
-			rcall	xc9500_mshift		;shift 3	
-			rcall	xc9500_mshift		;shift 4	
-			rcall	xc9500_mshift		;shift 5	
-			rcall	xc9500_mshift		;shift 6	
-			rcall	xc9500_mshift		;shift 7	
-			rcall	xc9500_mshift		;shift 8	
-			rcall	xc9500_mshift		;shift 9	
-			rcall	xc9500_mshift		;shift 10	
-			rcall	xc9500_mshift		;shift 11	
-			rcall	xc9500_mshift		;shift 12	
-			rcall	xc9500_mshift		;shift 13	
-			rcall	xc9500_mshift		;shift 14	
-			rcall	xc9500_mshift		;shift 15	
-			rcall	xc9500xl_prog_time	
-			rcall	xc9500_mshift		;shift 16	
-			cpi	r20,0x01
-			brne	xc9500xl_prog_err
+			mov	XL,r16			;shift size
+			subi	XL,0xf9			;+7
+			lsr	XL			;/8
+			lsr	XL
+			lsr	XL			
+			mov	r10,XL			;bytes per chunk
 
-			movw	r24,r6
+xc9500xl_prog_1:	rcall	xc9500_mshift0		;shift 1	
+			rcall	xc9500_mshift0		;shift 2	
+			rcall	xc9500_mshift0		;shift 3	
+			rcall	xc9500_mshift0		;shift 4	
+			rcall	xc9500_mshift0		;shift 5	
+			rcall	xc9500_mshift0		;shift 6	
+			rcall	xc9500_mshift0		;shift 7	
+			rcall	xc9500_mshift0		;shift 8	
+			rcall	xc9500_mshift0		;shift 9	
+			rcall	xc9500_mshift0		;shift 10	
+			rcall	xc9500_mshift0		;shift 11	
+			rcall	xc9500_mshift0		;shift 12	
+			rcall	xc9500_mshift0		;shift 13	
+			rcall	xc9500_mshift0		;shift 14	
+			rcall	xc9500_mshift0		;shift 15	
+
+			ldi	XL,128			;tries
+			mov	r12,XL
+
+xc9500xl_prog_wait:	ldi	ZL,12
+			ldi	ZH,0
+			call	api_wait_ms
+							
+			rcall	xc9500_mshift0		;shift 16	
+			cpi	r20,0x01
+			breq	xc9500xl_prog_next
+			dec	r12		
+			breq	xc9500xl_prog_err
+			sub	YL,r10
+			sbc	YH,const_0
+			rjmp	xc9500xl_prog_wait
+
+xc9500xl_prog_next:	movw	r24,r6
 			sbiw	r24,16
 			movw	r6,r24
 			brne	xc9500xl_prog_1
@@ -370,29 +403,38 @@ xc9500xl_prog_err:	ldi	r16,0x60
 			add	r16,r20
 			jmp	main_loop
 
-
 xc9500xl_prog_end:	ldi	r24,8			;8 bits
 			set				;IR shift
 			ldi	r16,0xf0		;"conld"
 			rcall	xc9500_shift		
 
+			ldi	r17,1			;1000 additional clocks
+			rcall	xc9500xl_prog_time
+
 			jmp	main_loop_ok
 
+			;r17 x 5000 TCK clocks with 1 MHz
 xc9500xl_prog_time:	push	ZL
 			push	ZH
 			push	XL
-			ldi	ZL,67
+			ldi	ZL,50
 			mul	ZL,r17
 			movw	ZL,r0
-xc9500xl_prog_time_1:	ldi	XL,33
-xc9500xl_prog_time_2:	dec	XL
-			brne	xc9500xl_prog_time_2
+xc9500xl_prog_time_1:	ldi	XL,100
+xc9500xl_prog_time_2:	sbi	CTRLPORT,J9500_TCK	;2
+			rcall	xc9500xl_prog_time_3	;7
+			cbi	CTRLPORT,J9500_TCK	;2			
+			rcall	xc9500xl_prog_time_3	;7
+			dec	XL			;1
+			brne	xc9500xl_prog_time_2	;2
 			sbiw	ZL,1
 			brne	xc9500xl_prog_time_1
 			pop	XL
 			pop	ZH
 			pop	ZL
 			ret
+
+xc9500xl_prog_time_3:	ret
 
 
 ;------------------------------------------------------------------------------
@@ -463,6 +505,7 @@ xc9500_shift_5:		ret
 ; r24		Bits to shift
 ; r20		result
 ;------------------------------------------------------------------------------
+xc9500_mshift0:		mov	r24,r4
 xc9500_mshift:		sbi	CTRLPORT,J9500_TMS
 			rcall	xc9500_stck			;-> DR-scan
 			cbi	CTRLPORT,J9500_TMS
@@ -507,13 +550,13 @@ xc9500_mshift_2:	sbrc	XL,0				;skip if zero
 			cpi	r24,1				;is this the last?
 			brne	xc9500_mshift_3
 			sbi	CTRLPORT,J9500_TMS		;last bit -> exit IR
-xc9500_mshift_3:	sbi	CTRLPORT,J9500_TCK	;2			
+xc9500_mshift_3:	sbi	CTRLPORT,J9500_TCK	;2
 			dec	r25
 			brne	xc9500_mshift_4			
 			call	api_buf_bread			;read first byte
 			ldi	r25,8				;bits per byte
 
-xc9500_mshift_4:	cbi	CTRLPORT,J9500_TCK	;2			
+xc9500_mshift_4:	cbi	CTRLPORT,J9500_TCK	;2
 			dec	r24				;bit counter
 			brne	xc9500_mshift_2			;shift loop
 

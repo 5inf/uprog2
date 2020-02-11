@@ -48,14 +48,16 @@
 .equ	RH850_FLMD0	= SIG5
 
 ;FLMD0, RH850_RESET, RH850_FPDR, RH850_SCK
-.equ	RH850_DIRSET	= SIG1_OR | SIG2_OR | SIG3_OR | SIG5_OR | SIG4_OR
+.equ	RH850_DIRSET	= SIG1_OR | SIG2_OR | SIG3_OR | SIG5_OR 
 
 ;------------------------------------------------------------------------------
 ; INIT CSI MODE
 ; PAR4=number of FLMDO pulses
 ; PAR3=SOD (will be stored)
+; PAR2=PR5 OF PM3
 ;------------------------------------------------------------------------------
-rh850_init:		mov	r8,r18				;store SOD
+rh850_init:		mov	r21,r17
+			mov	r8,r18				;store SOD
 			clr	r9				;low speed
 			ldi	XL,SIG2_OR
 			mov	r10,XL				;for faster clock
@@ -70,11 +72,20 @@ rh850_init:		mov	r8,r18				;store SOD
 			sbi	CTRLPORT,RH850_FLMD0		;FLMD0=1
 			sbi	CTRLPORT,RH850_SCK
 			sbi	CTRLPORT,RH850_FPDR
+			sbi	CTRLPORT,RH850_FPDT
+			ldi	ZL,10
+			ldi	ZH,0
+			call	wait_ms
+			sbi	CTRLPORT,RH850_RESET		;release RESET with FLMD0=1
+			ldi	ZL,1
+			ldi	ZH,0
+			call	wait_ms
+			cbi	CTRLPORT,RH850_RESET		;release RESET with FLMD0=1
 			ldi	ZL,1
 			ldi	ZH,0
 			call	wait_ms
 			sbi	CTRLPORT,RH850_RESET		;release RESET with FLMD0=1
-			ldi	ZL,100
+			mov	ZL,r21
 			ldi	ZH,0
 			call	wait_ms
 
@@ -95,7 +106,11 @@ rh850_init_1a:		rcall	rh850_wait_recv			;wait for FPDT HIGH
 rh850_init_err1:	ldi	r16,0x41			;timeout
 			jmp	main_loop
 			
-rh850_init_1b:		rcall	rh850_wait_send			;wait for FPDT LOW
+rh850_init_1b:		ldi	ZL,50
+			ldi	ZH,0
+			call	api_wait_ms
+
+			rcall	rh850_wait_send			;wait for FPDT LOW
 			brts	rh850_init_err1
 
 			ldi	XL,0x55
@@ -451,6 +466,74 @@ rh850_prog_start:	call	api_resetptr
 			
 			rcall	rh850_get_status
 			jmp	main_loop
+
+
+;------------------------------------------------------------------------------
+; Verify start
+;------------------------------------------------------------------------------
+rh850_vfy_start:	call	api_resetptr
+			rcall	rh850_send_soh		;SOH senden
+			ldi	XL,0x00			;LENH
+			rcall	rh850_sendbyte
+			ldi	XL,0x09			;LENL
+			rcall	rh850_sendbyte
+			ldi	XL,0x16			;verify command
+			rcall	rh850_sendbyte
+			lds	XL,devbuf+3		;SA HH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+2		;SA HL
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+1		;SA LH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+0		;SA LL
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+7		;EA HH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+6		;EA HL
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+5		;EA LH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+4		;EA LL
+			rcall	rh850_sendbyte		
+			rcall	rh850_send_csum
+			rcall	rh850_send_etx		;ETX senden
+			
+			rcall	rh850_get_status
+			jmp	main_loop
+
+;------------------------------------------------------------------------------
+; Bootstrap start
+;------------------------------------------------------------------------------
+rh850_bst_start:	call	api_resetptr
+			rcall	rh850_send_soh		;SOH senden
+			ldi	XL,0x00			;LENH
+			rcall	rh850_sendbyte
+			ldi	XL,0x09			;LENL
+			rcall	rh850_sendbyte
+			ldi	XL,0x3F			;bst command
+			rcall	rh850_sendbyte
+			lds	XL,devbuf+3		;SA HH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+2		;SA HL
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+1		;SA LH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+0		;SA LL
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+7		;EA HH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+6		;EA HL
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+5		;EA LH
+			rcall	rh850_sendbyte		
+			lds	XL,devbuf+4		;EA LL
+			rcall	rh850_sendbyte		
+			rcall	rh850_send_csum
+			rcall	rh850_send_etx		;ETX senden
+			
+			rcall	rh850_get_status
+			jmp	main_loop
+
 	
 ;------------------------------------------------------------------------------
 ; PROGRAM 1K block
@@ -478,6 +561,94 @@ rh850_prog_block_1:	call	api_buf_bread
 			rcall	rh850_sendbyte
 			sbiw	r24,1
 			brne	rh850_prog_block_1
+
+			ldi	ZL,1
+			ldi	ZH,0
+			call	api_wait_ms
+	
+			rcall	rh850_send_csum
+			mov	XL,r18			;ETX/ETB
+			rcall	rh850_sendbyte
+		
+			ldi	ZL,1
+			ldi	ZH,0
+			call	api_wait_ms
+		
+			call	api_resetptr
+			rcall	rh850_get_status
+			jmp	main_loop
+
+	
+;------------------------------------------------------------------------------
+; Verify 1K block
+; PAR4=ETX/ETB
+;------------------------------------------------------------------------------
+rh850_vfy_blockx:	movw	r24,r16
+			rjmp	rh850_vfy_block_0
+
+rh850_vfy_block:	ldi	r24,0
+			ldi	r25,4
+
+rh850_vfy_block_0:	mov	r18,r19
+			adiw	r24,1
+			call	api_resetptr
+			rcall	rh850_send_sod		;SOD senden
+			mov	XL,r25			;LENH
+			rcall	rh850_sendbyte
+			mov	XL,r24			;LENL
+			rcall	rh850_sendbyte
+			ldi	XL,0x16			;write command
+			rcall	rh850_sendbyte
+			sbiw	r24,1
+			
+rh850_vfy_block_1:	call	api_buf_bread
+			rcall	rh850_sendbyte
+			sbiw	r24,1
+			brne	rh850_vfy_block_1
+
+			ldi	ZL,1
+			ldi	ZH,0
+			call	api_wait_ms
+	
+			rcall	rh850_send_csum
+			mov	XL,r18			;ETX/ETB
+			rcall	rh850_sendbyte
+		
+			ldi	ZL,1
+			ldi	ZH,0
+			call	api_wait_ms
+		
+			call	api_resetptr
+			rcall	rh850_get_status
+			jmp	main_loop
+						
+
+;------------------------------------------------------------------------------
+; Bootstrap 1K block
+; PAR4=ETX/ETB
+;------------------------------------------------------------------------------
+rh850_bst_blockx:	movw	r24,r16
+			rjmp	rh850_bst_block_0
+
+rh850_bst_block:	ldi	r24,0
+			ldi	r25,4
+
+rh850_bst_block_0:	mov	r18,r19
+			adiw	r24,1
+			call	api_resetptr
+			rcall	rh850_send_sod		;SOD senden
+			mov	XL,r25			;LENH
+			rcall	rh850_sendbyte
+			mov	XL,r24			;LENL
+			rcall	rh850_sendbyte
+			ldi	XL,0x3F			;write command
+			rcall	rh850_sendbyte
+			sbiw	r24,1
+			
+rh850_bst_block_1:	call	api_buf_bread
+			rcall	rh850_sendbyte
+			sbiw	r24,1
+			brne	rh850_bst_block_1
 
 			ldi	ZL,1
 			ldi	ZH,0
@@ -812,7 +983,7 @@ rh850_get_status_3:	rcall	rh850_send_zero			;CMD
 			set
 			rcall	rh850_send_zero			;ERRCODE
 			mov	r16,XL
-			andi	r16,0x7f
+;			andi	r16,0x7f
 			rcall	rh850_send_zero			;CSUM			
 			rcall	rh850_send_zero			;ETX			
 			ret
@@ -1024,7 +1195,7 @@ rh850_wait_send:	push	ZH
 			clt
 rh850_wait_send_1:	sbis	CTRLPIN,RH850_FPDT		;1 FPDT
 			rjmp	rh850_wait_send_2
-;			rcall	rh850_ret			
+			rcall	rh850_ret			
 			sbiw	ZL,1
 			brne	rh850_wait_send_1
 			set					;timeout

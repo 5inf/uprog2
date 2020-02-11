@@ -57,7 +57,7 @@ int show_quadmode(void)
 	}
 	else
 	{
-		printf(" config/status: %02X  %02X\n",memory[0],memory[1]);
+		printf(" config/status: %02X  %02X %02X\n",memory[0],memory[1],memory[2]);
 
 	 	if(	((param[17]==0) && (memory[1] & 0x02)) ||
 			((param[17]==1) && (memory[0] & 0x40)))
