@@ -123,6 +123,8 @@ With a programmer programming can be done using e.g. AVRdude (https://www.nongnu
     avrdude ...
     uisp ...
     
+     uprog2 ATMEGA644PA -empmvm main-usb.hex
+    
 ##### Setting USB device strings on the FTDI USB Serial interface
 
 ! WARNING: This changes the configuration of the FTDI chip on your uprog2 board. Use with caution!
