@@ -44,42 +44,8 @@ main_loop_wait:		ldr	r0, [r1,#0]
 
 			cmp	r0, #0x72		// prog option bytes
 			beq	prog_opt
-
-			cmp	r0, #0x73		// option bytes erase
-			beq	opt_erase			
 			
 tloop:			b	main_loop
-
-
-################################################################################
-# option bytes erase
-################################################################################
-opt_erase:		//unlock flash
-			ldr	r4, =FLASH_BASE
-			mov	r3,#0
-			str	r3,[r4,#FLASH_CR]	//disable all PROG signals
-			ldr	r2, =0x45670123		//key 1
-			ldr	r3, =0xCDEF89AB		//key 2
-			str	r2,[r4,#FLASH_KEYR]	//write key 1	
-			str	r3,[r4,#FLASH_KEYR]	//write key 2	
-			str	r2,[r4,#FLASH_OPTKEYR]	//write key 1	
-			str	r3,[r4,#FLASH_OPTKEYR]	//write key 2	
-
-			ldr	r2, [r4,#FLASH_CR]
-			mov	r3,#0x20		//OPTER
-			orr	r2,r3
-			str	r2, [r4,#FLASH_CR]
-
-			mov	r3,#0x40		//STRT
-			orr	r2,r3
-			str	r2, [r4,#FLASH_CR]
-
-			mov	r3,#0x01		//wait for BUSY LOW
-opt_erase_1:		ldr	r2, [r4,#FLASH_SR]
-			tst	r2,r3
-			bne	opt_erase_1
-			b	main_loop		//done
-
 
 		
 ################################################################################
@@ -127,48 +93,6 @@ prog_flash_4:		sub	r6,#1
 			bne	prog_flash_1			
 			
 			b	main_loop
-
-################################################################################
-# program 1K flash (block 1)
-################################################################################
-prog_flash1:		ldr	r1, =0x20000400		//buffer base
-			ldr	r6, =0x400		//halfwords to do
-			ldr	r4, =FLASH_BASE
-			mov	r3,#0
-			str	r3,[r4,#FLASH_CR2]
-			ldr	r2, =0x45670123		//key 1
-			ldr	r3, =0xCDEF89AB		//key 2
-			str	r2,[r4,#FLASH_KEYR2]	//write key 1	
-			str	r3,[r4,#FLASH_KEYR2]	//write key 2	
-			
-			
-prog_flash1_1:		ldrh	r0,[r1,#0]		//get data
-			ldr	r3,=0xFFFF		//empty
-			cmp	r0,r3
-			beq	prog_flash1_3a		//nothing to do
-
-			ldr	r2, [r4,#FLASH_CR2]
-			mov	r3,#0x01		//set PG
-			orr	r2,r3
-			str	r2, [r4,#FLASH_CR2]
-
-			strh	r0,[r7,#0]		//store half word
-			lsr	r0,#16
-
-			mov	r3,#0x01		//BSY
-prog_flash1_3:		ldr	r2, [r4,#FLASH_SR2]
-			tst	r2,r3
-			bne	prog_flash1_3
-
-prog_flash1_3a:		add	r7,#2			//flash addr
-			add	r1,#2			//buffer addr
-
-prog_flash1_4:		sub	r6,#1
-			bne	prog_flash1_1			
-			
-			b	main_loop
-
-
 
 ################################################################################
 # program option bytes

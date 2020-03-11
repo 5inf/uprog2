@@ -45,6 +45,9 @@ void print_msp430b_error(int errc)
 		case 0x55:	set_error("(FETCH ERROR)",errc);
 				break;
 
+		case 0x57:	set_error("(VERIFY ERROR)",errc);
+				break;
+
 		default:	set_error("(unexpected error)",errc);
 	}
 	print_error();
@@ -248,7 +251,7 @@ int prog_msp430b()
 			if(memory[j] != memory[j+ROFFSET])
 			{
 				printf("ERR -> ADDR= %04X  DATA= %02X  READ= %02X\n",addr+j,memory[j],memory[j+ROFFSET]);
-				errc=1;
+				errc=0x57;
 			}
 		}
 	}
@@ -321,7 +324,7 @@ int prog_msp430b()
 			if(memory[j] != memory[j+ROFFSET])
 			{
 				printf("ERR -> ADDR= %04X  DATA= %02X  READ= %02X\n",addr+j,memory[j],memory[j+ROFFSET]);
-				errc=1;
+				errc=0x57;
 			}
 		}
 	}
@@ -347,7 +350,7 @@ int prog_msp430b()
 			if(memory[j] != memory[j+ROFFSET])
 			{
 				printf("ERR -> ADDR= %04X  DATA= %02X  READ= %02X\n",ramsize+j,memory[j],memory[j+ROFFSET]);
-				errc=1;
+				errc=0x57;
 			}
 		}
 		

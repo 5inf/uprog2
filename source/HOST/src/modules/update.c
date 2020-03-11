@@ -68,8 +68,7 @@ int check_update(void)
 	int upage,errc,blocks,isv=0;
 	unsigned long faddr;
 
-	if((blver & 0xC0) == 0x00) isv=256*system_u644[960]+system_u644[961];
-	if((blver & 0xC0) == 0x40) isv=256*system_b644[960]+system_b644[961];
+	isv=256*system_644[960]+system_644[961];
 
 	if(isv != sysversion)
 	{
@@ -80,8 +79,7 @@ int check_update(void)
 
 		for(faddr=0;faddr<57344;faddr++)
 		{			
-			if((blver & 0xC0) == 0x00) memory[faddr]=system_u644[faddr];
-			if((blver & 0xC0) == 0x40) memory[faddr]=system_b644[faddr];
+			memory[faddr]=system_644[faddr];
 		}	
 
 		blocks=28;				// Mega644
@@ -107,7 +105,7 @@ int check_update(void)
 		else
 		{
 			printf("\nUPDATE DONE\n");
-			return 0;
+			return -1;
 		}
 	}
 	return 1;

@@ -1,20 +1,20 @@
 
 a.out:     file format elf32-littlearm
 a.out
-architecture: armv4t, flags 0x00000010:
-HAS_SYMS
+architecture: armv4t, flags 0x00000011:
+HAS_RELOC, HAS_SYMS
 start address 0x00000000
 private flags = 5000000: [Version5 EABI]
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         00000134  00000000  00000000  00000034  2**2
-                  CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .data         00000000  00000000  00000000  00000168  2**0
+  0 .text         000000cc  00000000  00000000  00000034  2**2
+                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+  1 .data         00000000  00000000  00000000  00000100  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  2 .bss          00000000  00000000  00000000  00000168  2**0
+  2 .bss          00000000  00000000  00000000  00000100  2**0
                   ALLOC
-  3 .ARM.attributes 00000014  00000000  00000000  00000168  2**0
+  3 .ARM.attributes 00000014  00000000  00000000  00000100  2**0
                   CONTENTS, READONLY
 SYMBOL TABLE:
 00000000 l    d  .text	00000000 .text
@@ -37,24 +37,18 @@ SYMBOL TABLE:
 00000008 l       .text	00000000 main_start
 0000000e l       .text	00000000 main_loop
 00000014 l       .text	00000000 main_loop_wait
-0000005c l       .text	00000000 prog_flash
-000000d6 l       .text	00000000 prog_opt
-00000032 l       .text	00000000 opt_erase
-00000030 l       .text	00000000 tloop
-00000054 l       .text	00000000 opt_erase_1
-0000009e l       .text	00000000 prog_flash1
-00000078 l       .text	00000000 prog_flash_1
-00000094 l       .text	00000000 prog_flash_3a
-0000008e l       .text	00000000 prog_flash_3
-00000098 l       .text	00000000 prog_flash_4
-000000b0 l       .text	00000000 prog_flash1_1
-000000cc l       .text	00000000 prog_flash1_3a
-000000c6 l       .text	00000000 prog_flash1_3
-000000d0 l       .text	00000000 prog_flash1_4
-000000ec l       .text	00000000 prog_opt_1
-000000fa l       .text	00000000 prog_opt_3
-00000100 l       .text	00000000 prog_opt_4
+0000002e l       .text	00000000 prog_flash
+00000070 l       .text	00000000 prog_opt
+0000002c l       .text	00000000 tloop
+0000004a l       .text	00000000 prog_flash_1
+00000066 l       .text	00000000 prog_flash_3a
+00000060 l       .text	00000000 prog_flash_3
+0000006a l       .text	00000000 prog_flash_4
+00000086 l       .text	00000000 prog_opt_1
+00000094 l       .text	00000000 prog_opt_3
+0000009a l       .text	00000000 prog_opt_4
 00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+00000000         *UND*	00000000 prog_flash1
 
 
 
@@ -65,12 +59,12 @@ Disassembly of section .text:
    4:	20000009 	andcs	r0, r0, r9
 
 00000008 <main_start>:
-   8:	4c41      	ldr	r4, [pc, #260]	; (110 <prog_opt_4+0x10>)
+   8:	4c27      	ldr	r4, [pc, #156]	; (a8 <prog_opt_4+0xe>)
    a:	2331      	movs	r3, #49	; 0x31
    c:	6023      	str	r3, [r4, #0]
 
 0000000e <main_loop>:
-   e:	4941      	ldr	r1, [pc, #260]	; (114 <prog_opt_4+0x14>)
+   e:	4927      	ldr	r1, [pc, #156]	; (ac <prog_opt_4+0x12>)
   10:	2200      	movs	r2, #0
   12:	600a      	str	r2, [r1, #0]
 
@@ -79,171 +73,106 @@ Disassembly of section .text:
   16:	4290      	cmp	r0, r2
   18:	d0fc      	beq.n	14 <main_loop_wait>
   1a:	1c07      	adds	r7, r0, #0
-  1c:	4a3e      	ldr	r2, [pc, #248]	; (118 <prog_opt_4+0x18>)
+  1c:	4a24      	ldr	r2, [pc, #144]	; (b0 <prog_opt_4+0x16>)
   1e:	4017      	ands	r7, r2
   20:	22ff      	movs	r2, #255	; 0xff
   22:	4010      	ands	r0, r2
   24:	2852      	cmp	r0, #82	; 0x52
-  26:	d019      	beq.n	5c <prog_flash>
+  26:	d002      	beq.n	2e <prog_flash>
   28:	2872      	cmp	r0, #114	; 0x72
-  2a:	d054      	beq.n	d6 <prog_opt>
-  2c:	2873      	cmp	r0, #115	; 0x73
-  2e:	d000      	beq.n	32 <opt_erase>
+  2a:	d021      	beq.n	70 <prog_opt>
 
-00000030 <tloop>:
-  30:	e7ed      	b.n	e <main_loop>
+0000002c <tloop>:
+  2c:	e7ef      	b.n	e <main_loop>
 
-00000032 <opt_erase>:
-  32:	4c37      	ldr	r4, [pc, #220]	; (110 <prog_opt_4+0x10>)
-  34:	2300      	movs	r3, #0
-  36:	6123      	str	r3, [r4, #16]
-  38:	4a38      	ldr	r2, [pc, #224]	; (11c <prog_opt_4+0x1c>)
-  3a:	4b39      	ldr	r3, [pc, #228]	; (120 <prog_opt_4+0x20>)
-  3c:	6062      	str	r2, [r4, #4]
-  3e:	6063      	str	r3, [r4, #4]
-  40:	60a2      	str	r2, [r4, #8]
-  42:	60a3      	str	r3, [r4, #8]
-  44:	6922      	ldr	r2, [r4, #16]
-  46:	2320      	movs	r3, #32
-  48:	431a      	orrs	r2, r3
-  4a:	6122      	str	r2, [r4, #16]
-  4c:	2340      	movs	r3, #64	; 0x40
-  4e:	431a      	orrs	r2, r3
-  50:	6122      	str	r2, [r4, #16]
-  52:	2301      	movs	r3, #1
+0000002e <prog_flash>:
+  2e:	4a21      	ldr	r2, [pc, #132]	; (b4 <prog_opt_4+0x1a>)
+  30:	1c3b      	adds	r3, r7, #0
+  32:	4013      	ands	r3, r2
+  34:	4293      	cmp	r3, r2
+  36:	d0fe      	beq.n	0 <prog_flash1>
+			36: R_ARM_THM_JUMP8	prog_flash1
+  38:	491f      	ldr	r1, [pc, #124]	; (b8 <prog_opt_4+0x1e>)
+  3a:	4e20      	ldr	r6, [pc, #128]	; (bc <prog_opt_4+0x22>)
+  3c:	4c1a      	ldr	r4, [pc, #104]	; (a8 <prog_opt_4+0xe>)
+  3e:	4a20      	ldr	r2, [pc, #128]	; (c0 <prog_opt_4+0x26>)
+  40:	4b20      	ldr	r3, [pc, #128]	; (c4 <prog_opt_4+0x2a>)
+  42:	6062      	str	r2, [r4, #4]
+  44:	6063      	str	r3, [r4, #4]
+  46:	2300      	movs	r3, #0
+  48:	6123      	str	r3, [r4, #16]
 
-00000054 <opt_erase_1>:
-  54:	68e2      	ldr	r2, [r4, #12]
-  56:	421a      	tst	r2, r3
-  58:	d1fc      	bne.n	54 <opt_erase_1>
-  5a:	e7d8      	b.n	e <main_loop>
+0000004a <prog_flash_1>:
+  4a:	8808      	ldrh	r0, [r1, #0]
+  4c:	4b1e      	ldr	r3, [pc, #120]	; (c8 <prog_opt_4+0x2e>)
+  4e:	4298      	cmp	r0, r3
+  50:	d009      	beq.n	66 <prog_flash_3a>
+  52:	6922      	ldr	r2, [r4, #16]
+  54:	2301      	movs	r3, #1
+  56:	431a      	orrs	r2, r3
+  58:	6122      	str	r2, [r4, #16]
+  5a:	8038      	strh	r0, [r7, #0]
+  5c:	0c00      	lsrs	r0, r0, #16
+  5e:	2301      	movs	r3, #1
 
-0000005c <prog_flash>:
-  5c:	4a31      	ldr	r2, [pc, #196]	; (124 <prog_opt_4+0x24>)
-  5e:	1c3b      	adds	r3, r7, #0
-  60:	4013      	ands	r3, r2
-  62:	4293      	cmp	r3, r2
-  64:	d01b      	beq.n	9e <prog_flash1>
-  66:	4930      	ldr	r1, [pc, #192]	; (128 <prog_opt_4+0x28>)
-  68:	4e30      	ldr	r6, [pc, #192]	; (12c <prog_opt_4+0x2c>)
-  6a:	4c29      	ldr	r4, [pc, #164]	; (110 <prog_opt_4+0x10>)
-  6c:	4a2b      	ldr	r2, [pc, #172]	; (11c <prog_opt_4+0x1c>)
-  6e:	4b2c      	ldr	r3, [pc, #176]	; (120 <prog_opt_4+0x20>)
-  70:	6062      	str	r2, [r4, #4]
-  72:	6063      	str	r3, [r4, #4]
-  74:	2300      	movs	r3, #0
-  76:	6123      	str	r3, [r4, #16]
+00000060 <prog_flash_3>:
+  60:	68e2      	ldr	r2, [r4, #12]
+  62:	421a      	tst	r2, r3
+  64:	d1fc      	bne.n	60 <prog_flash_3>
 
-00000078 <prog_flash_1>:
-  78:	8808      	ldrh	r0, [r1, #0]
-  7a:	4b2d      	ldr	r3, [pc, #180]	; (130 <prog_opt_4+0x30>)
-  7c:	4298      	cmp	r0, r3
-  7e:	d009      	beq.n	94 <prog_flash_3a>
-  80:	6922      	ldr	r2, [r4, #16]
-  82:	2301      	movs	r3, #1
-  84:	431a      	orrs	r2, r3
-  86:	6122      	str	r2, [r4, #16]
-  88:	8038      	strh	r0, [r7, #0]
-  8a:	0c00      	lsrs	r0, r0, #16
-  8c:	2301      	movs	r3, #1
+00000066 <prog_flash_3a>:
+  66:	3702      	adds	r7, #2
+  68:	3102      	adds	r1, #2
 
-0000008e <prog_flash_3>:
-  8e:	68e2      	ldr	r2, [r4, #12]
-  90:	421a      	tst	r2, r3
-  92:	d1fc      	bne.n	8e <prog_flash_3>
+0000006a <prog_flash_4>:
+  6a:	3e01      	subs	r6, #1
+  6c:	d1ed      	bne.n	4a <prog_flash_1>
+  6e:	e7ce      	b.n	e <main_loop>
 
-00000094 <prog_flash_3a>:
-  94:	3702      	adds	r7, #2
-  96:	3102      	adds	r1, #2
+00000070 <prog_opt>:
+  70:	4911      	ldr	r1, [pc, #68]	; (b8 <prog_opt_4+0x1e>)
+  72:	2608      	movs	r6, #8
+  74:	4c0c      	ldr	r4, [pc, #48]	; (a8 <prog_opt_4+0xe>)
+  76:	2300      	movs	r3, #0
+  78:	6123      	str	r3, [r4, #16]
+  7a:	4a11      	ldr	r2, [pc, #68]	; (c0 <prog_opt_4+0x26>)
+  7c:	4b11      	ldr	r3, [pc, #68]	; (c4 <prog_opt_4+0x2a>)
+  7e:	6062      	str	r2, [r4, #4]
+  80:	6063      	str	r3, [r4, #4]
+  82:	60a2      	str	r2, [r4, #8]
+  84:	60a3      	str	r3, [r4, #8]
 
-00000098 <prog_flash_4>:
-  98:	3e01      	subs	r6, #1
-  9a:	d1ed      	bne.n	78 <prog_flash_1>
-  9c:	e7b7      	b.n	e <main_loop>
+00000086 <prog_opt_1>:
+  86:	8808      	ldrh	r0, [r1, #0]
+  88:	6922      	ldr	r2, [r4, #16]
+  8a:	2310      	movs	r3, #16
+  8c:	431a      	orrs	r2, r3
+  8e:	6122      	str	r2, [r4, #16]
+  90:	8038      	strh	r0, [r7, #0]
+  92:	2301      	movs	r3, #1
 
-0000009e <prog_flash1>:
-  9e:	4922      	ldr	r1, [pc, #136]	; (128 <prog_opt_4+0x28>)
-  a0:	4e22      	ldr	r6, [pc, #136]	; (12c <prog_opt_4+0x2c>)
-  a2:	4c1b      	ldr	r4, [pc, #108]	; (110 <prog_opt_4+0x10>)
-  a4:	2300      	movs	r3, #0
-  a6:	6523      	str	r3, [r4, #80]	; 0x50
-  a8:	4a1c      	ldr	r2, [pc, #112]	; (11c <prog_opt_4+0x1c>)
-  aa:	4b1d      	ldr	r3, [pc, #116]	; (120 <prog_opt_4+0x20>)
-  ac:	6462      	str	r2, [r4, #68]	; 0x44
-  ae:	6463      	str	r3, [r4, #68]	; 0x44
+00000094 <prog_opt_3>:
+  94:	68e2      	ldr	r2, [r4, #12]
+  96:	421a      	tst	r2, r3
+  98:	d1fc      	bne.n	94 <prog_opt_3>
 
-000000b0 <prog_flash1_1>:
-  b0:	8808      	ldrh	r0, [r1, #0]
-  b2:	4b1f      	ldr	r3, [pc, #124]	; (130 <prog_opt_4+0x30>)
-  b4:	4298      	cmp	r0, r3
-  b6:	d009      	beq.n	cc <prog_flash1_3a>
-  b8:	6d22      	ldr	r2, [r4, #80]	; 0x50
-  ba:	2301      	movs	r3, #1
-  bc:	431a      	orrs	r2, r3
-  be:	6522      	str	r2, [r4, #80]	; 0x50
-  c0:	8038      	strh	r0, [r7, #0]
-  c2:	0c00      	lsrs	r0, r0, #16
-  c4:	2301      	movs	r3, #1
-
-000000c6 <prog_flash1_3>:
-  c6:	6ce2      	ldr	r2, [r4, #76]	; 0x4c
-  c8:	421a      	tst	r2, r3
-  ca:	d1fc      	bne.n	c6 <prog_flash1_3>
-
-000000cc <prog_flash1_3a>:
-  cc:	3702      	adds	r7, #2
-  ce:	3102      	adds	r1, #2
-
-000000d0 <prog_flash1_4>:
-  d0:	3e01      	subs	r6, #1
-  d2:	d1ed      	bne.n	b0 <prog_flash1_1>
-  d4:	e79b      	b.n	e <main_loop>
-
-000000d6 <prog_opt>:
-  d6:	4914      	ldr	r1, [pc, #80]	; (128 <prog_opt_4+0x28>)
-  d8:	2608      	movs	r6, #8
-  da:	4c0d      	ldr	r4, [pc, #52]	; (110 <prog_opt_4+0x10>)
-  dc:	2300      	movs	r3, #0
-  de:	6123      	str	r3, [r4, #16]
-  e0:	4a0e      	ldr	r2, [pc, #56]	; (11c <prog_opt_4+0x1c>)
-  e2:	4b0f      	ldr	r3, [pc, #60]	; (120 <prog_opt_4+0x20>)
-  e4:	6062      	str	r2, [r4, #4]
-  e6:	6063      	str	r3, [r4, #4]
-  e8:	60a2      	str	r2, [r4, #8]
-  ea:	60a3      	str	r3, [r4, #8]
-
-000000ec <prog_opt_1>:
-  ec:	8808      	ldrh	r0, [r1, #0]
-  ee:	6922      	ldr	r2, [r4, #16]
-  f0:	2310      	movs	r3, #16
-  f2:	431a      	orrs	r2, r3
-  f4:	6122      	str	r2, [r4, #16]
-  f6:	8038      	strh	r0, [r7, #0]
-  f8:	2301      	movs	r3, #1
-
-000000fa <prog_opt_3>:
-  fa:	68e2      	ldr	r2, [r4, #12]
-  fc:	421a      	tst	r2, r3
-  fe:	d1fc      	bne.n	fa <prog_opt_3>
-
-00000100 <prog_opt_4>:
- 100:	3702      	adds	r7, #2
- 102:	3102      	adds	r1, #2
- 104:	3e01      	subs	r6, #1
- 106:	d1f1      	bne.n	ec <prog_opt_1>
- 108:	2300      	movs	r3, #0
- 10a:	6123      	str	r3, [r4, #16]
- 10c:	e77f      	b.n	e <main_loop>
- 10e:	46c0      	nop			; (mov r8, r8)
- 110:	40022000 	andmi	r2, r2, r0
- 114:	20000c00 	andcs	r0, r0, r0, lsl #24
- 118:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
- 11c:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
- 120:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 3d4 <prog_opt_4+0x2d4>
- 124:	00080000 	andeq	r0, r8, r0
- 128:	20000400 	andcs	r0, r0, r0, lsl #8
- 12c:	00000400 	andeq	r0, r0, r0, lsl #8
- 130:	0000ffff 	strdeq	pc, [r0], -pc	; <UNPREDICTABLE>
+0000009a <prog_opt_4>:
+  9a:	3702      	adds	r7, #2
+  9c:	3102      	adds	r1, #2
+  9e:	3e01      	subs	r6, #1
+  a0:	d1f1      	bne.n	86 <prog_opt_1>
+  a2:	2300      	movs	r3, #0
+  a4:	6123      	str	r3, [r4, #16]
+  a6:	e7b2      	b.n	e <main_loop>
+  a8:	40022000 	andmi	r2, r2, r0
+  ac:	20000c00 	andcs	r0, r0, r0, lsl #24
+  b0:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
+  b4:	00080000 	andeq	r0, r8, r0
+  b8:	20000400 	andcs	r0, r0, r0, lsl #8
+  bc:	00000400 	andeq	r0, r0, r0, lsl #8
+  c0:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
+  c4:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 378 <prog_opt_4+0x2de>
+  c8:	0000ffff 	strdeq	pc, [r0], -pc	; <UNPREDICTABLE>
 
 Disassembly of section .ARM.attributes:
 

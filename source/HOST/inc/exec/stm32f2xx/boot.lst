@@ -40,14 +40,14 @@ ARM GAS  boot.asm 			page 1
   19              	################################################################################
   20              	# set wait states
   21              	################################################################################
-  22 0008 414C     				ldr	r4, =FLASH_BASE
+  22 0008 354C     				ldr	r4, =FLASH_BASE
   23 000a 3123     				mov	r3,#0x31		//1 wait state
   24 000c 2360     				str	r3,[r4,#FLASH_ACR]
   25              	
   26              	################################################################################
   27              	# the main loop
   28              	################################################################################
-  29 000e 4149     	main_loop:		ldr	r1, =0x20000c00		//cmd word
+  29 000e 3549     	main_loop:		ldr	r1, =0x20000c00		//cmd word
   30 0010 0022     				mov	r2,#0		
   31 0012 0A60     				str	r2,[r1,#0]		//et to zero
   32              	
@@ -55,7 +55,7 @@ ARM GAS  boot.asm 			page 1
   34 0016 9042     				cmp	r0, r2
   35 0018 FCD0     				beq	main_loop_wait
   36 001a 071C     				mov	r7,r0			//address
-  37 001c 3E4A     				ldr	r2,=0xFFFFFF00
+  37 001c 324A     				ldr	r2,=0xFFFFFF00
   38 001e 1740     				and	r7,r2
   39 0020 FF22     				mov	r2,#0xff
 ARM GAS  boot.asm 			page 2
@@ -64,193 +64,156 @@ ARM GAS  boot.asm 			page 1
   40 0022 1040     				and	r0,r2			
   41              	
   42 0024 5228     				cmp	r0, #0x52		// prog main flash
-  43 0026 19D0     				beq	prog_flash
+  43 0026 02D0     				beq	prog_flash
   44              	
   45 0028 7228     				cmp	r0, #0x72		// prog option bytes
-  46 002a 54D0     				beq	prog_opt
+  46 002a 3DD0     				beq	prog_opt
   47              	
-  48 002c 7328     				cmp	r0, #0x73		// option bytes erase
-  49 002e 00D0     				beq	opt_erase			
-  50              				
-  51 0030 EDE7     	tloop:			b	main_loop
-  52              	
-  53              	
-  54              	################################################################################
-  55              	# option bytes erase
-  56              	################################################################################
-  57              	opt_erase:		//unlock flash
-  58 0032 374C     				ldr	r4, =FLASH_BASE
-  59 0034 0023     				mov	r3,#0
-  60 0036 2361     				str	r3,[r4,#FLASH_CR]	//disable all PROG signals
-  61 0038 384A     				ldr	r2, =0x45670123		//key 1
-  62 003a 394B     				ldr	r3, =0xCDEF89AB		//key 2
-  63 003c 6260     				str	r2,[r4,#FLASH_KEYR]	//write key 1	
-  64 003e 6360     				str	r3,[r4,#FLASH_KEYR]	//write key 2	
-  65 0040 A260     				str	r2,[r4,#FLASH_OPTKEYR]	//write key 1	
-  66 0042 A360     				str	r3,[r4,#FLASH_OPTKEYR]	//write key 2	
-  67              	
-  68 0044 2269     				ldr	r2, [r4,#FLASH_CR]
-  69 0046 2023     				mov	r3,#0x20		//OPTER
-  70 0048 1A43     				orr	r2,r3
-  71 004a 2261     				str	r2, [r4,#FLASH_CR]
-  72              	
-  73 004c 4023     				mov	r3,#0x40		//STRT
-  74 004e 1A43     				orr	r2,r3
-  75 0050 2261     				str	r2, [r4,#FLASH_CR]
-  76              	
-  77 0052 0123     				mov	r3,#0x01		//wait for BUSY LOW
-  78 0054 E268     	opt_erase_1:		ldr	r2, [r4,#FLASH_SR]
-  79 0056 1A42     				tst	r2,r3
-  80 0058 FCD1     				bne	opt_erase_1
-  81 005a D8E7     				b	main_loop		//done
-  82              	
+  48 002c EFE7     	tloop:			b	main_loop
+  49              	
+  50              			
+  51              	################################################################################
+  52              	# program 2K flash
+  53              	################################################################################
+  54 002e 2F4A     	prog_flash:		ldr	r2, =0x80000		//512K limit
+  55 0030 3B1C     				mov	r3,r7			//addr
+  56 0032 1340     				and	r3,r2
+  57 0034 9342     				cmp	r3,r2
+  58 0036 1BD0     				beq	prog_flash1		//use block 1
+  59              	
+  60 0038 2D49     				ldr	r1, =0x20000400		//buffer base
+  61 003a 2E4E     				ldr	r6, =0x400		//halfwords to do
+  62 003c 284C     				ldr	r4, =FLASH_BASE
+  63 003e 2E4A     				ldr	r2, =0x45670123		//key 1
+  64 0040 2E4B     				ldr	r3, =0xCDEF89AB		//key 2
+  65 0042 6260     				str	r2,[r4,#FLASH_KEYR]	//write key 1	
+  66 0044 6360     				str	r3,[r4,#FLASH_KEYR]	//write key 2	
+  67 0046 0023     				mov	r3,#0
+  68 0048 2361     				str	r3,[r4,#FLASH_CR]
+  69              				
+  70              				
+  71 004a 0888     	prog_flash_1:		ldrh	r0,[r1,#0]		//get data
+  72 004c 2C4B     				ldr	r3,=0xFFFF		//empty
+  73 004e 9842     				cmp	r0,r3
+  74 0050 09D0     				beq	prog_flash_3a		//nothing to do
+  75              	
+  76 0052 2269     				ldr	r2, [r4,#FLASH_CR]
+  77 0054 0123     				mov	r3,#0x01		//set PG
+  78 0056 1A43     				orr	r2,r3
+  79 0058 2261     				str	r2, [r4,#FLASH_CR]
+  80              	
+  81 005a 3880     				strh	r0,[r7,#0]		//store half word
+  82 005c 000C     				lsr	r0,#16
   83              	
-  84              			
-  85              	################################################################################
-  86              	# program 2K flash
-  87              	################################################################################
-  88 005c 314A     	prog_flash:		ldr	r2, =0x80000		//512K limit
-  89 005e 3B1C     				mov	r3,r7			//addr
-  90 0060 1340     				and	r3,r2
-  91 0062 9342     				cmp	r3,r2
-  92 0064 1BD0     				beq	prog_flash1		//use block 1
-  93              	
-  94 0066 3049     				ldr	r1, =0x20000400		//buffer base
-  95 0068 304E     				ldr	r6, =0x400		//halfwords to do
-  96 006a 294C     				ldr	r4, =FLASH_BASE
+  84 005e 0123     				mov	r3,#0x01		//BSY
+  85 0060 E268     	prog_flash_3:		ldr	r2, [r4,#FLASH_SR]
+  86 0062 1A42     				tst	r2,r3
+  87 0064 FCD1     				bne	prog_flash_3
+  88              	
+  89 0066 0237     	prog_flash_3a:		add	r7,#2			//flash addr
+  90 0068 0231     				add	r1,#2			//buffer addr
+  91              	
+  92 006a 013E     	prog_flash_4:		sub	r6,#1
+  93 006c EDD1     				bne	prog_flash_1			
+  94              				
+  95 006e CEE7     				b	main_loop
+  96              	
 ARM GAS  boot.asm 			page 3
 
 
-  97 006c 2B4A     				ldr	r2, =0x45670123		//key 1
-  98 006e 2C4B     				ldr	r3, =0xCDEF89AB		//key 2
-  99 0070 6260     				str	r2,[r4,#FLASH_KEYR]	//write key 1	
- 100 0072 6360     				str	r3,[r4,#FLASH_KEYR]	//write key 2	
- 101 0074 0023     				mov	r3,#0
- 102 0076 2361     				str	r3,[r4,#FLASH_CR]
- 103              				
- 104              				
- 105 0078 0888     	prog_flash_1:		ldrh	r0,[r1,#0]		//get data
- 106 007a 2D4B     				ldr	r3,=0xFFFF		//empty
- 107 007c 9842     				cmp	r0,r3
- 108 007e 09D0     				beq	prog_flash_3a		//nothing to do
- 109              	
- 110 0080 2269     				ldr	r2, [r4,#FLASH_CR]
- 111 0082 0123     				mov	r3,#0x01		//set PG
- 112 0084 1A43     				orr	r2,r3
- 113 0086 2261     				str	r2, [r4,#FLASH_CR]
- 114              	
- 115 0088 3880     				strh	r0,[r7,#0]		//store half word
- 116 008a 000C     				lsr	r0,#16
- 117              	
- 118 008c 0123     				mov	r3,#0x01		//BSY
- 119 008e E268     	prog_flash_3:		ldr	r2, [r4,#FLASH_SR]
- 120 0090 1A42     				tst	r2,r3
- 121 0092 FCD1     				bne	prog_flash_3
- 122              	
- 123 0094 0237     	prog_flash_3a:		add	r7,#2			//flash addr
- 124 0096 0231     				add	r1,#2			//buffer addr
- 125              	
- 126 0098 013E     	prog_flash_4:		sub	r6,#1
- 127 009a EDD1     				bne	prog_flash_1			
- 128              				
- 129 009c B7E7     				b	main_loop
- 130              	
- 131              	################################################################################
- 132              	# program 1K flash (block 1)
- 133              	################################################################################
- 134 009e 2249     	prog_flash1:		ldr	r1, =0x20000400		//buffer base
- 135 00a0 224E     				ldr	r6, =0x400		//halfwords to do
- 136 00a2 1B4C     				ldr	r4, =FLASH_BASE
- 137 00a4 0023     				mov	r3,#0
- 138 00a6 2365     				str	r3,[r4,#FLASH_CR2]
- 139 00a8 1C4A     				ldr	r2, =0x45670123		//key 1
- 140 00aa 1D4B     				ldr	r3, =0xCDEF89AB		//key 2
- 141 00ac 6264     				str	r2,[r4,#FLASH_KEYR2]	//write key 1	
- 142 00ae 6364     				str	r3,[r4,#FLASH_KEYR2]	//write key 2	
- 143              				
- 144              				
- 145 00b0 0888     	prog_flash1_1:		ldrh	r0,[r1,#0]		//get data
- 146 00b2 1F4B     				ldr	r3,=0xFFFF		//empty
- 147 00b4 9842     				cmp	r0,r3
- 148 00b6 09D0     				beq	prog_flash1_3a		//nothing to do
- 149              	
- 150 00b8 226D     				ldr	r2, [r4,#FLASH_CR2]
- 151 00ba 0123     				mov	r3,#0x01		//set PG
- 152 00bc 1A43     				orr	r2,r3
- 153 00be 2265     				str	r2, [r4,#FLASH_CR2]
+  97              	################################################################################
+  98              	# program 1K flash (block 1)
+  99              	################################################################################
+ 100 0070 1F49     	prog_flash1:		ldr	r1, =0x20000400		//buffer base
+ 101 0072 204E     				ldr	r6, =0x400		//halfwords to do
+ 102 0074 1A4C     				ldr	r4, =FLASH_BASE
+ 103 0076 0023     				mov	r3,#0
+ 104 0078 2365     				str	r3,[r4,#FLASH_CR2]
+ 105 007a 1F4A     				ldr	r2, =0x45670123		//key 1
+ 106 007c 1F4B     				ldr	r3, =0xCDEF89AB		//key 2
+ 107 007e 6264     				str	r2,[r4,#FLASH_KEYR2]	//write key 1	
+ 108 0080 6364     				str	r3,[r4,#FLASH_KEYR2]	//write key 2	
+ 109              				
+ 110              				
+ 111 0082 0888     	prog_flash1_1:		ldrh	r0,[r1,#0]		//get data
+ 112 0084 1E4B     				ldr	r3,=0xFFFF		//empty
+ 113 0086 9842     				cmp	r0,r3
+ 114 0088 09D0     				beq	prog_flash1_3a		//nothing to do
+ 115              	
+ 116 008a 226D     				ldr	r2, [r4,#FLASH_CR2]
+ 117 008c 0123     				mov	r3,#0x01		//set PG
+ 118 008e 1A43     				orr	r2,r3
+ 119 0090 2265     				str	r2, [r4,#FLASH_CR2]
+ 120              	
+ 121 0092 3880     				strh	r0,[r7,#0]		//store half word
+ 122 0094 000C     				lsr	r0,#16
+ 123              	
+ 124 0096 0123     				mov	r3,#0x01		//BSY
+ 125 0098 E26C     	prog_flash1_3:		ldr	r2, [r4,#FLASH_SR2]
+ 126 009a 1A42     				tst	r2,r3
+ 127 009c FCD1     				bne	prog_flash1_3
+ 128              	
+ 129 009e 0237     	prog_flash1_3a:		add	r7,#2			//flash addr
+ 130 00a0 0231     				add	r1,#2			//buffer addr
+ 131              	
+ 132 00a2 013E     	prog_flash1_4:		sub	r6,#1
+ 133 00a4 EDD1     				bne	prog_flash1_1			
+ 134              				
+ 135 00a6 B2E7     				b	main_loop
+ 136              	
+ 137              	
+ 138              	
+ 139              	################################################################################
+ 140              	# program option bytes
+ 141              	################################################################################
+ 142 00a8 1149     	prog_opt:		ldr	r1, =0x20000400		//buffer base
+ 143 00aa 0826     				ldr	r6, =0x08		//halfwords to do
+ 144              	
+ 145 00ac 0C4C     				ldr	r4, =FLASH_BASE
+ 146 00ae 0023     				mov	r3,#0
+ 147 00b0 2361     				str	r3,[r4,#FLASH_CR]
+ 148 00b2 114A     				ldr	r2, =0x45670123		//key 1
+ 149 00b4 114B     				ldr	r3, =0xCDEF89AB		//key 2
+ 150 00b6 6260     				str	r2,[r4,#FLASH_KEYR]	//write key 1	
+ 151 00b8 6360     				str	r3,[r4,#FLASH_KEYR]	//write key 2	
+ 152 00ba A260     				str	r2,[r4,#FLASH_OPTKEYR]	//write key 1	
+ 153 00bc A360     				str	r3,[r4,#FLASH_OPTKEYR]	//write key 2	
 ARM GAS  boot.asm 			page 4
 
 
  154              	
- 155 00c0 3880     				strh	r0,[r7,#0]		//store half word
- 156 00c2 000C     				lsr	r0,#16
- 157              	
- 158 00c4 0123     				mov	r3,#0x01		//BSY
- 159 00c6 E26C     	prog_flash1_3:		ldr	r2, [r4,#FLASH_SR2]
- 160 00c8 1A42     				tst	r2,r3
- 161 00ca FCD1     				bne	prog_flash1_3
- 162              	
- 163 00cc 0237     	prog_flash1_3a:		add	r7,#2			//flash addr
- 164 00ce 0231     				add	r1,#2			//buffer addr
- 165              	
- 166 00d0 013E     	prog_flash1_4:		sub	r6,#1
- 167 00d2 EDD1     				bne	prog_flash1_1			
- 168              				
- 169 00d4 9BE7     				b	main_loop
+ 155 00be 0888     	prog_opt_1:		ldrh	r0,[r1,#0]		//get data
+ 156              				
+ 157              				//program half-word
+ 158 00c0 2269     				ldr	r2, [r4,#FLASH_CR]
+ 159 00c2 1023     				mov	r3,#0x10		//set OPTPG
+ 160 00c4 1A43     				orr	r2,r3
+ 161 00c6 2261     				str	r2, [r4,#FLASH_CR]
+ 162              				
+ 163 00c8 3880     				strh	r0,[r7,#0]	
+ 164              	
+ 165 00ca 0123     				mov	r3,#1			//BSY
+ 166 00cc E268     	prog_opt_3:		ldr	r2, [r4,#FLASH_SR]
+ 167 00ce 1A42     				tst	r2,r3
+ 168 00d0 FCD1     				bne	prog_opt_3
+ 169              	
  170              	
- 171              	
- 172              	
- 173              	################################################################################
- 174              	# program option bytes
- 175              	################################################################################
- 176 00d6 1449     	prog_opt:		ldr	r1, =0x20000400		//buffer base
- 177 00d8 0826     				ldr	r6, =0x08		//halfwords to do
- 178              	
- 179 00da 0D4C     				ldr	r4, =FLASH_BASE
- 180 00dc 0023     				mov	r3,#0
- 181 00de 2361     				str	r3,[r4,#FLASH_CR]
- 182 00e0 0E4A     				ldr	r2, =0x45670123		//key 1
- 183 00e2 0F4B     				ldr	r3, =0xCDEF89AB		//key 2
- 184 00e4 6260     				str	r2,[r4,#FLASH_KEYR]	//write key 1	
- 185 00e6 6360     				str	r3,[r4,#FLASH_KEYR]	//write key 2	
- 186 00e8 A260     				str	r2,[r4,#FLASH_OPTKEYR]	//write key 1	
- 187 00ea A360     				str	r3,[r4,#FLASH_OPTKEYR]	//write key 2	
- 188              	
- 189 00ec 0888     	prog_opt_1:		ldrh	r0,[r1,#0]		//get data
- 190              				
- 191              				//program half-word
- 192 00ee 2269     				ldr	r2, [r4,#FLASH_CR]
- 193 00f0 1023     				mov	r3,#0x10		//set OPTPG
- 194 00f2 1A43     				orr	r2,r3
- 195 00f4 2261     				str	r2, [r4,#FLASH_CR]
- 196              				
- 197 00f6 3880     				strh	r0,[r7,#0]	
- 198              	
- 199 00f8 0123     				mov	r3,#1			//BSY
- 200 00fa E268     	prog_opt_3:		ldr	r2, [r4,#FLASH_SR]
- 201 00fc 1A42     				tst	r2,r3
- 202 00fe FCD1     				bne	prog_opt_3
- 203              	
- 204              	
- 205 0100 0237     	prog_opt_4:		add	r7,#2
- 206 0102 0231     				add	r1,#2
- 207 0104 013E     				sub	r6,#1
- 208 0106 F1D1     				bne	prog_opt_1			
- 209              	
- 210              				//disable
-ARM GAS  boot.asm 			page 5
-
-
- 211 0108 0023     				mov	r3,#0x00		//reset PG
- 212 010a 2361     				str	r3, [r4,#FLASH_CR]
- 213              				
- 214 010c 7FE7     				b	main_loop
- 215              	
- 216              						
- 217 010e C046     				.align 2
- 218              			
- 219 0110 00200240 	
- 219      000C0020 
- 219      00FFFFFF 
- 219      23016745 
- 219      AB89EFCD 
+ 171 00d2 0237     	prog_opt_4:		add	r7,#2
+ 172 00d4 0231     				add	r1,#2
+ 173 00d6 013E     				sub	r6,#1
+ 174 00d8 F1D1     				bne	prog_opt_1			
+ 175              	
+ 176              				//disable
+ 177 00da 0023     				mov	r3,#0x00		//reset PG
+ 178 00dc 2361     				str	r3, [r4,#FLASH_CR]
+ 179              				
+ 180 00de 96E7     				b	main_loop
+ 181              	
+ 182              						
+ 183              				.align 2
+ 184              			
+ 185 00e0 00200240 	
+ 185      000C0020 
+ 185      00FFFFFF 
+ 185      00000800 
+ 185      00040020 

@@ -93,12 +93,10 @@ int prog_stm32swd(void)
 	int option_readout=0;
 	int unsecure=0;
 	int ignore_id=0;
-	unsigned long sa=param[0];
 	errc=0;
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
-		printf("-- un -- unsecure device\n");
 		printf("-- em -- main flash erase\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
@@ -109,7 +107,6 @@ int prog_stm32swd(void)
 		printf("-- vo -- option bytes verify\n");
 		printf("-- ro -- option bytes readout\n");
 
-		printf("-- a0 -- main flash from 0x00000000\n");
 		printf("-- ii -- ignore ID\n");
 
 		printf("-- rr -- run code in RAM\n");
@@ -123,12 +120,6 @@ int prog_stm32swd(void)
 	{
 		errc=prg_comm(0x2ee,0,0,0,0,0,0,0,0);	//dev 2
 		printf("## switch to device 2\n");
-	}
-
-	if(find_cmd("a0"))
-	{
-		sa=0;
-		printf("## use data from address 0x00000000\n");
 	}
 
 	if(find_cmd("ii"))
@@ -238,6 +229,16 @@ int prog_stm32swd(void)
 //		printf("DEMCR: %02X%02X%02X%02X\n",memory[11],memory[10],memory[9],memory[8]);
 //		printf("DHCSR: %02X%02X%02X%02X\n",memory[15],memory[14],memory[13],memory[12]);
 
+
+		if((option_erase == 1) && (errc == 0) && (algo_nr < 37) && (param[9] > 0))
+		{
+			printf("ERASE OPTIONBYTES\n");
+			errc=prg_comm(0x4e,0,4,0,0,param[9],0,0,0);	//erase direct
+//			show_data(0,4);
+			printf("RE-INIT\n");
+			errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
+		}
+
 		if((main_erase == 1) && (errc == 0))
 		{
 			printf("ERASE FLASH\n");
@@ -247,10 +248,14 @@ int prog_stm32swd(void)
 			errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
 		}
 
+
+
+
+
 		//transfer loader to ram
-		if((run_ram == 0) && (errc == 0) && ((main_prog == 1) || (option_prog == 1)))
+		if((run_ram == 0) && (errc == 0) && ((main_prog == 1) || (option_prog == 1) || (option_erase == 1) || (unsecure == 1)))
 		{
-			printf("TRANSFER LOADER\n");
+			printf("TRANSFER LOADER...");
 			for(j=0;j<512;j++)
 			{
 				switch(algo_nr)
@@ -282,6 +287,9 @@ int prog_stm32swd(void)
 
 			errc=prg_comm(0x12b,0,64,0,0,0,0,0,0);	
 
+			printf("STARTED\n");
+
+
 /*
 			errc=prg_comm(0xb3,8,12,0,0,		//go
 				addr & 0xff,			
@@ -293,49 +301,6 @@ int prog_stm32swd(void)
 	
 	if((run_ram == 0) && (errc == 0) && (dev_start == 0))
 	{
-		if((unsecure == 1) && (errc == 0) && (algo_nr < 37))
-		{
-			printf("UNSECURE DEVICE\n");
-
-			errc=prg_comm(0x59,0,0,0,0,0x73,0x00,0x00,0x00);			//erase CMD
-
-			//the option bytes prototype
-			memory[0]=param[6] & 0xff;
-			memory[1]=param[7] & 0xff;
-			memory[2]=0xff;
-			memory[3]=0x00;
-			memory[4]=0xff;
-			memory[5]=0x00;
-			memory[6]=0xff;
-			memory[7]=0x00;
-			memory[8]=0xff;
-			memory[9]=0x00;
-			memory[10]=0xff;
-			memory[11]=0x00;
-			memory[12]=0xff;
-			memory[13]=0x00;
-			memory[14]=0xff;
-			memory[15]=0x00;
-
-			addr=param[2];
-
-			//transfer data
-			errc=prg_comm(0xb2,16,0,0,0,
-			0x04,0x00,0x20,1);
-
-			//execute prog
-			errc=prg_comm(0x59,0,0,0,0,
-					0x72,
-					(addr >> 8) & 0xff,
-					(addr >> 16) & 0xff,
-					(addr >> 24) & 0xff);
-
-			printf("PROGRAM OPTIONBYTES: ");
-			for(i=0;i<16;i++) printf(" %02X",memory[i]);
-			printf("\n");
-
-
-		}
 		
 		if((unsecure == 1) && (errc == 0) && (algo_nr == 37))
 		{
@@ -350,8 +315,9 @@ int prog_stm32swd(void)
 			addr=param[0];
 			maddr=0;
 			blocks=param[1]/max_blocksize;
-			len=read_block(sa,param[1],0);		//read flash
-			if(len==0)
+			len=read_block(param[0],param[1],0);			//read flash
+			if(len==0) len=read_block(0,param[1],0);		//read flash from addr=0
+
 			progress("FLASH PROG ",blocks,0);
 //			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,blocks);
 
@@ -414,7 +380,8 @@ int prog_stm32swd(void)
 		//verify main
 		if((main_verify == 1) && (errc == 0))
 		{
-			read_block(sa,param[1],0);
+			len=read_block(param[0],param[1],0);			//read flash
+			if(len==0) len=read_block(0,param[1],0);		//read flash from addr=0
 			printf("VERIFY DATA (%ld KBytes)\n",param[1]/1024);
 			addr = param[0];
 			maddr=0;
@@ -430,12 +397,6 @@ int prog_stm32swd(void)
 			}
 		}
 
-
-		if((option_erase == 1) && (errc == 0) && (algo_nr < 37))
-		{
-			printf("ERASE OPTIONBYTES\n");
-			errc=prg_comm(0x59,0,0,0,0,0x73,0x00,0x00,0x00);			//erase CMD
-		}
 
 		if((option_prog == 1) && (errc == 0) && (algo_nr < 37))
 		{

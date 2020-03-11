@@ -196,7 +196,7 @@ int prog_cc2640(void)
 		
 		i=0;
 
-		progress("TRANSFER ",blocks,0);
+		progress("TRANSFER   ",blocks,0);
 		
 		while(len > 0)
 		{
@@ -208,7 +208,7 @@ int prog_cc2640(void)
 					(addr >> 16) & 0xff,
 					(addr >> 24) & 0xff);
 	
-			progress("TRANSFER ",blocks,i+1);
+			progress("TRANSFER   ",blocks,i+1);
 			maddr+=bsize;
 			addr+=bsize;
 			len-=bsize;
@@ -267,7 +267,7 @@ int prog_cc2640(void)
 				maddr+=bsize;
 				progress("FLASH READ ",blocks,i+1);
 			}
-			printf("DONE\n");
+			printf("\nDONE\n");
 		}
 
 
@@ -294,7 +294,7 @@ int prog_cc2640(void)
 				maddr+=bsize;
 				progress("FLASH READ ",blocks,i+1);
 			}
-			printf("DONE\n");
+			printf("\nDONE\n");
 		}
 
 

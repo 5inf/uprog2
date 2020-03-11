@@ -101,7 +101,7 @@ int prog_s32kswd(void)
 	{
 		printf("-- 5V -- set VDD to 5V\n");
 		printf("-- ea -- erase all (mass erase)\n");
-//		printf("-- un -- unsecure device\n");
+		printf("-- un -- unsecure code (set FSEC to 0xFE)\n");
 //		printf("-- em -- main flash erase\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
@@ -135,6 +135,12 @@ int prog_s32kswd(void)
 	{
 		ignore_id=1;
 		printf("## ignore ID\n");
+	}
+
+	if(find_cmd("un"))
+	{
+		unsecure=1;
+		printf("## unsecure code\n");
 	}
 
 
@@ -206,6 +212,7 @@ int prog_s32kswd(void)
 			if(errc > 0) goto ERR_EXIT;
 //			show_data(0,4);
 			printf("RE-INIT\n");
+			errc=prg_comm(0x91,0,0,0,0,0,0,0,0);					//SWIM exit
 			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0);		//re-init
 		}
 		else
@@ -278,6 +285,7 @@ int prog_s32kswd(void)
 			maddr=0;
 			blocks=param[1]/max_blocksize;
 			len=read_block(param[0],param[1],0);		//read flash
+			if(unsecure==1) memory[0x40c]=0xFE;
 			progress("FLASH PROG  ",blocks,0);
 //			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,blocks);
 
@@ -337,6 +345,7 @@ int prog_s32kswd(void)
 		if((main_verify == 1) && (errc == 0))
 		{
 			read_block(param[0],param[1],0);
+			if(unsecure==1) memory[0x40c]=0xFE;
 			printf("VERIFY FLASH (%ld KBytes)\n",param[1]/1024);
 			addr = param[0];
 			maddr=0;
@@ -517,7 +526,7 @@ int prog_s32kswd(void)
 		(addr >> 24) & 0xff,
 		1);
 
-		show_data(ROFFSET,16);
+//		show_data(ROFFSET,16);
 		
 
 	}

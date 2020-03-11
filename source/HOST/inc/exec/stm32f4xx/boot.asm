@@ -61,19 +61,10 @@ main_loop_wait:		ldr	r0, [r1,#0]
 			cmp	r0, #0x72		// prog option bytes
 			beq	x_prog_opt
 
-			cmp	r0, #0x73		// option bytes erase
-			beq	opt_erase			
-			
 tloop:			b	main_loop
 
 x_prog_opt:		b	prog_opt			
 			
-
-################################################################################
-# option bytes erase is not available
-################################################################################
-opt_erase:		b	main_loop		//done
-
 
 ################################################################################
 # program 2K flash

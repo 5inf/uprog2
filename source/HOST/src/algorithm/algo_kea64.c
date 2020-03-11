@@ -105,7 +105,7 @@ int prog_kea64swd(void)
 	{
 		printf("-- 5V -- set VDD to 5V\n");
 		printf("-- ea -- erase all (mass erase)\n");
-//		printf("-- un -- unsecure device\n");
+		printf("-- un -- unsecure device\n");
 //		printf("-- em -- main flash erase\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
@@ -124,6 +124,8 @@ int prog_kea64swd(void)
 
 		return 0;
 	}
+
+//	errc=prg_comm(0xfe,0,0,0,0,1,1,0,0);	//enable PU
 
 	if(find_cmd("5v"))
 	{
@@ -204,6 +206,7 @@ int prog_kea64swd(void)
 		{
 			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0x55);	//init
 			printf("JID: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
+			if(errc > 0) goto ERR_EXIT;
 			printf("ERASE FLASH\n");
 			errc=prg_comm(0x1D4,0,4,0,0,0,0,0,0);		//erase direct
 			printf("MASS ERASE_TIME: %d ms\n",(20-memory[0])*20);
@@ -215,6 +218,7 @@ int prog_kea64swd(void)
 		{
 			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0);					//init
 			printf("JID: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
+			if(errc > 0) goto ERR_EXIT;
 		}
 
 		errc=prg_comm(0x1D1,0,4,0,0,0x00,0x80,0x04,0x40);				//READ DEVID
@@ -288,6 +292,7 @@ int prog_kea64swd(void)
 			blocks=param[1]/max_blocksize;
 			len=read_block(param[0],param[1],0);		//read flash
 			progress("FLASH PROG   ",blocks,0);
+			if(unsecure == 1) memory[0x40D]=0xFE;
 //			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,blocks);
 
 			for(i=0;i<blocks;i++)
@@ -443,7 +448,7 @@ int prog_kea64swd(void)
 		if((eeprom_verify == 1) && (errc == 0))
 		{
 			read_block(param[2],param[3],0);
-			printf("VERIFY EEPROM (%ld KBytes)\n",param[1]/1024);
+			printf("VERIFY EEPROM (%ld Bytes)\n",param[3]);
 			addr = param[2];
 			maddr=0;
 			len = param[3];
@@ -497,7 +502,7 @@ int prog_kea64swd(void)
 		}
 
 
-		addr=param[4];
+		addr=param[6];
 
 		printf("\nSTART CODE AT 0x%02x%02x%02x%02x\n",memory[7],memory[6],memory[5],memory[4]);
 		
@@ -533,15 +538,15 @@ int prog_kea64swd(void)
 
 		//read back
 		addr=0x20000000;
-		
+/*		
 		errc=prg_comm(0xbf,0,2048,0,ROFFSET,
 		(addr >> 8) & 0xff,
 		(addr >> 16) & 0xff,
 		(addr >> 24) & 0xff,
 		1);
 
-		show_data(ROFFSET,16);
-		
+		show_data(ROFFSET,28);
+*/		
 
 	}
 
@@ -560,6 +565,7 @@ ERR_EXIT:
 	i=prg_comm(0x91,0,0,0,0,0,0,0,0);					//SWIM exit
 
 	prg_comm(0x2ef,0,0,0,0,0,0,0,0);	//dev 1
+	prg_comm(0xfe,0,0,0,0,0,0,0,0);		//disable PU
 
 	print_kea64swd_error(errc);
 

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ftdi_eeprom --read-eeprom uprog2.conf
+ftdi_eeprom --flash-eeprom uprog2.conf
+rm -f eeprom.new

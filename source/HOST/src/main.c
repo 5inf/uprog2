@@ -44,6 +44,8 @@ int main(int argc, char *argv[])
 	pid_t mypid;
 	int errcode=0;
 	
+	range_err=0;
+	
 	force_exit=0;
 	is_error=0;
 	jj=0;
@@ -69,11 +71,11 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.33                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.36                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  (c) 2012-2019 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");
-	printf("#  usage: uprog2 device -commands [file/data]                                   #\n");
+	printf("#  usage: uprog2 device -commands [up to 4 files/data]                          #\n");
 	printf("#         uprog2 KILL                            kill active daemon             #\n");
 	printf("#         uprog2 LIST                            for device list                #\n");
 	printf("#         uprog2 device -help                    for device specific commands   #\n");
@@ -267,6 +269,115 @@ int main(int argc, char *argv[])
 		}	
 	}
 
+	if(argc > 4)
+	{
+		if(strncmp("0x",argv[4],2) == 0)
+		{
+			sscanf(strndup(argv[4],10),"%lx",&expar2);
+			printf("PARAM2 =  0x%lx\n",expar2);
+			have_expar2=1;
+		}
+		else if(strncmp("d:",argv[4],2) == 0)
+		{
+			sscanf(strndup(argv[4]+2,10),"%ld",&expar2);
+			printf("PARAM2 =  %ld\n",expar2);
+			have_expar2=1;
+		}			
+		else
+		{
+			file2_found=1;				//we have a filename
+			file2_mode=0;				//Motorola s37
+			strncpy(sfile2,argv[4],280);
+			if((sfile2 +strlen(sfile2) - strstr(sfile2,".hex")) == 4 ) file2_mode=1;	//Intel hex	
+			if((sfile2 +strlen(sfile2) - strstr(sfile2,".HEX")) == 4 ) file2_mode=1;	//Intel hex	
+			if((sfile2 +strlen(sfile2) - strstr(sfile2,".s28")) == 4 ) file2_mode=2;	//Motorola S28	
+			if((sfile2 +strlen(sfile2) - strstr(sfile2,".S28")) == 4 ) file2_mode=2;	//Motorola S28
+			if((sfile2 +strlen(sfile2) - strstr(sfile2,".s19")) == 4 ) file2_mode=3;	//Motorola S19	
+			if((sfile2 +strlen(sfile2) - strstr(sfile2,".S19")) == 4 ) file2_mode=3;	//Motorola S19
+				
+			datei=fopen(sfile2,"r");
+			if(datei != NULL)
+			{
+				fclose(datei);
+				file2_found=2;		//we can read the file
+			}
+		}	
+	}
+
+
+	if(argc > 5)
+	{
+		if(strncmp("0x",argv[5],2) == 0)
+		{
+			sscanf(strndup(argv[5],10),"%lx",&expar3);
+			printf("PARAM2 =  0x%lx\n",expar3);
+			have_expar3=1;
+		}
+		else if(strncmp("d:",argv[5],2) == 0)
+		{
+			sscanf(strndup(argv[5]+2,10),"%ld",&expar3);
+			printf("PARAM2 =  %ld\n",expar3);
+			have_expar3=1;
+		}			
+		else
+		{
+			file3_found=1;				//we have a filename
+			file3_mode=0;				//Motorola s37
+			strncpy(sfile3,argv[5],280);
+			if((sfile3 +strlen(sfile3) - strstr(sfile3,".hex")) == 4 ) file3_mode=1;	//Intel hex	
+			if((sfile3 +strlen(sfile3) - strstr(sfile3,".HEX")) == 4 ) file3_mode=1;	//Intel hex	
+			if((sfile3 +strlen(sfile3) - strstr(sfile3,".s28")) == 4 ) file3_mode=2;	//Motorola S28	
+			if((sfile3 +strlen(sfile3) - strstr(sfile3,".S28")) == 4 ) file3_mode=2;	//Motorola S28
+			if((sfile3 +strlen(sfile3) - strstr(sfile3,".s19")) == 4 ) file3_mode=3;	//Motorola S19	
+			if((sfile3 +strlen(sfile3) - strstr(sfile3,".S19")) == 4 ) file3_mode=3;	//Motorola S19
+				
+			datei=fopen(sfile3,"r");
+			if(datei != NULL)
+			{
+				fclose(datei);
+				file3_found=2;		//we can read the file
+			}
+		}	
+	}
+
+	if(argc > 6)
+	{
+		if(strncmp("0x",argv[6],2) == 0)
+		{
+			sscanf(strndup(argv[6],10),"%lx",&expar4);
+			printf("PARAM2 =  0x%lx\n",expar4);
+			have_expar4=1;
+		}
+		else if(strncmp("d:",argv[6],2) == 0)
+		{
+			sscanf(strndup(argv[6]+2,10),"%ld",&expar4);
+			printf("PARAM2 =  %ld\n",expar4);
+			have_expar4=1;
+		}			
+		else
+		{
+			file4_found=1;				//we have a filename
+			file4_mode=0;				//Motorola s37
+			strncpy(sfile4,argv[6],280);
+			if((sfile4 +strlen(sfile4) - strstr(sfile4,".hex")) == 4 ) file4_mode=1;	//Intel hex	
+			if((sfile4 +strlen(sfile4) - strstr(sfile4,".HEX")) == 4 ) file4_mode=1;	//Intel hex	
+			if((sfile4 +strlen(sfile4) - strstr(sfile4,".s28")) == 4 ) file4_mode=2;	//Motorola S28	
+			if((sfile4 +strlen(sfile4) - strstr(sfile4,".S28")) == 4 ) file4_mode=2;	//Motorola S28
+			if((sfile4 +strlen(sfile4) - strstr(sfile4,".s19")) == 4 ) file4_mode=3;	//Motorola S19	
+			if((sfile4 +strlen(sfile4) - strstr(sfile4,".S19")) == 4 ) file4_mode=3;	//Motorola S19
+				
+			datei=fopen(sfile4,"r");
+			if(datei != NULL)
+			{
+				fclose(datei);
+				file4_found=2;		//we can read the file
+			}
+		}	
+	}
+
+
+
+
 	
 	if(algo_nr == 110)
 	{
@@ -292,7 +403,10 @@ int main(int argc, char *argv[])
 	{
 		errcode=read_info();
 		if(errcode == 0) read_volt();
-		if(errcode == 0) check_update();
+		if(errcode == 0) 
+		{
+			if(check_update()== -1) read_volt();
+		}
 		if(errcode == 0) prg_comm(0x0f,100,100,0,0,0,0,0,0);
 	}
 //	bt_test();
@@ -353,6 +467,10 @@ int main(int argc, char *argv[])
 			case 55:	errcode=prog_pic16c();		break;	//pic16 new
 			case 56:	errcode=prog_kea64swd();	break;	//KEA64
 			case 57:	errcode=prog_pic16d();		break;	// mod EEPROM
+
+			case 59:	errcode=prog_sici();		break;
+			case 60:	errcode=prog_avr0();		break;
+			case 61:	errcode=prog_at89s8252();	break;
 			case 89:	errcode=prog_dgen();		break;
 			case 97:	errcode=prog_fgen();		break;
 
@@ -382,6 +500,13 @@ int main(int argc, char *argv[])
 		printf("FATAL: CONNECTION TO PROGRAMMER LOST!\n");
 		printf("   <<< PLEASE RESET PROGRAMMER >>>\n");
 	}
+
+	if(range_err > 0)
+	{
+		printf("\n!!!! ERROR: Address was out of range for S19/S28 !!!!\n\n");
+		errcode = 0xA0;
+	}
+
 
 	free(memory);
 	return errcode;

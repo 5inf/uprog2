@@ -1,0 +1,3 @@
+#UPROG2
+ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6661", MODE="0666"
+

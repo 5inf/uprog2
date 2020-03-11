@@ -1,0 +1,2 @@
+#!/bin/bash
+avra -l main.lst main.asm > main.mmap

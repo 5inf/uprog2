@@ -15,7 +15,7 @@
 
 	"CC2642",
 	51,
-	0x00000000,0x040000,		//main flash pages
+	0x00000000,0x058000,		//main flash pages
 	0x1FFFF800,0x000010,		//option bytes
 	0x20000000,0x005000,		//RAM
 	0x000000A5,0x00005A,		//ROP
