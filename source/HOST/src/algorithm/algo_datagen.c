@@ -40,19 +40,8 @@ void print_dgen_error(int errc)
 
 int prog_dgen(void)
 {
-	int errc,blocks,i;
-	unsigned char abyte;
-	unsigned long addr,maddr;
-	int bsize;
-	int main_erase=0;
-	int main_prog=0;
-	int main_verify=0;
-	int main_readout=0;
-	int speedmode=0;
-	int iaddr=0;
-	unsigned int csum;
-
-	errc=0;
+	int errc=0;
+	unsigned long addr;
 
 	printf("\n");
 	

@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2018 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -209,11 +209,18 @@ int prog_stm32swd(void)
 		errc=writeblock_open();
 	}
 
-	if(errc > 0) return errc;
+	if(errc > 0) goto STM32_EXIT;
 
 	if(dev_start == 0)
 	{
 		errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);					//init
+
+		if(errc > 0) 
+		{
+			printf("ACK STATUS: %d\n",memory[0]);
+			goto STM32_EXIT;
+		}
+
 		printf("JID: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
 
 
@@ -222,7 +229,7 @@ int prog_stm32swd(void)
 		if(algo_nr < 53)
 		{
 			printf("ID : %03X\n",((memory[ROFFSET+0x01] << 8) + memory[ROFFSET+0x00]) & 0xfff);
-			if((ignore_id == 0) && (((memory[ROFFSET+0x01] << 8) + memory[ROFFSET+0x00] & 0xfff) > 0xf00)) errc=0x50;
+			if((ignore_id == 0) && ((((memory[ROFFSET+0x01] << 8) + memory[ROFFSET+0x00]) & 0xfff) > 0xf00)) errc=0x50;
 		}
 
 //		printf("DHCSR: %02X%02X%02X%02X\n",memory[7],memory[6],memory[5],memory[4]);
@@ -238,6 +245,8 @@ int prog_stm32swd(void)
 			printf("RE-INIT\n");
 			errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
 		}
+
+		
 
 		if((main_erase == 1) && (errc == 0))
 		{
@@ -585,7 +594,7 @@ int prog_stm32swd(void)
 		show_stm32swd_registers();		
 
 
-/*		for(i=0;i<120;i++)
+		for(i=0;i<120;i++)
 		{
 			errc=prg_comm(0x129,0,100,0,0,0,0,0,0);	
 //			show_stm32swd_registers();		
@@ -632,6 +641,8 @@ int prog_stm32swd(void)
 		waitkey();
 		i=prg_comm(0x0f,0,0,0,0,0,0,0,0);					//exit
 	}
+
+STM32_EXIT:
 
 	i=prg_comm(0x91,0,0,0,0,0,0,0,0);					//SWIM exit
 

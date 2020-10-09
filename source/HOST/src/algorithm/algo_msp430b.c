@@ -68,7 +68,6 @@ int prog_msp430b()
 	int info_readout=0;
 	int dev_start=0;
 	int run_ram=0;
-	int load_exec=1;
 
 	errc=0;
 

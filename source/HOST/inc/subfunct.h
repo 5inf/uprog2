@@ -44,3 +44,4 @@ void set_error2(char *, int,unsigned long);
 
 void print_error(void);
 
+int check_00(long,int);

@@ -33,7 +33,7 @@ $head="exec_dspic30";
 
 sub gencode
 {
-	for($i=0;$i<5888;$i++)
+	for($i=0;$i<8192;$i++)
 	{
 		$romdata[$i]=chr(255);
 	}
@@ -46,7 +46,7 @@ sub gencode
 	}
 	close(BREAD);
 
-	$dlen=5888;
+	$dlen=8192;
 
 	open (DWRITE,$datfile);
 	print DWRITE "unsigned char ".$head."[$dlen] = {";

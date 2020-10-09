@@ -42,19 +42,9 @@ void print_lps25h_error(int errc)
 
 int read_lps25h(void)
 {
-	int errc,blocks,bsize,page_num,pages;
-	unsigned long value,i,j;
+	int errc;
 	int dev_addr=0xb8;
-	int conf_erase=0;
-	int all_erase=0;
-	int main_prog=0;
-	int main_verify=0;
-	int main_readout=0;
-	int conf_prog=0;
-	int conf_verify=0;
-	int conf_readout=0;
-	int dev_start=0;
-	char *parptr;
+	unsigned long value;
 	float fvalue;
 
 	errc=0;

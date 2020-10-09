@@ -2,7 +2,7 @@
 //#										#
 //#										#
 //#										#
-//# copyright (c) 2010-2015 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -551,7 +551,7 @@ int prog_r8c(void)
 		j=read_block(param[8],param[9]+1,0);
 		if(j > (param[9]+1))
 		{
-			printf("!! ERROR, RAM IMAGE TO BIG (%d > %d bytes) !!\n",j,param[9]);
+			printf("!! ERROR, RAM IMAGE TO BIG (%d > %ld bytes) !!\n",j,param[9]);
 		}
 		else
 		{

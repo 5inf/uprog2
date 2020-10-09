@@ -59,7 +59,6 @@ int prog_avr(void)
 	int eeprom_prog=0;
 	int eeprom_verify=0;
 	int eeprom_readout=0;
-	int eeprom_ext=0;
 	int lfuse_prog=0;
 	int hfuse_prog=0;
 	int efuse_prog=0;
@@ -128,7 +127,6 @@ int prog_avr(void)
 
 	if(find_cmd("ex"))
 	{
-		eeprom_ext=1;
 		param[3]+=384;
 		printf("## Include eeprom extension\n");
 	}

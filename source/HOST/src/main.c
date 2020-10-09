@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2010-2019 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -71,9 +71,9 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.36                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.37                                                  #\n");
 	printf("#                                                                               #\n");
-	printf("#  (c) 2012-2019 Joerg Wolfram                                                  #\n");
+	printf("#  (c) 2012-2020 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  usage: uprog2 device -commands [up to 4 files/data]                          #\n");
 	printf("#         uprog2 KILL                            kill active daemon             #\n");
@@ -407,10 +407,8 @@ int main(int argc, char *argv[])
 		{
 			if(check_update()== -1) read_volt();
 		}
-		if(errcode == 0) prg_comm(0x0f,100,100,0,0,0,0,0,0);
 	}
-//	bt_test();
-
+	
 	if(errcode == 0)
 	{
 		switch (algo_nr)
@@ -423,7 +421,7 @@ int main(int argc, char *argv[])
 			case 6:		errcode=prog_s12xe();		break;
 			case 7:		errcode=prog_s12xd();		break;
 			case 8:		errcode=prog_stm8();		break;
-			case 9:		errcode=prog_c2000();		break;
+//			case 9:		errcode=prog_c2000();		break;
 			case 10:	errcode=prog_dspic33();		break;
 			case 11:	errcode=prog_s12xs();		break;
 			case 12:	errcode=prog_nec2();		break;
@@ -463,7 +461,7 @@ int main(int argc, char *argv[])
 			case 51:	errcode=prog_cc2640();		break;
 			case 52:	errcode=prog_stm32swd();	break;	//l4
 			case 53:	errcode=prog_s32kswd();		break;	//s32k
-
+			case 54:	errcode=prog_ppcjtag3();	break;
 			case 55:	errcode=prog_pic16c();		break;	//pic16 new
 			case 56:	errcode=prog_kea64swd();	break;	//KEA64
 			case 57:	errcode=prog_pic16d();		break;	// mod EEPROM
@@ -471,6 +469,9 @@ int main(int argc, char *argv[])
 			case 59:	errcode=prog_sici();		break;
 			case 60:	errcode=prog_avr0();		break;
 			case 61:	errcode=prog_at89s8252();	break;
+			case 62:	errcode=prog_s12z();		break;
+			case 63:	errcode=prog_ppcjtag4();	break;
+			case 64:	errcode=prog_efm32swd();	break;
 			case 89:	errcode=prog_dgen();		break;
 			case 97:	errcode=prog_fgen();		break;
 
@@ -494,7 +495,6 @@ int main(int argc, char *argv[])
 		prg_comm(0xfa,0,0,0,0,0,0,0,0);	//set back to 3,3V mode
 	}
 
-	printf("Errorcode: %i\n",errcode);
 	if(errcode == 0x9f)
 	{
 		printf("FATAL: CONNECTION TO PROGRAMMER LOST!\n");
@@ -509,5 +509,6 @@ int main(int argc, char *argv[])
 
 
 	free(memory);
+
 	return errcode;
 }

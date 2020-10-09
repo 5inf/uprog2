@@ -43,7 +43,7 @@ void print_mlx363_error(int errc)
 
 int prog_mlx363(void)
 {
-	long errc,vx,vy,vz,sx,sy,sz,i,j;
+	long errc,vx,vy,vz,sx,sy,sz,i;
 
 	errc=0;
 
@@ -89,9 +89,9 @@ int prog_mlx363(void)
 		if(vy > 0x1fff) vy=(vy & 0x1fff) - 0x2000;  
 		if(vz > 0x1fff) vz=(vz & 0x1fff) - 0x2000;  
 
-		printf("X= %d\n",vx);
-		printf("Y= %d\n",vy);
-		printf("Z= %d\n",vz);
+		printf("X= %ld\n",vx);
+		printf("Y= %ld\n",vy);
+		printf("Z= %ld\n",vz);
 	}
 
 	if(find_cmd("rraw"))
@@ -121,9 +121,9 @@ int prog_mlx363(void)
 		sy >>=4;
 		sz >>=4;
 
-		printf("X= %d\n",sx);
-		printf("Y= %d\n",sy);
-		printf("Z= %d\n",sz);
+		printf("X= %ld\n",sx);
+		printf("Y= %ld\n",sy);
+		printf("Z= %ld\n",sz);
 	}
 
 

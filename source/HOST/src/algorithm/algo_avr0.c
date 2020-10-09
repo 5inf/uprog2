@@ -58,11 +58,7 @@ int prog_avr0(void)
 	int user_verify=0;
 	int user_readout=0;
 	int user_blind=0;
-	int eeprom_ext=0;
 	int fuse_prog=0;
-	int fuse_num=0;
-	int fuse_val=0;
-	int lock_prog=0;
 	int dev_start=0;
 	int ignore_devid=0;
 	int eep_erase=0;
@@ -394,7 +390,7 @@ AVR0_NCMD:
 
 	if ((errc == 0) && (fuse_prog == 1))
 	{
-		printf("PROGRAM FUSE (%d) with %02X\n",(expar & 0xff),(expar2 & 0xff));
+		printf("PROGRAM FUSE (%ld) with %02lX\n",(expar & 0xff),(expar2 & 0xff));
 		errc=prg_comm(0x1d7,0,1,0,0,0,0,(expar & 0xff),(expar2 & 0xff));	//write fuse
 //		printf("Status = %02X\n",memory[0]); 
 
@@ -584,7 +580,7 @@ AVR0_NCMD:
 
 		for(tblock=0;tblock<blocks;tblock++)
 		{
-			if(must_prog(maddr,bsize) && (errc == 0))
+			if(must_prog(0,bsize) && (errc == 0))
 			{
 				errc=prg_comm(0x1d5,bsize,0,0,0,(param[8]) & 0xff,(param[8] >> 8) & 0xff,
 				0,param[5]);	//program

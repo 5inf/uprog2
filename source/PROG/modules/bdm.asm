@@ -42,11 +42,13 @@
 .equ		BDM_SUB_WSTAT = 0xf8
 
 
-bdm_prepare:	in	r21,CTRLPORT		;1
+bdm_prepare:	push	r21
+		in	r21,CTRLPORT		;1
 		andi	r21,SIG2_AND		;1 clear SIG2
 		mov	r0,r21			;1 store for start bit
 		ori	r21,SIG2_OR		;1
 		mov	r1,r21			;1 set SIG2
+		pop	r21
 		ret
 
 bdm_wait_ack:	clr	r20
@@ -134,6 +136,20 @@ bdm_setfreq:	ldi	r18,HIGH(bdm_jtab)
 		rcall	reinit_bdm_nf
 		jmp	main_loop
 
+bdm_setfreq0:	ldi	r18,HIGH(bdm_jtab)
+		add	r16,r18
+		out	EEARL,r16
+		jmp	main_loop_ok
+		sbi	CTRLPORT,SIG2		;BKGD HIGH
+		sbi	CTRLDDR,SIG2		;activate BKGD
+		ldi	ZL,3			;5ms
+		clr	ZH
+		call	wait_ms
+		cbi	CTRLPORT,SIG2		;BKGD LOW
+		ldi	ZH,0x10		
+		rcall	reinit_bdm_s1		
+		jmp	main_loop_ok
+
 
 reinit_bdm:	cbi	CTRLPORT,SIG2		;BKGD LOW
 		cbi	CTRLPORT,SIG1		;RESET LOW
@@ -192,8 +208,18 @@ reinit_bdm_1:	sbis	CTRLPIN,SIG2		;2 wait for sync
 reinit_bdm_2:	sbic	CTRLPIN,SIG2		;2 wait for no sync
 		rjmp	reinit_bdm_3		;branch, sync is ended
 reinit_bdm_2a:	inc	XL			;1
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop		
 		brne	reinit_bdm_2		;2 no timeout
-		ldi	r16,0x32		;error-SYNC pulse too long
+		ldi	r16,0x33		;error-SYNC pulse too long
 		ret				;timeout -> no sync
 
 reinit_bdm_3:	call	api_resetptr		;reset buf ptr
@@ -269,6 +295,17 @@ init_bdm_1:	sbis	CTRLPIN,SIG2		;2 wait for sync
 init_bdm_2:	sbic	CTRLPIN,SIG2		;2 wait for no sync
 		rjmp	init_bdm_3		;branch, sync is ended
 init_bdm_2a:	inc	XL			;1
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop		
+
 		brne	init_bdm_2		;2 no timeout
 		ldi	r16,0x32		;error-SYNC pulse too long
 		jmp	main_loop		;timeout -> no sync

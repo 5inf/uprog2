@@ -86,11 +86,9 @@ int prog_kea64swd(void)
 	int errc,blocks,i,j;
 	unsigned long addr,len,maddr;
 	int mass_erase=0;
-	int main_erase=0;
 	int main_prog=0;
 	int main_verify=0;
 	int main_readout=0;
-	int eeprom_erase=0;
 	int eeprom_prog=0;
 	int eeprom_verify=0;
 	int eeprom_readout=0;
@@ -98,7 +96,6 @@ int prog_kea64swd(void)
 	int dev_start=0;
 	int run_ram=0;
 	int unsecure=0;
-	int ignore_id=0;
 	errc=0;
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
@@ -106,17 +103,13 @@ int prog_kea64swd(void)
 		printf("-- 5V -- set VDD to 5V\n");
 		printf("-- ea -- erase all (mass erase)\n");
 		printf("-- un -- unsecure device\n");
-//		printf("-- em -- main flash erase\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
 		printf("-- rm -- main flash readout\n");
 
-//		printf("-- ee -- eeprom erase\n");
 		printf("-- pe -- eeprom program\n");
 		printf("-- ve -- eeprom verify\n");
 		printf("-- re -- eeprom readout\n");
-
-		printf("-- ii -- ignore ID\n");
 
 		printf("-- rr -- run code in RAM\n");
 		printf("-- st -- start device\n");
@@ -138,12 +131,6 @@ int prog_kea64swd(void)
 	{
 		errc=prg_comm(0x2ee,0,0,0,0,0,0,0,0);	//dev 2
 		printf("## switch to device 2\n");
-	}
-
-	if(find_cmd("ii"))
-	{
-		ignore_id=1;
-		printf("## ignore ID\n");
 	}
 
 

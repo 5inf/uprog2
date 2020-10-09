@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2010-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -82,6 +82,7 @@ void list_devices(void)
 	listgroup(52,0,0,"STMicro STM32L4xx");
 	listgroup(56,0,0,"NXP S9KEA");
 	listgroup(53,0,0,"NXP S32K");
+	listgroup(62,0,0,"NXP S12Z");
 	listgroup(32,0,0,"Cypress PSoC4");
 	listgroup(21,0,0,"I2C EEPROM");
 	listgroup(22,0,0,"SPI Flash");

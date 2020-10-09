@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#

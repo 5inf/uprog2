@@ -2,7 +2,7 @@
 //#										#
 //# UPROG universal programmer							#
 //#										#
-//# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -43,9 +43,9 @@ void print_spieeprom_error(int errc)
 
 int prog_spieeprom(void)
 {
-	int errc,blocks,i,loops,maxloops,rstat;
+	int errc,blocks,i;
 	unsigned long addr,maddr,len;
-	int bsize,bank;
+	int bsize;
 	int main_erase=0;
 	int main_prog=0;
 	int main_verify=0;
@@ -227,7 +227,7 @@ int prog_spieeprom(void)
 	if((main_readout == 1) && (errc == 0))
 	{
 //		printf("SAVE=%08lx   SIZE=%08lX\n",param[0],len);
-		writeblock_data(0,len,param[0]+(bank << 24));
+		writeblock_data(0,len,param[0]);
 	}
 
 	if(main_readout > 0)

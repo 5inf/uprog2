@@ -56,35 +56,17 @@ void print_cc2640_error(int errc)
 int prog_cc2640(void)
 {
 	int errc,blocks,bsize;
-	unsigned short stat;
-	unsigned long addr,maddr,i,j,devid,idreg,pfapr;
+	unsigned long addr,maddr,i,j;
 	long len;
 	int mass_erase=0;
 	int main_prog=0;
 	int main_verify=0;
 	int main_readout=0;
 	int info_readout=0;
-	int test_prog=0;
-	int test_verify=0;
-	int test_readout=0;
 	int dev_start=0;
 	int run_ram=0;
-	int unlock=0;
-	int lb0,lb1,lb2,lb3,lb4,lb5,lb6,lb7,lbx;
-	char hexbyte[5];
-	char *parptr;
 
 	errc=0;
-
-	lb0=0xfe;	//default KEY
-	lb1=0xed;
-	lb2=0xfa;
-	lb3=0xce;
-	lb4=0xca;
-	lb5=0xfe;
-	lb6=0xbe;
-	lb7=0xef;
-
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
@@ -156,8 +138,7 @@ int prog_cc2640(void)
 	{
 		printf("INIT DEVICE \n");
 		errc=prg_comm(0x1C0,0,4,0,0,0,0,0,0);					//init
-		idreg=memory[0] + (memory[1] << 8) + (memory[2] << 16) + (memory[3] << 24);
-		printf("ID-REG     = %04lX%04lX\n",memory[2] + (memory[3] << 8),memory[0] + (memory[1] << 8));	
+		printf("ID-REG     = %04X%04X\n",memory[2] + (memory[3] << 8),memory[0] + (memory[1] << 8));	
 	}
 
 	if(mass_erase == 1)
@@ -167,13 +148,12 @@ int prog_cc2640(void)
 		i=prg_comm(0x0f,0,0,0,0,0,0,0,0);			//exit
 		printf("RE-INIT DEVICE \n");
 		errc=prg_comm(0x1C0,0,4,0,0,0,0,0,0);
-		idreg=memory[0] + (memory[1] << 8) + (memory[2] << 16) + (memory[3] << 24);
-		printf("ID-REG     = %04lX%04lX\n",memory[2] + (memory[3] << 8),memory[0] + (memory[1] << 8));
+		printf("ID-REG     = %04X%04X\n",memory[2] + (memory[3] << 8),memory[0] + (memory[1] << 8));
 	}					//init
 		errc=prg_comm(0x1c1,0,0,0,0,0,0,0,0);			//-> write
 
 	errc=prg_comm(0x1c2,2048,16,0,0,0x40,0x00,0x00,0x00);		//init core
-	printf("CM3 ID-REG = %04lX%04lX\n",memory[2] + (memory[3] << 8),memory[0] + (memory[1] << 8));	
+	printf("CM3 ID-REG = %04X%04X\n",memory[2] + (memory[3] << 8),memory[0] + (memory[1] << 8));	
 //	show_data(4,5);
 
 

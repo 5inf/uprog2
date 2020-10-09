@@ -2,7 +2,7 @@
 //#										#
 //# UPOG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -568,7 +568,7 @@ int prog_stm8(void)
 		ramsize = param[9];
 		read_block(ramstart,ramsize,ramstart);
 		bsize=max_blocksize;
-		if(ramsize > ramsize) bsize = ramsize;
+		if(bsize > ramsize) bsize = ramsize;
 
 //		errc=prg_comm(0x53,0,256,0,ROFFSET,0,0,0,0);			//SWIM test
 		if(errc == 0) errc=prg_comm(0x54,bsize,0,ramstart,0,0,4,0,0);	//write data (4 blocks)

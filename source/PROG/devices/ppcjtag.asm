@@ -159,7 +159,8 @@ ppcjtag_read_jid_2:	ldi	r16,LOW(JPPC_ONCE_RD_JID)
 			set				;IR shift
 			rcall	jppc_shift		
 			
-			clr	r16
+ppcjtag_get32:
+ppcjtag_read_jid_2a:	clr	r16
 			clr	r17
 			clr	r18
 			clr	r19
@@ -212,6 +213,62 @@ ppcjtag_enter_dbg2:	ldi	r16,LOW(JPPC_ONCE_WR_DBCR0)
 			sbi	CTRLPORT,JPPC_RESET	;set reset HI
 
 			jmp	main_loop_ok
+
+;-------------------------------------------------------------------------------
+; enter external debug mode  
+;-------------------------------------------------------------------------------
+ppcjtag_enter_dbg4:	cbi	CTRLPORT,JPPC_RESET	;set reset HI
+			call	api_resetptr
+			
+			ldi	r16,LOW(JPPC_ONCE_WR_OCR)
+			ldi	r17,HIGH(JPPC_ONCE_WR_OCR)
+			ldi	r24,10			;10 bits
+			set				;IR shift
+			rcall	jppc_shift		
+			
+			ldi	r16,0x05
+			ldi	r17,0x80
+			ldi	r18,0x80
+			ldi	r19,0x00
+			ldi	r24,32			;32 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+
+;			jmp	main_loop_ok
+
+
+;			sbi	CTRLPORT,JPPC_RESET	;set reset HI
+
+			ldi	ZL,50
+			ldi	ZH,0
+			call	api_wait_ms
+
+			ldi	r16,LOW(JPPC_ONCE_RD_OCR)
+			ldi	r17,HIGH(JPPC_ONCE_RD_OCR)
+			ldi	r24,10			;10 bits
+			set				;IR shift
+			rcall	jppc_shift		
+
+			ldi	r16,0x00
+			ldi	r17,0x00
+			ldi	r18,0x00
+			ldi	r19,0x00
+			ldi	r24,32			;32 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+
+			mov	XL,r20
+			call	api_buf_bwrite		;DATAH
+			mov	XL,r21
+			call	api_buf_bwrite
+			mov	XL,r22
+			call	api_buf_bwrite
+			mov	XL,r23
+			call	api_buf_bwrite		;DATAL
+
+			jmp	main_loop_ok
+
+
 
 ;-------------------------------------------------------------------------------
 ; read OnCE status  
@@ -315,6 +372,7 @@ ppcjtag_exit_dbg:	ldi	r16,LOW(JPPC_ONCE_WR_DBCR0)
 			clt				;DR shift
 			rcall	jppc_shift		
 
+
 			jmp	main_loop_ok
 
 ;-------------------------------------------------------------------------------
@@ -351,17 +409,7 @@ ppcjtag_nexus_write:	call	api_resetptr
 			clt				;DR shift
 			rcall	jppc_shift		
 			
-		
-			ldi	r16,JPPC_NEXUS_WR_ADDR
-			ldi	r24,8			;10 bits
-			clt				;DR shift
-			rcall	jppc_shift		
-		
-			movw	r16,r6			;restore address
-			movw	r18,r8
-			ldi	r24,32			;32 bits
-			clt				;DR shift
-			rcall	jppc_shift		
+			rcall	nexus_set_address
 			
 			ldi	r16,JPPC_NEXUS_WR_RWCS
 			ldi	r24,8			;10 bits
@@ -376,57 +424,25 @@ ppcjtag_nexus_write:	call	api_resetptr
 			clt				;DR shift
 			rcall	jppc_shift		
 
-			ldi	r16,JPPC_NEXUS_WR_DATA
-			ldi	r24,8			;10 bits
-			clt				;DR shift
-			rcall	jppc_shift				
-		
-			call	api_buf_bread		;DATAH
-			mov	r19,XL
-			call	api_buf_bread
-			mov	r18,XL
-			call	api_buf_bread
-			mov	r17,XL
-			call	api_buf_bread		;DATAL
-			mov	r16,XL
-			ldi	r24,32			;32 bits
-			clt				;DR shift
-			rcall	jppc_shift		
+			rcall	nexus_write_data32r
+			rcall	nexus_clear_rwcs
 			
-			ldi	r16,JPPC_NEXUS_WR_RWCS
-			ldi	r24,8			;10 bits
-			clt				;DR shift
-			rcall	jppc_shift		
-
-			ldi	r16,0x00
-			ldi	r17,0x00
-			ldi	r18,0x00		;no priority
-			ldi	r19,0x00		;end access
-			ldi	r24,32			;32 bits
-			clt				;DR shift
-			rcall	jppc_shift		
-					
 			jmp	main_loop_ok
 
 ;-------------------------------------------------------------------------------
 ; nexus read longword
 ;-------------------------------------------------------------------------------	
+ppcjtag_nexus_pread:	ldi	ZL,0
+			ldi	ZH,1
+			call	api_wait_ms
+
 ppcjtag_nexus_read:	call	api_resetptr
 			mov	r6,r19			;Addr LSB
 			mov	r7,r18
 			mov	r8,r17
 			mov	r9,r16			;addr MSB
 
-			ldi	r16,JPPC_NEXUS_WR_ADDR
-			ldi	r24,8			;10 bits
-			clt				;DR shift
-			rcall	jppc_shift		
-		
-			movw	r16,r6			;set address
-			movw	r18,r8
-			ldi	r24,32			;32 bits
-			clt				;DR shift
-			rcall	jppc_shift		
+			rcall	nexus_set_address
 			
 			ldi	r16,JPPC_NEXUS_WR_RWCS
 			ldi	r24,8			;10 bits
@@ -441,41 +457,8 @@ ppcjtag_nexus_read:	call	api_resetptr
 			clt				;DR shift
 			rcall	jppc_shift		
 	
-			ldi	r16,JPPC_NEXUS_RD_DATA
-			ldi	r24,8			;10 bits
-			clt				;DR shift
-			rcall	jppc_shift				
-		
-			clr	r16
-			clr	r17
-			clr	r18
-			clr	r19
-			ldi	r24,32			;32 bits
-			clt				;DR shift
-			rcall	jppc_shift		
-
-			mov	XL,r20
-			call	api_buf_bwrite		;DATAH
-			mov	XL,r21
-			call	api_buf_bwrite
-			mov	XL,r22
-			call	api_buf_bwrite
-			mov	XL,r23
-			call	api_buf_bwrite		;DATAL
-
-			
-			ldi	r16,JPPC_NEXUS_WR_RWCS
-			ldi	r24,8			;10 bits
-			clt				;DR shift
-			rcall	jppc_shift		
-
-			ldi	r16,0x00
-			ldi	r17,0x00
-			ldi	r18,0x00		;C0 = highest
-			ldi	r19,0x00		;end access
-			ldi	r24,32			;32 bits
-			clt				;DR shift
-			rcall	jppc_shift		
+			rcall	nexus_read_data32
+			rcall	nexus_clear_rwcs
 					
 			jmp	main_loop_ok
 	
@@ -651,6 +634,63 @@ ppcjtag_nexus_wbkb_2:	push	ZL
 			ldi	r24,32			;32 bits
 			clt				;DR shift
 			rcall	jppc_shift		
+					
+			jmp	main_loop_ok
+
+
+
+;-------------------------------------------------------------------------------
+; nexus write block in burst mode (r16-r19 = address)
+;-------------------------------------------------------------------------------	
+ppcjtag_nexus_wblockb2:	call	api_resetptr
+			mov	r6,r19			;Addr LSB
+			mov	r7,r18
+			mov	r8,r17
+			mov	r9,r16			;addr MSB
+			ldi	ZH,64
+			
+			
+ppcjtag_nexus_wbkb2_1:	push	ZH
+			
+			rcall	nexus_set_address
+
+			
+			ldi	r16,JPPC_NEXUS_WR_RWCS	;0x0F
+			ldi	r24,8			;8 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+
+			ldi	r16,0x20		;8 transfers
+			ldi	r17,0x00
+			ldi	r18,0xE0		;C0 = highest priority
+			ldi	r19,0xD8		;64 bit transfer, write
+			ldi	r24,32			;32 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+
+
+			ldi	ZL,8
+			
+ppcjtag_nexus_wbkb2_2:	push	ZL
+
+			rcall	nexus_write_data32
+
+			pop	ZL
+			dec	ZL
+			brne	ppcjtag_nexus_wbkb2_2
+
+
+			rcall	ppjtag_wait_ready2
+
+			movw	ZL,r6
+			adiw	ZL,32
+			movw	r6,ZL
+
+			pop	ZH
+			dec	ZH
+			brne	ppcjtag_nexus_wbkb2_1
+			
+			rcall	nexus_clear_rwcs
 					
 			jmp	main_loop_ok
 
@@ -833,6 +873,12 @@ ppcjtag_nexus_rbk_1:	push	ZL
 					
 			jmp	main_loop_ok
 			
+ppcjtag_get_rwcs:	ldi	r16,JPPC_NEXUS_RD_RWCS
+			ldi	r24,8			;8 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+			rjmp	ppcjtag_get32	
+			
 ;-------------------------------------------------------------------------------
 ; wait for ready  
 ;-------------------------------------------------------------------------------
@@ -945,10 +991,103 @@ ppcjtag_unlock:		ldi	XL,0x07			;censorship register
 			ldi	r24,64			;bits to do
 			rcall	jppc_mshift
 	
-			jmp	main_loop_ok
-
 ppcjtag_unlock2:	jmp	main_loop_ok
 
+
+;------------------------------------------------------------------------------
+; clear nexus rwcs register
+;------------------------------------------------------------------------------
+nexus_clear_rwcs:	ldi	r16,JPPC_NEXUS_WR_RWCS
+			ldi	r24,8			;10 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+
+			ldi	r16,0x00
+			ldi	r17,0x00		;C0 = highest
+			ldi	r18,0x00
+			ldi	r19,0x00		;end access
+			ldi	r24,32			;32 bits
+			clt				;DR shift
+			rjmp	jppc_shift		
+
+;------------------------------------------------------------------------------
+; set nexus address register
+;------------------------------------------------------------------------------
+nexus_set_address:	ldi	r16,JPPC_NEXUS_WR_ADDR
+			ldi	r24,8			;10 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+		
+			movw	r16,r6			;set address
+			movw	r18,r8
+			ldi	r24,32			;32 bits
+			clt				;DR shift
+			rjmp	jppc_shift		
+
+	
+;------------------------------------------------------------------------------
+; read 32 bits over nexus data register
+;------------------------------------------------------------------------------
+nexus_read_data32:	ldi	r16,JPPC_NEXUS_RD_DATA
+			ldi	r24,8			;10 bits
+			clt				;DR shift
+			rcall	jppc_shift				
+		
+			clr	r16
+			clr	r17
+			clr	r18
+			clr	r19
+			ldi	r24,32			;32 bits
+			clt				;DR shift
+			rcall	jppc_shift		
+
+			mov	XL,r20
+			call	api_buf_bwrite		;DATAH
+			mov	XL,r21
+			call	api_buf_bwrite
+			mov	XL,r22
+			call	api_buf_bwrite
+			mov	XL,r23
+			jmp	api_buf_bwrite		;DATAL
+
+;------------------------------------------------------------------------------
+; write 32 bits over nexus data register
+;------------------------------------------------------------------------------
+nexus_write_data32r:	ldi	r16,JPPC_NEXUS_WR_DATA
+			ldi	r24,8			;10 bits
+			clt				;DR shift
+			rcall	jppc_shift				
+
+			call	api_buf_bread		;DATAH
+			mov	r19,XL
+			call	api_buf_bread
+			mov	r18,XL
+			call	api_buf_bread
+			mov	r17,XL
+			call	api_buf_bread		;DATAL
+			mov	r16,XL
+			ldi	r24,32			;32 bits
+			clt				;DR shift
+			rjmp	jppc_shift
+			
+;------------------------------------------------------------------------------
+; write 32 bits over nexus data register
+;------------------------------------------------------------------------------
+nexus_write_data32:	ldi	r16,JPPC_NEXUS_WR_DATA
+			ldi	r24,8			;10 bits
+			clt				;DR shift
+			rcall	jppc_shift				
+
+			call	api_buf_bread		;DATAH
+			mov	r16,XL
+			call	api_buf_bread
+			mov	r17,XL
+			call	api_buf_bread
+			mov	r18,XL
+			call	api_buf_bread		;DATAL
+			mov	r19,XL
+			ldi	r24,32			;32 bits
+			clt				;DR shift
 
 ;------------------------------------------------------------------------------
 ; do IR/DR SHIFT (1-255 Bits)
@@ -963,14 +1102,14 @@ jppc_shift:		clr	r20
 			clr	r22
 			clr	r23
 			ldi	r25,0x20
-			sub	r25,r24			;r25=result shift
+			sub	r25,r24				;r25=result shift
 			sbi	CTRLPORT,JPPC_TMS
-			PPCJTAG_CLOCK			;-> DR-scan
+			PPCJTAG_CLOCK				;-> DR-scan
 			brtc	jppc_shift_1
-			PPCJTAG_CLOCK			;-> IR-scan
+			PPCJTAG_CLOCK				;-> IR-scan
 jppc_shift_1:		cbi	CTRLPORT,JPPC_TMS
-			PPCJTAG_CLOCK			;-> CAPTURE
-			PPCJTAG_CLOCK			;-> SHIFT
+			PPCJTAG_CLOCK				;-> CAPTURE
+			PPCJTAG_CLOCK				;-> SHIFT
 
 jppc_shift_2:		sbrc	r16,0				;skip if zero
 			sbi	CTRLPORT,JPPC_TDI
@@ -1091,5 +1230,12 @@ jppc_stcks:		sbi	CTRLPORT,JPPC_TCK	;2
 			cbi	CTRLPORT,JPPC_TCK	;2
 			ret
 
-
+ppcjtag_xreset:		cbi	CTRLPORT,JPPC_RESET
+			ldi	ZL,100
+			ldi	ZH,0
+			call	api_wait_ms
+			sbi	CTRLPORT,JPPC_RESET
+			out	CTRLDDR,const_0
+			jmp	main_loop_ok
+			
 

@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2018 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -83,11 +83,9 @@ int prog_s32kswd(void)
 	int errc,blocks,i,j;
 	unsigned long addr,len,maddr;
 	int mass_erase=0;
-	int main_erase=0;
 	int main_prog=0;
 	int main_verify=0;
 	int main_readout=0;
-	int data_erase=0;
 	int data_prog=0;
 	int data_verify=0;
 	int data_readout=0;

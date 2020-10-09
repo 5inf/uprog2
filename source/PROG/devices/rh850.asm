@@ -284,7 +284,7 @@ rh850_lb_enable:	call	api_resetptr
 			rcall	rh850_get_full_frame
 			jmp	main_loop_ok
 							
-rh850_lben_data:	.db	0x01,0x24			;ID authentication mode get
+rh850_lben_data:	.db	0x01,0x24			;ID lock bit enable
 
 ;------------------------------------------------------------------------------
 ; signature
@@ -304,7 +304,7 @@ rh850_signature:	call	api_resetptr
 			rcall	rh850_get_full_frame
 			jmp	main_loop_ok
 				
-rh850_signature_e1:	ldi	r16,0x44				;wrong status
+rh850_signature_e1:	ldi	r16,0x44			;wrong status
 			jmp	main_loop
 			
 rh850_signature_data:	.db	0x01,0x3a			;signature
@@ -377,14 +377,14 @@ rh850_erase:		rcall	rh850_send_soh		;SOH senden
 			rcall	rh850_sendbyte		
 			mov	XL,r16			;SA LL
 			rcall	rh850_sendbyte		
-			push	r16
+		;	push	r16
 			rcall	rh850_send_csum
 			rcall	rh850_send_etx		;ETX senden
 			rcall	rh850_get_status
-			pop	r16
+		;	pop	r16
 			brts	rh850_erase_err
 			jmp	main_loop_ok
-rh850_erase_err:	ldi	r16,0x46
+rh850_erase_err:;	ldi	r16,0x46
 			jmp	main_loop
 
 
@@ -956,7 +956,7 @@ test:
 ;------------------------------------------------------------------------------
 rh850_get_status:	clt					;status
 			clr	r16
-			ldi	r24,200
+			ldi	r24,50
 rh850_get_status_1:	rcall	rh850_wait_recv			;wait for FPDT HIGH
 			brtc	rh850_get_status_2
 			dec	r24

@@ -268,7 +268,7 @@ int prog_ppcbam(void)
 		
 		errc=prg_comm(0x92,0x410,0,0x0f0,0,param[6] & 0xff,0,0x10,0x04);		//transfer loader & exec
 
-		printf("SPD=%02X\n",param[6] & 0xff);
+		printf("SPD=%02lX\n",param[6] & 0xff);
 		
 
 		sleep(1);

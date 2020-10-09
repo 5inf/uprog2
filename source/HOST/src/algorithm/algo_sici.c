@@ -46,7 +46,6 @@ void print_sici_error(int errc)
 unsigned char tle5014_crc(unsigned char start,unsigned char len)
 {
 	unsigned char crc,pos,cbit,cbyte;
-	unsigned short ipos;
 	
 	crc=0xff;
 	pos=start;
@@ -72,7 +71,6 @@ unsigned char tle5014_crc(unsigned char start,unsigned char len)
 unsigned char tle5014_crc2(unsigned char start,unsigned char len)
 {
 	unsigned char crc,pos,cbit,cbyte;
-	unsigned short ipos;
 	
 	crc=0xff;
 	pos=start;
@@ -97,14 +95,13 @@ unsigned char tle5014_crc2(unsigned char start,unsigned char len)
 
 int prog_sici(void)
 {
-	long errc,len;
-	int angle,i,page,block;
+	long errc;
+	int i,page,block;
 	unsigned short val1,val2,val3;
-	float fangle;
 	int ee_prog=0;
 	int ee_verify=0;
 	int ee_readout=0;
-	int madr,adr;
+	int madr;
 	int wait_ext=0;
 	unsigned char crc;
 	
@@ -234,7 +231,7 @@ int prog_sici(void)
 		
 		if(ee_prog == 1)
 		{
-			len=read_block(param[0],param[1],0);		//read flash
+			read_block(param[0],param[1],0);		//read flash
 			crc=tle5014_crc2(6,15);printf("Config CRC = %02X, should be %02X\n",memory[20],crc);
 			if(memory[20] != crc)
 			{

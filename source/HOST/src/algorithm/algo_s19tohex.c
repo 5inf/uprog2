@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -25,21 +25,7 @@
 
 int s19tohex(void)
 {
-	int errc,blocks,tblock,bsize,j,eblock=0,tbyte;
-	int pagesize,wpp;
-	unsigned long addr,maddr;
-	int chip_erase=0;
-	int main_prog=0;
-	int main_verify=0;
-	int main_readout=0;
-	int eeprom_prog=0;
-	int eeprom_verify=0;
-	int eeprom_readout=0;
-	int lfuse_prog=0;
-	int hfuse_prog=0;
-	int efuse_prog=0;
-	int lock_prog=0;
-	int dev_start=0;
+	int errc,j;
 	int bpl=0;
 
 	printf("## S19 TO HEX converter\n");

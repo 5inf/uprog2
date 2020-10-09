@@ -2,7 +2,7 @@
 //#										#
 //#										#
 //#										#
-//# copyright (c) 2010-2015 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -230,7 +230,8 @@ void waitkey(void)
 
 int abortkey(void)
 {
-	int i,j;
+	int j;
+	
 	printf("\nPRESS ENTER TO ABORT \n");
 	do
 	{
@@ -278,10 +279,10 @@ void show_data4_b(long addr, int len)
 	int i;
 	for(i=0;i<len;i++)
 	{
-		printf("ADDR= %08lX  DATA= %08lX\n",addr+4*i,	(memory[addr+4*i]<<24) |
+		printf("ADDR= %08lX  DATA= %08lX\n",addr+4*i,	(unsigned long)((memory[addr+4*i]<<24) |
 								(memory[addr+4*i+1]<<16) |
 								(memory[addr+4*i+2]<<8) |
-								(memory[addr+4*i+3]));
+								(memory[addr+4*i+3])));
 	}
 }
 
@@ -290,10 +291,10 @@ void show_data4_l(long addr, int len)
 	int i;
 	for(i=0;i<len;i++)
 	{
-		printf("ADDR= %08lX  DATA= %08lX\n",addr+4*i,	(memory[addr+4*i]) |
+		printf("ADDR= %08lX  DATA= %08lX\n",addr+4*i,	(unsigned long)((memory[addr+4*i]) |
 								(memory[addr+4*i+1]<<8) |
 								(memory[addr+4*i+2]<<16) |
-								(memory[addr+4*i+3]<<24));
+								(memory[addr+4*i+3]<<24)));
 	}
 }
 

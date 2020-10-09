@@ -1,7 +1,7 @@
 #ifndef _DEVICE_LIST_
 
-devicedat valid_devices[1000] = 
-{
+devicedat valid_devices[1000] = {
+
 	"LIST",
 	100,
 	0x00000000,0x00000000,		//dummy data
@@ -14,6 +14,7 @@ devicedat valid_devices[1000] =
 	0x0000,0x0000,
 	0x0000,0x0000,
 	0x0000,0x0000,
+
 
 	"LIST4",
 	112,
@@ -162,6 +163,7 @@ devicedat valid_devices[1000] =
 #include	"devices/devices_DSPIC33.h"
 #include	"devices/devices_PPCBAM.h"
 #include	"devices/devices_SPC56.h"
+#include	"devices/devices_MPC57.h"
 #include	"devices/devices_RL78F12.h"
 #include	"devices/devices_RL78F13.h"
 #include	"devices/devices_RL78F14.h"
@@ -192,7 +194,7 @@ devicedat valid_devices[1000] =
 
 
 
-
+#include	"devices/devices_SPC58.h"
 #include	"devices/devices_MLX.h"
 #include	"devices/devices_DGEN.h"
 #include	"devices/devices_SPIEEPROM.h"
@@ -202,9 +204,10 @@ devicedat valid_devices[1000] =
 #include	"devices/devices_TLE.h"
 #include	"devices/devices_AVR0.h"
 #include	"devices/devices_AT89.h"
+#include	"devices/devices_S12Z.h"
+#include	"devices/devices_EFM32.h"
 
 	"END",0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
-
 };
 
 #define _DEVICE_LIST_

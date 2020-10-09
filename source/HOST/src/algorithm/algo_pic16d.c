@@ -92,9 +92,9 @@ int prog_pic16d()
 		printf("-- vc -- configuration verify\n");
 		printf("-- rc -- configuration readout\n");
 
-		printf("-- pu -- cuser id program\n");
-		printf("-- vu -- cuser id verify\n");
-		printf("-- ru -- cuser id readout\n");
+		printf("-- pu -- user id program\n");
+		printf("-- vu -- user id verify\n");
+		printf("-- ru -- user id readout\n");
 
 		printf("-- ii -- ignore wrong ID\n");
 		printf("-- st -- start device\n");
@@ -180,7 +180,10 @@ int prog_pic16d()
 			printf("ID = %04X, REV = %02X\n",dev_id,memory[0] & 0x1f);
 		}
 
+		if ((ignore_devid == 0) && (errc != 0)) goto PIC16D_EXIT;
+
 		if((ignore_devid == 1) && (errc == 0x7e)) errc=0; 
+		
 
 	}
 
@@ -188,17 +191,20 @@ int prog_pic16d()
 	//erase
 	if((all_erase == 1) && (errc == 0))
 	{
+		printf("CHIP ERASE\n");
 		errc=prg_comm(0x73,0,0,0,0,100,0,0,0);				//erase all
 		errc=prg_comm(0x75,0,0,0,0,100,0,0,0);				//erase data
 	}
 
 	if((main_erase == 1) && (errc == 0))
 	{
+		printf("MAIN ERASE\n");
 		errc=prg_comm(0x74,0,0,0,0,100,0,0,0);				//erase prog
 	}
 
 	if((eeprom_erase == 1) && (errc == 0))
 	{
+		printf("EEPROM ERASE\n");
 		errc=prg_comm(0x75,0,0,0,0,100,0,0,0);				//erase data
 	}
 
@@ -305,6 +311,8 @@ int prog_pic16d()
 		len = param[3];
 		bsize=len*2;
 		maddr=0;
+		j=0;
+		blocks=1;
 
 //		printf("bsize= %04X  addr= %04X\n",bsize,addr);
 
@@ -325,6 +333,8 @@ int prog_pic16d()
 		len = param[3];
 		bsize = len*2;
 		maddr=0;
+		j=0;
+		blocks=1;
 		
 		progress("READ DATA ",blocks,0);
 		errc=prg_comm(0x127,0,bsize,0,maddr+ROFFSET,
@@ -482,6 +492,8 @@ int prog_pic16d()
 		waitkey();
 		prg_comm(0x71,0,0,0,0,0,0,0,0);						//exit
 	}
+
+PIC16D_EXIT:
 
 	prg_comm(0x71,0,0,0,0,0,0,0,0);					//exit
 	prg_comm(0xf5,0,0,0,0,0,0,0,0);					//vpp off

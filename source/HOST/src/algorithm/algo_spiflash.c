@@ -2,7 +2,7 @@
 //#										#
 //# UPROG universal programmer							#
 //#										#
-//# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -86,11 +86,9 @@ int prog_spiflash(void)
 	int protect=0;
 	int quadmode=0;
 	int ignore_size=0;
-	int conf_read=0;
 	int res_quad=0;
 	int set_quad=0;
 	int is_quad=0;
-	int qm_result;
 	errc=0;
 
 
@@ -239,14 +237,14 @@ int prog_spiflash(void)
 
 	}
 
-	if((memory[2] != (unsigned char)(param[5] >> 8) & 0xff) && (ignore_size == 0))
+	if((memory[2] != ((unsigned char)(param[5] >> 8) & 0xff)) && (ignore_size == 0))
 	{
 		printf(" Memory size:   %02X, should be %02X\n\n",memory[2],(unsigned char)(param[5] >> 8) & 0xff);
 		errc=0x43;
 		goto SPIF_FEXIT;
 	}
 
-	if((memory[0] != (unsigned char)(param[5] >> 24) & 0xff) && (ignore_size == 0) && (param[18]==1))
+	if((memory[0] != ((unsigned char)(param[5] >> 24) & 0xff)) && (ignore_size == 0) && (param[18]==1))
 	{
 		printf(" Vendor:        %02X, should be %02X\n\n",memory[0],(unsigned char)(param[5] >> 24) & 0xff);
 		errc=0x43;

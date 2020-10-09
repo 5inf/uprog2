@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2010-2015 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -82,7 +82,6 @@ int prog_s12xs(void)
 	int dev_start=0;
 	int run_ram=0;
 	int small_model=1;
-	int dflash_erase=0;
 	int dflash_prog=0;
 	int dflash_verify=0;
 	int dflash_readout=0;
@@ -171,11 +170,6 @@ int prog_s12xs(void)
 			printf("## Action: main flash erase\n");
 		}
 
-		if(find_cmd("ed"))
-		{
-			dflash_erase=1;
-			printf("## Action: DFLASH erase\n");
-		}
 
 		if(find_cmd("un"))
 		{

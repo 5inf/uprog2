@@ -58,7 +58,6 @@ void print_ppcjtag2_error(int errc)
 
 void ppcjtag2_setcpu(void)
 {
-	int errc;
 	memory[ 0]=0x00;		//WBBRl
 	memory[ 1]=0x00;
 	memory[ 2]=0x00;
@@ -89,25 +88,23 @@ void ppcjtag2_setcpu(void)
 	memory[22]=0x00;
 	memory[23]=0x00;
 
-	errc=prg_comm(0x180,24,0,0,0,0,0,0,0);		//-> write CPUSCR
+	prg_comm(0x180,24,0,0,0,0,0,0,0);		//-> write CPUSCR
 }
 
 
 void ppcjtag2_oncestat(void)
 {
-	int errc;
 	unsigned short stat;
-	errc=prg_comm(0x185,0,2,0,0,0,0,0,0);					//read OnCE status register
+	prg_comm(0x185,0,2,0,0,0,0,0,0);					//read OnCE status register
 	stat=memory[0] + (memory[1] << 8);
 	printf("OnCE-STAT = %04X\n",stat);	
-	errc=prg_comm(0x179,0,0,0,0,0,0,0,0);					//enable Nexus 0
+	prg_comm(0x179,0,0,0,0,0,0,0,0);					//enable Nexus 0
 }
 
 int prog_ppcjtag2(void)
 {
 	int errc,blocks,bsize;
-	unsigned short stat;
-	unsigned long addr,maddr,i,j,devid,idreg,pfapr;
+	unsigned long addr,maddr,i,j,devid,idreg;
 	long len;
 	int main_erase=0;
 	int main_prog=0;

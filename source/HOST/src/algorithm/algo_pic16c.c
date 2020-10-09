@@ -57,9 +57,6 @@ int prog_pic16c()
 	int main_prog=0;
 	int main_verify=0;
 	int main_readout=0;
-	int eeprom_erase=0;
-	int eeprom_prog=0;
-	int eeprom_verify=0;
 	int eeprom_readout=0;
 	int conf_prog=0;
 	int conf_verify=0;
@@ -82,11 +79,6 @@ int prog_pic16c()
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
 		printf("-- rm -- main flash readout\n");
-
-//		printf("-- ee -- eeprom erase\n");
-//		printf("-- pe -- eeprom program\n");
-//		printf("-- ve -- eeprom verify\n");
-//		printf("-- re -- eeprom readout\n");
 
 		printf("-- pc -- configuration program\n");
 		printf("-- vc -- configuration verify\n");
@@ -120,11 +112,6 @@ int prog_pic16c()
 		printf("## Action: main flash erase\n");
 	}
 
-//	if(find_cmd("ee"))
-//	{
-//		eeprom_erase=1;
-//		printf("## Action: eeprom erase\n");
-//	}
 
 	if(find_cmd("ea"))
 	{
@@ -133,17 +120,14 @@ int prog_pic16c()
 	}
 
 	main_prog=check_cmd_prog("pm","code flash");
-//	eeprom_prog=check_cmd_prog("pe","eeprom");
 	conf_prog=check_cmd_prog("pc","config");
 	uid_prog=check_cmd_prog("pu","user id");
 
 	main_verify=check_cmd_verify("vm","code flash");
-//	eeprom_verify=check_cmd_verify("ve","eeprom");
 	conf_verify=check_cmd_verify("vc","config");
 	uid_verify=check_cmd_verify("vu","user id");
 
 	main_readout=check_cmd_read("rm","code flash",&main_prog,&main_verify);
-//	eeprom_readout=check_cmd_read("re","eeprom",&eeprom_prog,&eeprom_verify);
 	conf_readout=check_cmd_read("rc","config",&conf_prog,&conf_verify);
 	uid_readout=check_cmd_read("ru","user id",&uid_prog,&uid_verify);
 
@@ -276,99 +260,6 @@ int prog_pic16c()
 		writeblock_data(0,param[1]*2,param[0]*2);
 	}
 
-/*
-	//program data flash
-	if((eeprom_prog == 1) && (errc == 0))
-	{
-		read_block(param[2]*2,param[3],0);
-		addr = param[2]*2;
-		len = param[3];
-		bsize = 1024;
-		if(len < bsize) bsize = len;
-		blocks = len / bsize;
-		maddr=0;
-
-//		printf("bsize= %04X  addr= %04X\n",bsize,addr);
-
-		progress("PROG DATA ",blocks,0);
-		for(j=0;j<blocks;j++)
-		{
-			if(must_prog(maddr,bsize) && (errc == 0)) 
-			{
-				if(j==0)
-				{
-					errc=prg_comm(0x78,bsize,0,maddr,0,
-					bsize & 0xff,(bsize >> 8) & 0xff,param[12],1);		//program first block
-				}
-				else
-				{
-					errc=prg_comm(0x78,bsize,0,maddr,0,
-					bsize & 0xff,(bsize >> 8) & 0xff,param[12],0);		//program block
-				}
-			}
-			addr+=bsize;
-			maddr+=bsize;
-			progress("PROG DATA ",blocks,j+1);
-		}
-		printf("\n");
-	}
-
-	//verify/readout data flash
-	if(((eeprom_readout == 1) || (eeprom_verify == 1)) && (errc == 0))
-	{
-		addr = param[2]*2;
-		len = param[3];
-		bsize = 1024;
-		if(len < bsize) bsize = len;
-		blocks = len / bsize;
-		maddr=0;
-		
-		progress("READ DATA ",blocks,0);
-		for(j=0;j<blocks;j++)
-		{
-			if(errc == 0) 
-			{
-				if(j==0)
-				{
-					errc=prg_comm(0x79,0,bsize,0,maddr+ROFFSET,
-					bsize & 0xff,(bsize >> 8) & 0xff,0,1);		//read first block
-				}
-				else
-				{
-					errc=prg_comm(0x79,0,bsize,0,maddr+ROFFSET,
-					bsize & 0xff,(bsize >> 8) & 0xff,0,0);		//read block
-				}
-			}
-			progress("READ DATA ",blocks,j+1);
-			addr+=bsize;
-			maddr+=bsize;
-		}
-		printf("\n");
-	}
-
-	if(eeprom_verify == 1)
-	{
-		read_block(param[2]*2,param[3],0);
-		addr = param[2]*2;
-		len = param[3];
-		for(j=0;j<len;j+=1)
-		{
-			rdata=memory[addr+j+ROFFSET];
-			fdata=memory[addr+j];
-			
-			if(rdata != fdata)
-			{
-				printf("ERR -> ADDR= %04X  DATA= %02X  READ= %02X\n",addr+j,fdata,rdata);
-				errc=1;
-			}
-		}
-	}
-
-	if(eeprom_readout == 1)
-	{
-		writeblock_data(0,param[3],param[2]*2);
-	}
-*/
 
 	//program user ID
 	if((uid_prog == 1) && (errc == 0))

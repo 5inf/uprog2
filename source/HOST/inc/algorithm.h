@@ -1,5 +1,6 @@
 #include <algorithm/algo_atxmega.h>
 #include <algorithm/algo_avr.h>
+#include <algorithm/algo_avr0.h>
 #include <algorithm/algo_c2000.h>
 #include <algorithm/algo_cc25xx.h>
 #include <algorithm/algo_dspic30.h>
@@ -19,7 +20,8 @@
 #include <algorithm/algo_ppcbam.h>
 #include <algorithm/algo_ppcjtag.h>
 #include <algorithm/algo_ppcjtag2.h>
-
+#include <algorithm/algo_ppcjtag3.h>
+#include <algorithm/algo_ppcjtag4.h>
 #include <algorithm/algo_psoc4.h>
 #include <algorithm/algo_r8c.h>
 #include <algorithm/algo_rl78.h>
@@ -52,6 +54,8 @@
 #include <algorithm/algo_kea64swd.h>
 #include <algorithm/algo_sici.h>
 #include <algorithm/algo_at89s8252.h>
+#include <algorithm/algo_s12z.h>
+#include <algorithm/algo_efm32swd.h>
 
 
 #include <algorithm/algo_xc9500.h>

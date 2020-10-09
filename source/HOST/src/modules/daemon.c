@@ -42,11 +42,11 @@
 #include<bluetooth/hci_lib.h>
 #include<bluetooth/rfcomm.h>
 
-#ifdef COMP_32
-#include<ftdi.h>
-#else
+//#ifdef COMP_32
+//#include<ftdi.h>
+//#else
 #include<libftdi1/ftdi.h>
-#endif
+//#endif
 
 #include <main.h>
 
@@ -73,6 +73,7 @@ int daemon_task(void)
 	char addr[19] = { 0 };
 	char name[248] = { 0 };
 
+	sock=-1;
 
 	ping_data[0]=0xaa;	//query
 	ping_data[1]=0xf9;	//returns a "invalid" answer
@@ -147,7 +148,7 @@ int daemon_task(void)
 		interface_type=1;
 	}
 
-	if((interface_type == 2) && ((usb_stat = ftdi_usb_open(&ftdic,0x2763,0xffff)) != 0))
+	if((interface_type == 2) && ((usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6661)) != 0))
 	{
 #if DEBUG_OUTPUT == 1
 		printf("NO FTDI DEVICE (%s)\n",ftdi_get_error_string(&ftdic));
@@ -500,7 +501,7 @@ DAEMON_W1:
 	
 daemon_end:
 
-	if(interface_type == 1)
+	if((interface_type == 1) && (sock > -1))
 	{
 		close(sock);
 	}

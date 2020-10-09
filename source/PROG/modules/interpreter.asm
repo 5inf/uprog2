@@ -428,11 +428,11 @@ prg_exec_jtab2:
 		jmp	ppcjtag_enter_once	;code 188 PPC JTAG enter OnCE
 		jmp	jppc_init_0		;code 189 unknown
 		jmp	ppcjtag_unlock2		;code 18a PPC JTAG unlock device
-		jmp	prg_exec_e1		;code 18b unknown
-		jmp	prg_exec_e1		;code 18c unknown
-		jmp	prg_exec_e1		;code 18d unknown
-		jmp	prg_exec_e1		;code 18e unknown
-		jmp	prg_exec_e1		;code 18f unknown
+		jmp	ppcjtag_enter_dbg4	;code 18b unknown
+		jmp	ppcjtag_get_rwcs	;code 18c unknown
+		jmp	ppcjtag_nexus_wblockb2	;code 18d unknown
+		jmp	ppcjtag_xreset		;code 18e unknown
+		jmp	ppcjtag_nexus_pread	;code 18f PPC nexus read long withadditional pause
 
 		jmp	la1m_start		;code 190 logic analyzer, 1M sample freq
 		jmp	freq_gen_start		;code 191 frequency generator
@@ -566,29 +566,29 @@ prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
 		jmp	at8252_eprog		;code 215 AT89S8252 eeprom program
 		jmp	at8252_eread		;code 216 AT89S8252 eeprom read
 		jmp	at8252_wlock		;code 217 AT89S8252 write lockbits
-		jmp	prg_exec_e1		;code 218 unknown
-		jmp	prg_exec_e1		;code 219 unknown
-		jmp	prg_exec_e1		;code 21a unknown
-		jmp	prg_exec_e1		;code 21b unknown
-		jmp	prg_exec_e1		;code 21c unknown
+		jmp	efm32_init		;code 218 EFM32 init
+		jmp	efm32_lock		;code 219 EFM32 lock
+		jmp	efm32_unlock		;code 21a EFM32 unlock via SWD 
+		jmp	efm32_merase		;code 21b EFM32 mass erase direct
+		jmp	efm32_perase		;code 21c EFM32 page erase direct
 		jmp	prg_exec_e1		;code 21d unknown
 		jmp	prg_exec_e1		;code 21e unknown
 		jmp	prg_exec_e1		;code 21f unknown
 
-		jmp	prg_exec_e1		;code 220 unknown
-		jmp	prg_exec_e1		;code 221 unknown
-		jmp	prg_exec_e1		;code 222 unknown
-		jmp	prg_exec_e1		;code 223 unknown
-		jmp	prg_exec_e1		;code 224 unknown
-		jmp	prg_exec_e1		;code 225 unknown
-		jmp	prg_exec_e1		;code 226 unknown
-		jmp	prg_exec_e1		;code 227 unknown
-		jmp	prg_exec_e1		;code 228 unknown
-		jmp	prg_exec_e1		;code 229 unknown
-		jmp	prg_exec_e1		;code 22a unknown
-		jmp	prg_exec_e1		;code 22b unknown
-		jmp	prg_exec_e1		;code 22c unknown
-		jmp	prg_exec_e1		;code 22d unknown
+		jmp	s12z_entry		;code 220 S12Z entry
+		jmp	s12z_write		;code 221 S12Z write data to RAM
+		jmp	s12z_exec		;code 222 S12Z exec code
+		jmp	s12z_read		;code 223 S12Z read memory
+		jmp	s12z_prog_flash		;code 224 S12Z program flash
+		jmp	s12z_unsecure		;code 225 S12Z unsecure (mass erase)
+		jmp	s12z_prog_eeprom	;code 226 S12Z program EEPROM
+		jmp	bdm_setfreq0		;code 227 unknown
+		jmp	s12z_test		;code 228 S12Z LED and secure test
+		jmp	s12z_active		;code 229 S12Z enter active background debug mode
+		jmp	s12z_go			;code 22a S12Z release CPU
+		jmp	s12z_step		;code 22b S12Z single step
+		jmp	s12z_readregs		;code 22c S12Z read registers
+		jmp	s12z_writereg		;code 22d S12Z write register
 		jmp	prg_exec_e1		;code 22e unknown
 		jmp	prg_exec_e1		;code 22f unknown
 

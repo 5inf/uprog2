@@ -32,7 +32,6 @@ int check_shm(unsigned long key)
 	char line[100];
 	char skey[20];
 	FILE *cmd;
-	int pids,p;
 
 	sprintf(skey,"0x%08lx",key);
 

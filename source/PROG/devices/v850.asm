@@ -45,8 +45,8 @@
 .equ	V850_FLMD0	= SIG5
 .equ	V850_TRIGGER	= SIG6
 
-;FLMD0, V850_RESET, V850_SI, V850_SCK
-.equ	V850_DIRSET	= SIG1_OR | SIG2_OR | SIG3_OR | SIG5_OR | SIG6_OR 
+;FLMD0, V850_RESET, V850_SCK
+.equ	V850_DIRSET	= SIG1_OR | SIG2_OR | SIG5_OR | SIG6_OR
 
 ;------------------------------------------------------------------------------
 ; INIT CSI MODE
@@ -59,17 +59,18 @@ v850_init:		ldi	XL,SIG2_OR
 			ldi	XL,V850_DIRSET			;set direction
 			out	CTRLDDR,XL
 			call	api_vcc_on			;VCC on
-			ldi	ZL,50
+			sbi	CTRLPORT,V850_TRIGGER
+			ldi	ZL,100
 			ldi	ZH,0
 			call	api_wait_ms
 			sbi	CTRLPORT,V850_SCK
-			sbi	CTRLPORT,V850_SI
-			ldi	ZL,50
+;			sbi	CTRLPORT,V850_SI
+			ldi	ZL,2
 			ldi	ZH,0
 			call	wait_ms
 			sbi	CTRLPORT,V850_FLMD0		;FLMD0=1
-			cbi	CTRLPORT,V850_SI
-			ldi	ZL,2
+;			cbi	CTRLPORT,V850_SI
+			ldi	ZL,15
 			ldi	ZH,0
 			call	wait_ms
 			sbi	CTRLPORT,V850_RESET		;release RESET with FLMD0=1
@@ -85,10 +86,13 @@ v850_init_1:		cbi	CTRLPORT,V850_FLMD0		;FLMD0=0 (pulse start)
 			dec	r19				;pulse counter
 			brne	v850_init_1
 
-			rcall	v850_wait_send
-			ldi	ZL,50
+;			rcall	v850_wait_send
+			ldi	ZL,150
 			ldi	ZH,0
 			call	wait_ms
+
+			sbi	CTRLDDR,V850_SI			;data out
+			sbi	CTRLPORT,V850_TRIGGER		;trigger LA
 
 			rcall	v850_reset_cmd
 		
@@ -155,7 +159,7 @@ v850_set_osc:		rcall	v850_send_soh		;SOH senden
 			rcall	v850_send_csum
 			rcall	v850_send_etx		;ETX senden
 
-			ldi	ZL,2
+			ldi	ZL,100
 			ldi	ZH,0
 			call	wait_ms
 
@@ -861,7 +865,7 @@ v850_wait_100u_1:	dec	XH
 
 
 v850_slow_wait:		push	XH
-			clr	XH
+			ldi	XH,200
 v850_slow_wait_1:	dec	XH
 			nop
 			nop

@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2010-2015 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -166,7 +166,7 @@ int prog_st7f(void)
 
 	printf("\n");
 	
-	if((main_readout || eeprom_readout) > 9)
+	if((main_readout || eeprom_readout) > 0)
 	{
 		errc=writeblock_open();
 	}
@@ -370,7 +370,7 @@ int prog_st7f(void)
 		if(errc == 0) waitkey();
 	}
 
-	if((main_readout || eeprom_readout) > 9)
+	if((main_readout || eeprom_readout) > 0)
 	{
 		writeblock_close();
 	}

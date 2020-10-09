@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -69,10 +69,8 @@ void print_v850_error(int errc)
 
 int prog_v850(void)
 {
-	unsigned int flashblocks;
-	int errc,blocks,bsize,fbtype,loops,maxloops,rstat;
-	unsigned long addr,len,maddr,i,j,freq,fbsize;
-	unsigned int fbnum;
+	int errc,blocks,bsize;
+	unsigned long addr,len,maddr,i;
 	unsigned int osc_freq;
 	int protect=0;
 	int chip_erase=0;
@@ -82,13 +80,8 @@ int prog_v850(void)
 	int data_blank=0;
 	int data_prog=0;
 	int data_verify=0;
-	int dev_start=0;
 	int blank_state=0;
 
-	long flash_size;
-	int flash_sectors;
-	long flash_sector_addr[50];
-	long flash_sector_size[50];
 	
 	errc=0;
 	osc_freq=8;
@@ -184,11 +177,10 @@ int prog_v850(void)
 
 	if(find_cmd("st"))
 	{
-		dev_start=1;
 		printf("## Action: start device\n");
 		i=prg_comm(0x162,0,0,0,0,0,0,0,0);		//init
 		waitkey();					//exit
-		return 0;
+		goto V850_END;
 	}
 	printf("\n");
 
@@ -203,43 +195,12 @@ int prog_v850(void)
 //	show_data(0,32);	//debug only
 	printf(">> VENDOR        = %02X\n",memory[1]); 			
 	printf(">> FLASH TYPE    = %02X,%02X\n",memory[2],memory[3]); 
- 	flash_size=(memory[4] & 0x7f)+((memory[5] & 0x7f) << 7) + ((memory[6] & 0x7f) << 14) + 1;
 	printf(">> DEVICE NAME   = ");
 	for(i=7;i<17;i++)
 	{
 		printf("%c",memory[i] & 0x7f);
 	} 
 	printf("\n");
- 	flash_sectors=memory[17];
-	printf(">> FLASH SIZE    = %dK\n",flash_size >> 10); 
-	printf(">> FLASH SECTORS = %d\n\n",flash_sectors); 
-
-	if((memory[7] != 0xc4) || (memory[8] != 0x37) ||(memory[9] != 0xB0) ||(memory[10] != 0x46))
-	{
-		errc=0x48;
-		goto V850_END;
-	} 
-	
-	for(i=0;i<4;i++)
-	{
-		if((memory[11+i] & 0x7f) != ((param[10] >> ((3-i) * 8)) & 0x7f))
-		{
-			errc=0x47;
-			goto V850_END;
-		
-		}
-	}
-
-	for(i=0;i<2;i++)
-	{
-		if((memory[15+i] & 0x7f) != ((param[12] >> ((3-i) * 8)) & 0x7f))
-		{
-			errc=0x47;
-			goto V850_END;
-		
-		}
-	}
-
 
 	if(main_blank == 1)
 	{

@@ -72,7 +72,7 @@ int prog_dspic30(void)
 {
 	int errc,blocks,bsize,i,j;
 	unsigned long addr,faddr,maddr;
-	int jj,flash_erased;
+	int flash_erased=0;
 	int bulk_erase=0;
 	int total_erase=0;
 	int exec_erase=0;
@@ -534,7 +534,7 @@ int prog_dspic30(void)
 	errc=prg_comm(0xc1,0,0,0,0,0,0,0,0);					// exit
 	errc=prg_comm(0xf5,0,0,0,0,0,0,0,0);					// VPP off
 
-	print_dspic33_error(errc);
+	print_dspic30_error(errc);
 
 	return errc;
 }

@@ -72,7 +72,7 @@ int prog_dspic33(void)
 {
 	int errc,blocks,bsize,i,j;
 	unsigned long addr,faddr,maddr;
-	int jj,flash_erased;
+	int flash_erased=0;
 	int bulk_erase=0;
 	int total_erase=0;
 	int exec_erase=0;

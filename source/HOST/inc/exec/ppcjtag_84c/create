@@ -1,0 +1,5 @@
+#!/bin/bash
+
+make clean
+make rbin
+./generate_boot.pl boot.s37 exec_ppcjtag.h exec_ppcjtag_84c 

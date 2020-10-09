@@ -1,3 +1,35 @@
+# 28.9.2020 Version 1.37
+*  System-Version ist jetzt 0015, Update erfolgt automatisch
+*  Die 32-Bit Version (X86 Binary) habe ich eingestellt
+*  Anpassungen an GCC10
+*  Neue Devices: NXP/Freescale S12Z
+*  Neue Devices: NXP/Freescale MPC574x
+*  Neue Devices: STM SPC584cc
+*  Neue Devices: Silabs EFM32/EFR32
+*  diverse kleinere Bugfixes
+
+# 27.1.2020 Version 1.36
+*  System-Version ist jetzt 0014, Update erfolgt automatisch
+*  Bugfix: Programmierung XC95xxXL funktionerte nicht richtig
+*  Feature: Bootstrapping beim RH850
+*  Feature: Config lesen/schreiben beim SPI Flash
+*  Neue Devices: AT89S8252
+*  Modellpflege: neue Devices beim RH850
+*  Modellpflege: neue Devices beim SPI-Flash, Änderung der Standardtypen
+
+# 25.10.2019 Version 1.35
+*  Loader-Version ist jetzt 1.6, das gesamte Image muss neu programmiert werden
+*  System-Version ist jetzt 0013
+*  Wichtig: Änderung der USB PID auf 0x6661
+*  externe Versorgung wird jetzt erst ab 1,5V erkannt
+*  Bugfix: Beim RH850 wurde der Data-Flash nicht komlett beschrieben
+*  Feature: Es können beim Programmieren/Verify bis zu 4 Dateien angegeben werden
+*  Feature: Security beim RH850 lesen/schreiben
+*  Neue Devices: AVR0 mit UPDI
+*  Neue Devices: TLE5014
+*  Modellpflege: neue Devices und Funktionen bei den SPI-Flashes
+
+
 # 7.4.2019 Version 1.33 
 * System-Version ist jetzt 0012, Update erfolgt automatisch
 * Bugfix: langsame SPI-Geschwindigkeit beim AVR war zu hoch

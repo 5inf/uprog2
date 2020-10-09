@@ -310,45 +310,18 @@ s32k_data_erase2:	.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x00	;FSTAT
 ;-------------------------------------------------------------------------------
 ; erase
 ;-------------------------------------------------------------------------------
-s32k_erase:		ldi		ZL,LOW(s32k_data2_erase*2)
-			ldi		ZH,HIGH(s32k_data2_erase*2)
-			ldi		r24,4
+s32k_erase:		ldi		ZL,LOW(s32k_data_erase*2)
+			ldi		ZH,HIGH(s32k_data_erase*2)
+			ldi		r24,5
 s32k_erase_0:		rcall		s32k_write_dap_table
 			dec		r24
 			brne		s32k_erase_0
 
-			rcall		s32k_read_drwx			;read IDR and check for 0x1C0020
-;			cpi		r20,0x00
-;			brne		s32_erase_err
-			cpi		r21,0x00
-			brne		s32_erase_err
-			cpi		r22,0x1c
-			brne		s32_erase_err
-
 			sbi		CTRLPORT,S32K_TRIGGER		
-			ldi		ZL,LOW(s32k_data_erase*2)
-			ldi		ZH,HIGH(s32k_data_erase*2)	
-			rcall		s32k_write_dap_table
-
-			ldi		r24,20
-s32k_erase_1:		ldi		XL,S32K_READ_CSW
-			rcall		s32k_read_dap		;status register
-			ldi		XL,S32K_READ_CSW
-			rcall		s32k_read_dap		;status register
-			andi		r20,0x02
-			brne		s32k_erase_1e
-			ldi		ZL,20
-			ldi		ZH,0
-			call		api_wait_ms
-			dec		r24
-			brne		s32k_erase_1
-			rjmp		s32_erase_err	
-
-s32k_erase_1e:		rcall		s32k_write_dap_table
 
 			ldi		r24,20
 s32k_erase_2:		ldi		ZL,20
-			ldi		ZH,0
+			ldi		ZH,1
 			call		api_wait_ms
 		
 s32k_erase_3:		ldi		XL,S32K_READ_TAR
@@ -371,17 +344,11 @@ s32_erase_err:		ldi		r16,0x43			;erase timeout
 s32k_erase_4:		sts		0x100,r24
 			jmp		main_loop_ok
 
-s32k_data_erase:;	.db S32K_WRITE_ABORT,	0x00,	0x00,0x00,0x00,0x1e	;clear all errors
+s32k_data_erase:	.db S32K_WRITE_ABORT,	0x00,	0x00,0x00,0x00,0x1e	;clear all errors
 			.db S32K_WRITE_SELECT,	0x00,	0x01,0x00,0x00,0x00	;switch to MDM-AP
-;			.db S32K_WRITE_CTRL,	0x00,	0x50,0x00,0x00,0x00	;power up debug interface
-;			.db S32K_WRITE_CTRL,	0x00,	0x54,0x00,0x00,0x00	;request debug reset
-;			.db S32K_WRITE_CTRL,	0x00,	0x50,0x00,0x0F,0x00	;init AP transfer mode
-			.db S32K_WRITE_TAR,	0x00,	0x00,0x00,0x00,0x01	;initiate erase			
-
-s32k_data2_erase:	.db S32K_WRITE_ABORT,	0x00,	0x00,0x00,0x00,0x1e	;clear all errors
-			.db S32K_WRITE_SELECT,	0x00,	0x01,0x00,0x00,0xF0	;switch to MDM-AP
 			.db S32K_WRITE_CTRL,	0x00,	0x50,0x00,0x00,0x00	;power up debug interface
 			.db S32K_WRITE_CTRL,	0x00,	0x54,0x00,0x00,0x00	;request debug reset
+			.db S32K_WRITE_TAR,	0x00,	0x00,0x00,0x00,0x01	;initiate erase			
 
 
 ;-------------------------------------------------------------------------------

@@ -62,6 +62,7 @@
 			
 ;-------------------------------------------------------------------------------
 ; init
+; R19 bit 4 = release reset
 ;-------------------------------------------------------------------------------
 swd32_init:		out		CTRLPORT,const_0
 			sbi		CTRLDDR,SWD32_RST
@@ -74,6 +75,10 @@ swd32_init:		out		CTRLPORT,const_0
 			ldi		ZH,0
 			call		api_wait_ms
 
+			sbrc		r19,4
+			sbi		CTRLPORT,SWD32_RST	;release reset
+
+
 swd32_init_1:		cbi		CTRLPORT,SWD32_CLOCK
 			cbi		CTRLPORT,SWD32_DATA
 			clr		ZL
@@ -82,6 +87,8 @@ swd32_init_1:		cbi		CTRLPORT,SWD32_CLOCK
 			ldi		r16,0x41		;timeout
 
 			rcall		swd32_reginit_reset	;set registers for faster output
+			sbrc		r19,4
+			rcall		swd32_reginit		;set registers for faster output
 			ldi		YL,0
 			ldi		YH,1
 
@@ -90,7 +97,7 @@ swd32_init_1:		cbi		CTRLPORT,SWD32_CLOCK
 			ldi		r25,4			;1024 tries
 swd32_init_2:		rcall		swd32_reset		;reset state machine
 
-			ldi		XL,SWD32_READ_IDCODE	;read ID code
+swd32_init_2a:		ldi		XL,SWD32_READ_IDCODE	;read ID code
 			rcall		swd32_read_dap
 			
 			sts		0x100,XL
@@ -169,7 +176,7 @@ swd32_data_init1:	;DebugPortStart
 swd32_reset:		sbi		CTRLPORT,SWD32_DATA
 			sbi		CTRLDDR,SWD32_DATA
 			;min 50 clocks with TMS high
-			ldi		XH,50
+			ldi		XH,56
 swd32_reset_1:		out		CTRLPORT,r14		;one
 			dec		XH
 			out		CTRLPIN,r15		;clock inactive
@@ -189,18 +196,9 @@ swd32_reset_2:		mov		XL,r14			;one
 			dec		XH
 			brne		swd32_reset_2
 
-			;min 50 clocks with TMS high
-			sbi		CTRLPORT,SWD32_DATA
-			ldi		XH,50
-swd32_reset_3:		out		CTRLPORT,r14		;one
-			dec		XH
-			out		CTRLPIN,r15		;clock inactive
-			brne		swd32_reset_3
-		
-
 			;goto run-test-idle
 			cbi		CTRLPORT,SWD32_DATA
-			ldi		XH,2
+			ldi		XH,16
 swd32_reset_4:		out		CTRLPORT,r13		;zero
 			dec		XH
 			out		CTRLPIN,r15		;clock inactive
@@ -374,16 +372,15 @@ swd32_cmd_0:		ldi		XL,SWD32_WRITE_TAR
 			movw		r20,r16
 			movw		r22,r18
 			ldi		XL,SWD32_WRITE_DRW
-			rcall		swd32_write_dap
+;			rcall		swd32_write_dap
+			rcall		swd32_read_drwx		;dummy readout
 
 swd32_cmd_1:		ldi		ZL,1
 			ldi		ZH,0
 			call		api_wait_ms
 
 			rcall		swd32_read_drwx		;readout
-			or		r21,r20
-			or		r22,r20
-			or		r23,r20
+			cpi		r20,0x00
 			brne		swd32_cmd_1		;wait until cmd word is zero
 			
 			jmp		main_loop_ok
@@ -701,7 +698,8 @@ swd32_data_erase5:	.db SWD32_WRITE_TAR,	0x00,	0x40,0x02,0x20,0x10	;CR
 ; XL=ack out
 ;-------------------------------------------------------------------------------
 swd32_head:		ldi		XH,8			;bits to do
-swd32_head_1:		mov		r12,r14			;one
+swd32_head_1:	;	sbrc		XL,7
+			mov		r12,r14			;one
 			sbrs		XL,7
 			mov		r12,r13			;zero
 			
@@ -711,11 +709,13 @@ swd32_head_1:		mov		r12,r14			;one
 			out		CTRLPIN,r15
 			brne		swd32_head_1
 
-			cbi		CTRLPORT,SWD32_CLOCK	;TRN
 			cbi		CTRLDDR,SWD32_DATA
+			cbi		CTRLPORT,SWD32_CLOCK	;TRN
+			nop
+			nop
 			sbi		CTRLPORT,SWD32_CLOCK
 
-			ldi		XL,10
+			ldi		XL,5
 shd2:			dec		XL
 			brne		shd2	
 
@@ -791,7 +791,7 @@ swd32_wd_1:		mov		r12,r14			;one
 ;-------------------------------------------------------------------------------
 swd32_read_drwx:	ldi		XL,SWD32_READ_DRW
 			rcall		swd32_read_dap		;first dummy read
-			ldi		XL,SWD32_READ_DRW
+			ldi		XL,SWD32_READ_RDBUFF
 			
 swd32_read_dap:		mov		r9,XL
 			rcall		swd32_head		;send header

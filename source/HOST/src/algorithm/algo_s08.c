@@ -70,7 +70,7 @@ void print_s08_error(int errc)
 
 int prog_s08(void)
 {
-	int errc,blocks,bsize,i,j,jj,fbsize;
+	int errc,blocks,bsize,j,fbsize;
 	unsigned int ramsize,ramstart,addr;
 	int prdiv8,bfreq,fcdiv;
 	float freq,bdmfreq;
@@ -87,7 +87,7 @@ int prog_s08(void)
 	int force_4m=0;
 	int force_8m=0;
 	int res_norel=0;
-	int ftrim,trim_min,trim_max,trim_cyc;
+	int trim_min,trim_max,trim_cyc=0;
 	errc=0;
 
 
@@ -232,7 +232,7 @@ int prog_s08(void)
 		prdiv8=0;
 		if(errc == 0)
 		{
-			bdmfreq=512/memory[0];
+			bdmfreq=171/memory[0];
 			if(force_4m==1)
 			{
 				printf("BDM FREQ = %2.1fMHz     FORCED TO = 4MHz\n",bdmfreq);
@@ -323,7 +323,7 @@ int prog_s08(void)
 		prdiv8=0;
 		if(errc == 0)
 		{
-			bdmfreq=512/memory[0];
+			bdmfreq=171/memory[0];
 			freq=bdmfreq;			//bus clock
 			if((freq) > 12.6)
 			{
@@ -339,13 +339,13 @@ int prog_s08(void)
 		memory[0xffaf]=trim;
 		memory[0xffae]=0;
 
-		if(errc == 0) errc=prg_comm(0x18,1,0,4,0,param[11],0,1,0);			//set trim reg to center
+//		if(errc == 0) errc=prg_comm(0x18,1,0,4,0,param[11],0,1,0);			//set trim reg to center
 		if(errc == 0) errc=prg_comm(0x2b,0,4,0,0,0,0,0,0);				//sync
 
 		prdiv8=0;
 		if(errc == 0)
 		{
-			bdmfreq=512/memory[0];
+			bdmfreq=171/memory[0];
 			freq=bdmfreq;			//bus clock
 			if((freq) > 12.6)
 			{
@@ -361,7 +361,6 @@ int prog_s08(void)
 				errc=prg_comm(0x12,0,0,0,0,fcdiv,bfreq-1,0,0);
 			}
 		}
-
 	}
 
 
@@ -486,7 +485,7 @@ int prog_s08(void)
 		if(trim > 0) { memory[0xffae]=0; memory[0xffaf]=trim;} 
 
 		addr = param[2];
-		i=0;
+		
 		for(j=0;j<param[3];j++)
 		{
 			if(memory[addr+j] != memory[addr+j+ROFFSET])
@@ -541,7 +540,7 @@ int prog_s08(void)
 		if(trim > 0) { memory[0xffae]=0; memory[0xffaf]=trim;} 
 
 		addr = param[0];
-		i=0;
+
 		for(j=0;j<param[1];j++)
 		{
 			if(memory[addr+j] != memory[addr+j+ROFFSET])
@@ -577,15 +576,15 @@ int prog_s08(void)
 
 	if(dev_start == 1)
 	{
-		i=prg_comm(0x0e,0,0,0,0,0,0,0,0);		//init
+		prg_comm(0x0e,0,0,0,0,0,0,0,0);		//init
 		waitkey();
 	}
 
-	i=prg_comm(0x0f,0,0,0,0,0,0,0,0);			//exit
-	i=prg_comm(0x11,0,0,0,0,0,0,0,0);			//BDM exit
-	i=prg_comm(0xfe,0,0,0,0,0,0,0,0);			//disable Pull-up
+	prg_comm(0x0f,0,0,0,0,0,0,0,0);			//exit
+	prg_comm(0x11,0,0,0,0,0,0,0,0);			//BDM exit
+	prg_comm(0xfe,0,0,0,0,0,0,0,0);			//disable Pull-up
 	
-	prg_comm(0x2ef,0,0,0,0,0,0,0,0);			//dev 1
+	prg_comm(0x2ef,0,0,0,0,0,0,0,0);		//dev 1
 	print_s08_error(errc);
 
 	return errc;

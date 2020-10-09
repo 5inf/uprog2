@@ -47,27 +47,17 @@ void print_at89s8252_error(int errc)
 
 int prog_at89s8252(void)
 {
-	int errc,blocks,tblock,bsize,j,eblock=0,tbyte;
-	int pagesize,wpp;
+	int errc,blocks,tblock,bsize,j;
 	unsigned long addr,maddr;
 	int chip_erase=0;
 	int main_prog=0;
 	int main_verify=0;
 	int main_readout=0;
-	int rom_readout=0;
-	int rom_dummy=0;
 	int eeprom_prog=0;
 	int eeprom_verify=0;
 	int eeprom_readout=0;
-	int eeprom_ext=0;
-	int lfuse_prog=0;
-	int hfuse_prog=0;
-	int efuse_prog=0;
 	int lock_prog=0;
 	int dev_start=0;
-	int ignore_devid=0;
-	int cal_value=0x80;
-	int cal_set=0;
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
@@ -101,12 +91,6 @@ int prog_at89s8252(void)
 	{
 		chip_erase=1;
 		printf("## Action: chip erase\n");
-	}
-
-	if(find_cmd("wc"))
-	{
-		cal_set=1;
-		printf("## Action: write calibration to flash\n");
 	}
 
 	if(find_cmd("st"))

@@ -1,2 +1,0 @@
-#!/bin/bash
-avrel -l main-bt.lst main-bt.asm > main-bt.mmap

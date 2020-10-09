@@ -1,0 +1,272 @@
+
+boot.elf:     file format elf32-littlearm
+boot.elf
+architecture: arm, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x20000000
+
+Program Header:
+    LOAD off    0x00010000 vaddr 0x20000000 paddr 0x20000000 align 2**16
+         filesz 0x000000e0 memsz 0x000001e0 flags rwx
+private flags = 5000200: [Version5 EABI] [soft-float ABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000e0  20000000  20000000  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .heap         00000100  200000e0  200000e0  000100e0  2**0
+                  ALLOC
+  2 .ARM.attributes 00000021  00000000  00000000  000100e0  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+20000000 l    d  .text	00000000 .text
+200000e0 l    d  .heap	00000000 .heap
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+00000000 l    df *ABS*	00000000 build/src/boot.o
+40008064 l       *ABS*	00000000 CMU_CLKEN0
+40008068 l       *ABS*	00000000 CMU_CLKEN1
+4003c000 l       *ABS*	00000000 GPIOA_CTRL
+4003c004 l       *ABS*	00000000 GPIOA_MODEL
+4003c00c l       *ABS*	00000000 GPIOA_MODEH
+4003c010 l       *ABS*	00000000 GPIOA_DOUT
+4003c014 l       *ABS*	00000000 GPIOA_DIN
+4003c030 l       *ABS*	00000000 GPIOB_CTRL
+4003c034 l       *ABS*	00000000 GPIOB_MODEL
+4003c03c l       *ABS*	00000000 GPIOB_MODEH
+4003c040 l       *ABS*	00000000 GPIOB_DOUT
+4003c044 l       *ABS*	00000000 GPIOB_DIN
+4003c060 l       *ABS*	00000000 GPIOC_CTRL
+4003c064 l       *ABS*	00000000 GPIOC_MODEL
+4003c06c l       *ABS*	00000000 GPIOC_MODEH
+4003c070 l       *ABS*	00000000 GPIOC_DOUT
+4003c074 l       *ABS*	00000000 GPIOC_DIN
+4003c090 l       *ABS*	00000000 GPIOD_CTRL
+4003c094 l       *ABS*	00000000 GPIOD_MODEL
+4003c09c l       *ABS*	00000000 GPIOD_MODEH
+4003c0a0 l       *ABS*	00000000 GPIOD_DOUT
+4003c0a4 l       *ABS*	00000000 GPIOD_DIN
+40030000 l       *ABS*	00000000 MSC_BASE
+0000000c l       *ABS*	00000000 MSC_WRITECTRL
+00000010 l       *ABS*	00000000 MSC_WRITECMD
+00000014 l       *ABS*	00000000 MSC_ADDRB
+00000018 l       *ABS*	00000000 MSC_WDATA
+0000001c l       *ABS*	00000000 MSC_STATUS
+00000001 l       *ABS*	00000000 LED_DEBUG
+00000005 l       *ABS*	00000000 RLED
+00000004 l       *ABS*	00000000 GLED
+00000002 l       *ABS*	00000000 SPXC
+00000008 l       *ABS*	00000000 SPXD
+00000020 l       *ABS*	00000000 RLED_MASK
+0000ffdf l       *ABS*	00000000 RLED_IMASK
+00000010 l       *ABS*	00000000 GLED_MASK
+0000ffef l       *ABS*	00000000 GLED_IMASK
+00000004 l       *ABS*	00000000 SPXC_MASK
+0000fffb l       *ABS*	00000000 SPXC_IMASK
+00000100 l       *ABS*	00000000 SPXD_MASK
+0000feff l       *ABS*	00000000 SPXD_IMASK
+00000030 l       *ABS*	00000000 LED_MASK
+20000008 l       .text	00000000 main
+2000001c l       .text	00000000 main_loop
+20000022 l       .text	00000000 main_loop_wait
+20000042 l       .text	00000000 prog_flash
+20000068 l       .text	00000000 prog_flash1
+2000003c l       .text	00000000 wx1
+2000004c l       .text	00000000 prog_flash_1
+20000052 l       .text	00000000 prog_flash_2
+20000072 l       .text	00000000 prog_flash1_1
+20000078 l       .text	00000000 prog_flash1_2
+2000008e l       .text	00000000 blink
+20000094 l       .text	00000000 p1
+2000009a l       .text	00000000 p2
+2000009e l       .text	00000000 p3
+200000a4 l       .text	00000000 p4
+20000000 g       .text	00000000 reset_addr
+00000000         *UND*	00000000 SPX_PORT
+00000100 g       *ABS*	00000000 heap_size
+00000000 g       *ABS*	00000000 _sidata
+200000e0 g       .text	00000000 __exidx_end
+200000e0 g       .text	00000000 _etext
+200000e0 g       .text	00000000 _sbss
+200000e0 g       .text	00000000 __bss_start__
+200000e0 g       .text	00000000 _sdata
+00000000         *UND*	00000000 PCR2
+00000000         *UND*	00000000 PCR5
+00000000         *UND*	00000000 PORT_C
+200001e0 g       .heap	00000000 _heap_end
+200000e0 g       .text	00000000 __exidx_start
+00000000         *UND*	00000000 PORT_A
+00000000         *UND*	00000000 PORTC_BASE
+00000000         *UND*	00000000 GPIOE_BASE
+200000e0 g       .text	00000000 _ebss
+00000000         *UND*	00000000 PCC_PORTA
+200000e0 g       .heap	00000000 _heap_start
+00000000         *UND*	00000000 PORT_D
+200000e0 g       .text	00000000 __bss_end__
+00000000         *UND*	00000000 PCC_PORTE
+00000400 g       *ABS*	00000000 stack_size
+00000000         *UND*	00000000 PORT_B
+00000000         *UND*	00000000 PCC_PORTC
+20003400 g       *ABS*	00000000 _stack_end
+20003800 g       *ABS*	00000000 _stack_start
+00000000         *UND*	00000000 PCR8
+00000000         *UND*	00000000 GPIOA_BASE
+200000e0 g       .text	00000000 _edata
+00000000         *UND*	00000000 PORT_E
+00000000         *UND*	00000000 PORTA_BASE
+00000000         *UND*	00000000 PCR4
+00000000         *UND*	00000000 PORTE_BASE
+00000000         *UND*	00000000 AUX
+00000000         *UND*	00000000 GPIOC_BASE
+
+
+
+Disassembly of section .text:
+
+20000000 <reset_addr>:
+20000000:	20000ffc 	strdcs	r0, [r0], -ip
+20000004:	20000009 	andcs	r0, r0, r9
+
+20000008 <main>:
+20000008:	4d28      	ldr	r5, [pc, #160]	; (200000ac <p4+0x8>)
+2000000a:	4c29      	ldr	r4, [pc, #164]	; (200000b0 <p4+0xc>)
+2000000c:	602c      	str	r4, [r5, #0]
+2000000e:	4c29      	ldr	r4, [pc, #164]	; (200000b4 <p4+0x10>)
+20000010:	606c      	str	r4, [r5, #4]
+20000012:	4d29      	ldr	r5, [pc, #164]	; (200000b8 <p4+0x14>)
+20000014:	4c29      	ldr	r4, [pc, #164]	; (200000bc <p4+0x18>)
+20000016:	606c      	str	r4, [r5, #4]
+20000018:	2408      	movs	r4, #8
+2000001a:	612c      	str	r4, [r5, #16]
+
+2000001c <main_loop>:
+2000001c:	4928      	ldr	r1, [pc, #160]	; (200000c0 <p4+0x1c>)
+2000001e:	2200      	movs	r2, #0
+20000020:	600a      	str	r2, [r1, #0]
+
+20000022 <main_loop_wait>:
+20000022:	6808      	ldr	r0, [r1, #0]
+20000024:	4290      	cmp	r0, r2
+20000026:	d0fc      	beq.n	20000022 <main_loop_wait>
+20000028:	1c03      	adds	r3, r0, #0
+2000002a:	4a26      	ldr	r2, [pc, #152]	; (200000c4 <p4+0x20>)
+2000002c:	4013      	ands	r3, r2
+2000002e:	22ff      	movs	r2, #255	; 0xff
+20000030:	4010      	ands	r0, r2
+20000032:	2852      	cmp	r0, #82	; 0x52
+20000034:	d005      	beq.n	20000042 <prog_flash>
+20000036:	2854      	cmp	r0, #84	; 0x54
+20000038:	d016      	beq.n	20000068 <prog_flash1>
+2000003a:	4823      	ldr	r0, [pc, #140]	; (200000c8 <p4+0x24>)
+
+2000003c <wx1>:
+2000003c:	3801      	subs	r0, #1
+2000003e:	d1fd      	bne.n	2000003c <wx1>
+20000040:	e7ec      	b.n	2000001c <main_loop>
+
+20000042 <prog_flash>:
+20000042:	4c22      	ldr	r4, [pc, #136]	; (200000cc <p4+0x28>)
+20000044:	4f22      	ldr	r7, [pc, #136]	; (200000d0 <p4+0x2c>)
+20000046:	4923      	ldr	r1, [pc, #140]	; (200000d4 <p4+0x30>)
+20000048:	2201      	movs	r2, #1
+2000004a:	60ca      	str	r2, [r1, #12]
+
+2000004c <prog_flash_1>:
+2000004c:	614b      	str	r3, [r1, #20]
+2000004e:	6822      	ldr	r2, [r4, #0]
+20000050:	618a      	str	r2, [r1, #24]
+
+20000052 <prog_flash_2>:
+20000052:	69ca      	ldr	r2, [r1, #28]
+20000054:	2508      	movs	r5, #8
+20000056:	402a      	ands	r2, r5
+20000058:	d0fb      	beq.n	20000052 <prog_flash_2>
+2000005a:	3304      	adds	r3, #4
+2000005c:	3404      	adds	r4, #4
+2000005e:	3f01      	subs	r7, #1
+20000060:	d1f4      	bne.n	2000004c <prog_flash_1>
+20000062:	2200      	movs	r2, #0
+20000064:	60ca      	str	r2, [r1, #12]
+20000066:	e7d9      	b.n	2000001c <main_loop>
+
+20000068 <prog_flash1>:
+20000068:	4c18      	ldr	r4, [pc, #96]	; (200000cc <p4+0x28>)
+2000006a:	2740      	movs	r7, #64	; 0x40
+2000006c:	4919      	ldr	r1, [pc, #100]	; (200000d4 <p4+0x30>)
+2000006e:	2201      	movs	r2, #1
+20000070:	60ca      	str	r2, [r1, #12]
+
+20000072 <prog_flash1_1>:
+20000072:	614b      	str	r3, [r1, #20]
+20000074:	6822      	ldr	r2, [r4, #0]
+20000076:	618a      	str	r2, [r1, #24]
+
+20000078 <prog_flash1_2>:
+20000078:	69ca      	ldr	r2, [r1, #28]
+2000007a:	2508      	movs	r5, #8
+2000007c:	402a      	ands	r2, r5
+2000007e:	d0fb      	beq.n	20000078 <prog_flash1_2>
+20000080:	3304      	adds	r3, #4
+20000082:	3404      	adds	r4, #4
+20000084:	3f01      	subs	r7, #1
+20000086:	d1f4      	bne.n	20000072 <prog_flash1_1>
+20000088:	2200      	movs	r2, #0
+2000008a:	60ca      	str	r2, [r1, #12]
+2000008c:	e7c6      	b.n	2000001c <main_loop>
+
+2000008e <blink>:
+2000008e:	4d0a      	ldr	r5, [pc, #40]	; (200000b8 <p4+0x14>)
+20000090:	4c0a      	ldr	r4, [pc, #40]	; (200000bc <p4+0x18>)
+20000092:	606c      	str	r4, [r5, #4]
+
+20000094 <p1>:
+20000094:	2400      	movs	r4, #0
+20000096:	612c      	str	r4, [r5, #16]
+20000098:	4e0f      	ldr	r6, [pc, #60]	; (200000d8 <p4+0x34>)
+
+2000009a <p2>:
+2000009a:	3e01      	subs	r6, #1
+2000009c:	d1fd      	bne.n	2000009a <p2>
+
+2000009e <p3>:
+2000009e:	2408      	movs	r4, #8
+200000a0:	612c      	str	r4, [r5, #16]
+200000a2:	4e0e      	ldr	r6, [pc, #56]	; (200000dc <p4+0x38>)
+
+200000a4 <p4>:
+200000a4:	3e01      	subs	r6, #1
+200000a6:	d1fd      	bne.n	200000a4 <p4>
+200000a8:	e7f4      	b.n	20000094 <p1>
+200000aa:	80640000 	rsbhi	r0, r4, r0
+200000ae:	00004000 	andeq	r4, r0, r0
+200000b2:	00000400 	andeq	r0, r0, r0, lsl #8
+200000b6:	c0000002 	andgt	r0, r0, r2
+200000ba:	40004003 	andmi	r4, r0, r3
+200000be:	0c000000 	stceq	0, cr0, [r0], {-0}
+200000c2:	ff002000 			; <UNDEFINED> instruction: 0xff002000
+200000c6:	2710ffff 			; <UNDEFINED> instruction: 0x2710ffff
+200000ca:	04000000 	streq	r0, [r0], #-0
+200000ce:	02002000 	andeq	r2, r0, #0
+200000d2:	00000000 	andeq	r0, r0, r0
+200000d6:	42404003 	submi	r4, r0, #3
+200000da:	86a0000f 	strthi	r0, [r0], pc
+200000de:	Address 0x200000de is out of bounds.
+
+
+Disassembly of section .heap:
+
+200000e0 <_heap_start>:
+	...
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00002041 	andeq	r2, r0, r1, asr #32
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000016 	andeq	r0, r0, r6, lsl r0
+  10:	726f4305 	rsbvc	r4, pc, #335544320	; 0x14000000
+  14:	2d786574 	cfldr64cs	mvdx6, [r8, #-464]!	; 0xfffffe30
+  18:	0600334d 	streq	r3, [r0], -sp, asr #6
+  1c:	094d070a 	stmdbeq	sp, {r1, r3, r8, r9, sl}^
+  20:	Address 0x00000020 is out of bounds.
+

@@ -66,7 +66,6 @@ int prog_msp430a()
 
 	int all_readout=0;
 
-	int dev_start=0;
 	int run_ram=0;
 
 	errc=0;
@@ -96,7 +95,6 @@ int prog_msp430a()
 
 	if(find_cmd("st"))
 	{
-		dev_start=1;
 		printf("## Action: start device\n");
 		errc=prg_comm(0xfe,0,0,0,0,3,3,0,0);			//enable pull-up
 		errc=prg_comm(0x0e,0,0,0,0,1,0,1,0);			//init

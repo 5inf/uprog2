@@ -308,7 +308,7 @@ int prog_rl78(void)
 				errc=prg_comm(0x6f,0,7,0,0,(addr >> 8) & 0xff,(addr >> 16) & 0xff,0,0);	//program
 				if(errc!=0) 
 				{
-					if(memory[4]=0x1b) 
+					if(memory[4]==0x1b) 
 						errc=0x4A;
 					else	
 						printf("RESP = %02X %02X %02X %02X %02X\n",memory[2],memory[3],memory[4],memory[5],memory[6]);		

@@ -46,7 +46,7 @@ void print_dataflash_error(int errc)
 
 int prog_dataflash(void)
 {
-	int errc,blocks,i,psize,fact,pages_per_block;
+	int errc,blocks,i,psize,pages_per_block;
 	unsigned long addr,maddr,nextaddr;
 	int bsize;
 	int main_erase=0;

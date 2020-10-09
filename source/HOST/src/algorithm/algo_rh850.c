@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -128,11 +128,10 @@ unsigned long flashblocks_b[64]={	0x800000,0x808000,0x810000,0x818000,0x820000,0
 
 int prog_rh850(void)
 {
-	unsigned long flashblock_a[32];
-	unsigned int flashblocks;
-	int errc,blocks,bsize,fbtype,loops,maxloops,rstat;
-	unsigned long addr,len,maddr,i,j,freq,fbsize;
-	unsigned int fbnum;
+//	unsigned long flashblock_a[32];
+//	unsigned int flashblocks;
+	int errc,blocks,bsize;
+	unsigned long addr,len,maddr,i,j,freq;
 	int main_blank=0;
 	int main_erase=0;
 	int main_prog=0;
@@ -143,6 +142,7 @@ int prog_rh850(void)
 	int dflash_blank=0;
 	int dflash_erase=0;
 	int dflash_prog=0;
+	int partial_mode=0;	//partial
 	int dflash_verify=0;
 	int dflash_readout=0;
 	int dflash_crc=0;
@@ -159,17 +159,12 @@ int prog_rh850(void)
 	int opt1_write=0;
 	int opt2_write=0;
 	int opt3_write=0;
-	int opt4_write=0;
-	int opt5_write=0;
-	int opt6_write=0;
-	int opt7_write=0;
 	int sb_write=0;
 	int osc_sel=0;
-	char hexbyte[5];
-	char *parptr;
 	float dfreq;
 	int verify_mode=0;
 	int run_ram=0;
+	unsigned long p6=0,p7=0;
 
 	errc=0;
 
@@ -214,12 +209,6 @@ int prog_rh850(void)
 		printf("-- nr -- protect readout\n");
 		printf("-- nw -- protect write\n");
 		printf("-- ne -- protect erase\n");
-		
-//		printf("-- wopt4 write option byte 4\n");
-//		printf("-- wopt5 write option byte 5\n");
-//		printf("-- wopt6 write option byte 6\n");
-//		printf("-- wopt7 write option byte 7\n");
-
 
 //		printf("-- rr -- run code in RAM\n");
 		printf("-- st -- start device\n");
@@ -277,6 +266,12 @@ int prog_rh850(void)
 	}
 
 
+	if(find_cmd("pt"))
+	{
+		partial_mode=1;		
+		printf("## partial mode\n");
+	}
+
 	if(find_cmd("rr"))
 	{
 		run_ram=1;		
@@ -294,50 +289,27 @@ int prog_rh850(void)
 	if(find_cmd("wopt0"))
 	{
 		opt0_write=1;
-		printf("## Action: write option byte 0 to 0x%08X\n",expar & 0xFFFFFFFF);
+		printf("## Action: write option byte 0 to 0x%08lX\n",expar & 0xFFFFFFFF);
 		goto RH850_INIT;
 	}
 
 	if(find_cmd("wopt1"))
 	{
 		opt1_write=1;
-		printf("## Action: write option byte 1 to 0x%08X\n",expar & 0xFFFFFFFF);
+		printf("## Action: write option byte 1 to 0x%08lX\n",expar & 0xFFFFFFFF);
 		goto RH850_INIT;
 	}
 	if(find_cmd("wopt2"))
 	{
 		opt2_write=1;
-		printf("## Action: write option byte 2 to 0x%08X\n",expar & 0xFFFFFFFF);
+		printf("## Action: write option byte 2 to 0x%08lX\n",expar & 0xFFFFFFFF);
 		goto RH850_INIT;
 	}
 	if(find_cmd("wopt3"))
 	{
 		opt3_write=1;
-		printf("## Action: write option byte 3 to 0x%08X\n",expar & 0xFFFFFFFF);
+		printf("## Action: write option byte 3 to 0x%08lX\n",expar & 0xFFFFFFFF);
 		goto RH850_INIT;
-	}
-	if(find_cmd("wopt4"))
-	{
-		opt4_write=1;
-		printf("## Action: write option byte 4 to 0x%08X\n",expar & 0xFFFFFFFF);
-		goto RH850_INIT;
-	}
-	if(find_cmd("wopt5"))
-	{
-		opt5_write=1;
-		printf("## Action: write option byte 5 to 0x%08X\n",expar & 0xFFFFFFFF);
-		goto RH850_INIT;
-	}
-	if(find_cmd("wopt6"))
-	{
-		opt6_write=1;
-		printf("## Action: write option byte 6 to 0x%08X\n",expar & 0xFFFFFFFF);
-		goto RH850_INIT;
-	}
-	if(find_cmd("wopt7"))
-	{
-		opt7_write=1;
-		printf("## Action: write option byte 7 to 0x%08X\n",expar & 0xFFFFFFFF);
 	}
 	
 	if(find_cmd("em"))
@@ -441,7 +413,7 @@ RH850_INIT:
 		errc=writeblock_open();
 	}
 
-	printf("INIT DEVICE (%dms wait time, %d pulses)\n",param[11] >> 8,param[11] & 0xff);
+	printf("INIT DEVICE (%ldms wait time, %ld pulses)\n",param[11] >> 8,param[11] & 0xff);
 	if(dev_start == 0)
 	{
 		errc=prg_comm(0x140,0,0,0,0,0,(param[11] >> 8) & 0xff,param[12],param[11] & 0xff);			//init
@@ -511,8 +483,6 @@ RH850_INIT:
 		if(errc!=0) goto RH850_END;
 		
 
-goto ZZRO;
-
 		errc=prg_comm(0x147,0,100,0,ROFFSET,0,0,0,0);				//ID authmode get
 		if(errc!=0) goto RH850_END;
 //		showframe_rh850(0);
@@ -535,7 +505,7 @@ goto ZZRO;
 //		showframe_rh850(0);
 
 		printf(">> DEVICE = ");
-		for(i=4;i<20;i++) printf("%c",memory[ROFFSET+i]);
+		for(i=4;i<21;i++) printf("%c",memory[ROFFSET+i]);
 		printf("\n");
 		
 /*
@@ -581,9 +551,6 @@ goto ZZRO;
 		showframe_rh850(0);
 	}
 
-//		waitkey();
-ZZRO:
-
 	errc=prg_comm(0x15c,0,2,0,ROFFSET,0,0,0,0);				//get prot status
 	printf(">> PROT STATUS  = 0x%02X\n",memory[ROFFSET]);
 	if(memory[ROFFSET] & 0x80)
@@ -614,7 +581,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 		}
@@ -626,7 +593,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -643,7 +610,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 		}
@@ -655,7 +622,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -672,7 +639,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 		}
@@ -684,7 +651,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -701,7 +668,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 		}
@@ -713,7 +680,7 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -730,11 +697,13 @@ ZZRO:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%d = 0x%08X\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
 			}
 		
 		}
 
+//		waitkey();
+		
 		if((main_erase == 1) && (errc == 0))
 		{
 			if(param[1] > 0)
@@ -934,7 +903,8 @@ ZZRO:
 			}
 		}
 
-		
+		if(partial_mode == 1) param[1]-=256;
+
 		if((main_prog == 1) && (errc == 0))
 		{
 			if(param[1] > 0)
@@ -956,14 +926,7 @@ ZZRO:
 				if(blocks > 1)
 				for(i=1;i<blocks;i++)
 				{
-					if(must_prog(maddr,bsize) && (errc==0))
-					{
-						errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
-					}
-					else
-					{
-						errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);					
-					}
+					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
 					if(errc > 0) 
 					{
 						printf("\n Error at addr %08lX\n",addr);
@@ -974,14 +937,7 @@ ZZRO:
 					maddr+=bsize;
 					progress("CFLASH A PROG ",blocks,i+1);					
 				}
-				if(must_prog(maddr,bsize) && (errc==0))
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
-				}
-				else
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);					
-				}
+				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
 				printf("\n");
 			}
 
@@ -1002,14 +958,7 @@ ZZRO:
 				progress("CFLASH B PROG ",blocks,0);
 				for(i=1;i<blocks;i++)
 				{
-					if(must_prog(maddr,bsize) && (errc==0))
-					{
-						errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
-					}
-					else
-					{
-						errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);					
-					}
+					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
 					if(errc > 0) 
 					{
 						printf("\n Error at addr %08lX\n",addr);
@@ -1019,18 +968,18 @@ ZZRO:
 					maddr+=bsize;
 					progress("CFLASH B PROG ",blocks,i+1);					
 				}
-				if(must_prog(maddr,bsize) && (errc==0))
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
-				}
-				else
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);					
-				}
+				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
 				printf("\n");
 			}
 		}
-
+		
+		if(partial_mode == 1)
+		{
+			p6=param[6];
+			p7=param[7];
+			param[6]=0xFF20FD80;
+			param[7]=144;
+		}
 
 		if((dflash_prog == 1) && (errc == 0) && (param[7]>0))
 		{
@@ -1040,23 +989,30 @@ ZZRO:
 			blocks=param[7] / bsize;
 			maddr=0;
 
+//			show_data(0,16);
+			
+//			waitkey();
+
 			addr=param[6];
 			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			addr=param[6]+param[7]-1;
 			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//bcheck
+			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//prog
+
+			if(partial_mode == 1)
+			{
+				errc=prg_comm(0x158,bsize,0,maddr,0,144,0,0x13,0x03);
+				progress("DFLASH PROG   ",1,1);
+				goto nbx;
+			}
+			
 
 			progress("DFLASH PROG   ",blocks,0);
+
 			for(i=1;i<blocks;i++)
 			{
-				if(must_prog(maddr,bsize) && (errc==0))
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
-				}
-				else
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);					
-				}
+				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
+
 				if(errc > 0) 
 				{
 					printf("\n Error at addr %08lX\n",addr);
@@ -1066,15 +1022,16 @@ ZZRO:
 				maddr+=bsize;
 				progress("DFLASH PROG   ",blocks,i+1);					
 			}
-			if(must_prog(maddr,bsize) && (errc==0))
-			{
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
-			}
-			else
-			{
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);					
-			}
+			errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
+nbx:
 			printf("\n");
+		}
+
+
+		if(partial_mode == 1)
+		{
+			param[6]=p6;
+			param[7]=p7;
 		}
 
 		if((extended_prog == 1) && (errc == 0) && (param[5]>0))
@@ -1091,17 +1048,11 @@ ZZRO:
 			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//bcheck
 
+
 			progress("EXTFLASH PROG ",blocks,0);
 			for(i=1;i<blocks;i++)
 			{
-				if(must_prog(maddr,bsize) && (errc==0))
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
-				}
-				else
-				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);					
-				}
+				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
 				if(errc > 0) 
 				{
 					printf("\n Error at addr %08lX\n",addr);
@@ -1111,15 +1062,9 @@ ZZRO:
 				maddr+=bsize;
 				progress("EXTFLASH PROG ",blocks,i+1);					
 			}
-			if(must_prog(maddr,bsize) && (errc==0))
-			{
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
-			}
-			else
-			{
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);					
-			}
+			errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
 			printf("\n");
+
 		}
 
 
@@ -1564,7 +1509,7 @@ ZZRO:
 
 			if(errc > 0) 
 			{
-				printf("\n Error: NOT SUPPORTED\n",addr);
+				printf("\n Error: NOT SUPPORTED\n");
 				goto RH850_END;
 			}
 
@@ -1646,8 +1591,15 @@ ZZRO:
 				progress("DFLASH READ   ",blocks,i+1);
 			}
 			printf("\n");
-			writeblock_data(0,param[7],param[6]);
 
+			if(partial_mode == 1)
+			{
+				writeblock_data(0xFD80,144,0xFF20FD80);
+			}
+			else
+			{
+				writeblock_data(0,param[7],param[6]);
+			}
 		}
 	}		
 		

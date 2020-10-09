@@ -186,14 +186,14 @@ const char * const cables[]=
 	// 61 AT89S8252
 	"(1=VSS  2=VDD  3=RST  4=SCK  5=MOSI  6=MISO)",
 	
-	// 62 
-	"no connections",
+	// 62 (S12Z-BDM)
+	"(1=VSS  2=VDD  3=RESET  4=BKGD)",
 	
-	// 63 
-	"no connections",
+	// 63 (MPC57xx) 
+	"(1=VSS  2=VDD  3=TMS  4=TCK  5=TDI  6=TDO  7=JCOMP  [8=RESET])",
 	
-	// 64 
-	"no connections",
+	// 64 EFM32 
+	"(1=VSS  2=VDD  3=RST  4=SWDCK  5=SWDIO)",
 	
 	// 65 
 	"no connections",
