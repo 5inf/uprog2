@@ -113,17 +113,19 @@ successfully builds the AVR binary.
 
 This is a chicken and egg situation. A programmer is required to initially program the programmer. Subsequent firmware updates are (mostly) handled automatically by uprog.
 
-Any AVR ISP compatible programmer works with the board. This can even be an Arduino which has been programmed via the Arduino IDE to act as ISP programmer.
+Any AVR ISP compatible programmer works with the board. I recommend an AVR ISP mk2 compatible USB programmer to do this. The programmer can even be an Arduino which has been programmed via the Arduino IDE to act as ISP programmer.
 
 With a programmer programming can be done using e.g. AVRdude (https://www.nongnu.org/avrdude/) or uisp (http://savannah.nongnu.org/projects/uisp).
 
-    apt-get install avrdude
-    apt-get install uisp
+    sudo apt-get install avrdude
+    sudo avrdude -c avrisp2 -p atmega644p -U hfuse:w:0xD0:m -U lfuse:w:0xE6:m -U efuse:w:0xFF:m -U flash:w:./binary/PROG/main.hex
     
-    avrdude ...
+    apt-get install uisp
     uisp ...
     
-     uprog2 ATMEGA644PA -empmvm main-usb.hex
+ If at least one uprog is already available uprog2 itsel can be used to program the next ones.
+ 
+    uprog2 ATMEGA644PA -empmvm main-usb.hex
     
 ##### Setting USB device strings on the FTDI USB Serial interface
 
