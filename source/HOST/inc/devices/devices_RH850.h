@@ -283,7 +283,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0E00,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -300,7 +300,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -317,7 +317,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -334,7 +334,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -351,7 +351,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -368,7 +368,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0E00,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -385,7 +385,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0E00,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -402,7 +402,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -419,7 +419,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -436,7 +436,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -453,7 +453,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -470,7 +470,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -487,7 +487,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -504,7 +504,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -521,7 +521,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -538,7 +538,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0E00,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -555,7 +555,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0E00,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -572,7 +572,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -589,7 +589,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -606,7 +606,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -623,7 +623,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -640,7 +640,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -657,7 +657,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -674,7 +674,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -691,7 +691,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -709,7 +709,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0E00,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -726,7 +726,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0E00,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -743,7 +743,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -760,7 +760,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1200,				//code flash blocks
-	0x0200,				//data flash blocks
+	0x01FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -777,7 +777,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -794,7 +794,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -811,7 +811,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -828,7 +828,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -845,7 +845,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -862,7 +862,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -879,7 +879,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -896,7 +896,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -914,7 +914,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -931,7 +931,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -948,7 +948,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -965,7 +965,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -982,7 +982,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -999,7 +999,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1016,7 +1016,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x3600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1033,7 +1033,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x3600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1050,7 +1050,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x4600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1067,7 +1067,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x4600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1084,7 +1084,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1101,7 +1101,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x1E00,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1118,7 +1118,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1135,7 +1135,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x2600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1152,7 +1152,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x3600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1169,7 +1169,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x3600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1186,7 +1186,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x4600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1203,7 +1203,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x4600,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1220,7 +1220,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0200,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1237,7 +1237,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0100,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1254,7 +1254,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0200,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,
@@ -1271,7 +1271,7 @@
 	0x0081,				//SOD
 	0x0000,				//lock bit?
 	0x0100,				//code flash blocks
-	0x0400,				//data flash blocks
+	0x03FF,				//data flash blocks
 	0x0000,
 	0x0006,				//offset for frequency setting
 	0x0000,

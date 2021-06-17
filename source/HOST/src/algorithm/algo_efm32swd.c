@@ -63,34 +63,6 @@ void print_efm32_ackstat(int stat)
 	}		
 }
 
-void show_efm32swd_registers(void)
-{
-	int i;
-	for(i=0;i<13;i++)
-	{
-		printf("R%2d: %02X%02X%02X%02X\n",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	}
-	i=13;
-		printf("SP : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=14;
-		printf("LR : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=15;
-		printf("PC : %02X%02X%02X%02X --> ",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=16;
-		if((memory[i*4-4] & 0x02) == 0x02)
-		{
-			printf("%02X%02X %02X%02X %02X%02X\n",memory[67],memory[66],memory[69],memory[68],memory[71],memory[70]);
-		}
-		else
-		{
-			printf("%02X%02X %02X%02X %02X%02X\n",memory[65],memory[64],memory[67],memory[66],memory[69],memory[68]);
-		}
-		
-
-
-	printf("\n");
-}
-
 int prog_efm32swd(void)
 {
 	int errc,blocks,i,j;
@@ -108,6 +80,15 @@ int prog_efm32swd(void)
 	int lock_readout=0;
 	int unsecure=0;
 	int dlock=0;
+	int debug_ram=0;
+	int debug_flash=0;
+	size_t dbg_len = 80;
+	char *dbg_line;
+	char *dbg_ptr;
+	char c;
+	unsigned long dbg_addr,dbg_val;
+
+	dbg_line=malloc(100);
 	errc=0;
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
@@ -127,6 +108,8 @@ int prog_efm32swd(void)
 		printf("-- rl -- lock bits readout\n");
 
 		printf("-- rr -- run code in RAM\n");
+		printf("-- dr -- debug code in RAM\n");
+		printf("-- df -- debug code in FLASH\n");
 		printf("-- st -- start device\n");
  		printf("-- d2 -- switch to device 2\n");
 
@@ -139,6 +122,7 @@ int prog_efm32swd(void)
 		printf("## switch to device 2\n");
 	}
 
+
 	if(find_cmd("rr"))
 	{
 		if(file_found < 2)
@@ -150,7 +134,28 @@ int prog_efm32swd(void)
 		{
 			run_ram=1;
 			printf("## Action: run code in RAM using %s\n",sfile);
+			goto EFM32SWD_ORUN;
 		}
+	}
+	else if(find_cmd("dr"))
+	{
+		if(file_found < 2)
+		{
+			debug_ram = 0;
+			printf("## Action: debug code in RAM !! DISABLED BECAUSE OF NO FILE !!\n");
+		}
+		else
+		{
+			debug_ram = 1;
+			printf("## Action: debug code in RAM using %s\n",sfile);
+			goto EFM32SWD_ORUN;
+		}
+	}
+	else if(find_cmd("df"))
+	{
+		debug_flash = 1;
+		printf("## Action: debug code in FLASH\n");
+		goto EFM32SWD_ORUN;
 	}
 	else
 	{
@@ -201,6 +206,8 @@ int prog_efm32swd(void)
 		}
 	}
 	printf("\n");
+
+EFM32SWD_ORUN:
 
 	//open file if read 
 	if((main_readout == 1) || (udata_readout == 1) || (lock_readout == 1))
@@ -559,6 +566,8 @@ int prog_efm32swd(void)
 		}
 		
 	}
+
+#include "dbg_cortex.c"
 
 	errc|=prg_comm(0x9A,0,0,0,0,0x00,0x00,0x00,0x00);			//exit debug
 

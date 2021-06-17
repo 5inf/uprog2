@@ -28,6 +28,7 @@
 #include "exec/stm32f2xx/exec_stm32f2xx.h"
 #include "exec/stm32f3xx/exec_stm32f3xx.h"
 #include "exec/stm32f4xx/exec_stm32f4xx.h"
+#include "exec/stm32f7xx/exec_stm32f7xx.h"
 #include "exec/stm32l4xx/exec_stm32l4xx.h"
 
 void print_stm32swd_error(int errc)
@@ -44,37 +45,15 @@ void print_stm32swd_error(int errc)
 		case 0x50:	set_error("(wrong ID)",errc);
 				break;
 
+		case 0x60:	set_error("(Write Protection Error)",errc);
+				break;
+
+		case 0x61:	set_error("(Erase timeout error)",errc);
+				break;
+
 		default:	set_error("(unexpected error)",errc);
 	}
 	print_error();
-}
-
-void show_stm32swd_registers(void)
-{
-	int i;
-	for(i=0;i<13;i++)
-	{
-		printf("R%2d: %02X%02X%02X%02X\n",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	}
-	i=13;
-		printf("SP : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=14;
-		printf("LR : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=15;
-		printf("PC : %02X%02X%02X%02X --> ",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=16;
-		if((memory[i*4-4] & 0x02) == 0x02)
-		{
-			printf("%02X%02X %02X%02X %02X%02X\n",memory[67],memory[66],memory[69],memory[68],memory[71],memory[70]);
-		}
-		else
-		{
-			printf("%02X%02X %02X%02X %02X%02X\n",memory[65],memory[64],memory[67],memory[66],memory[69],memory[68]);
-		}
-		
-
-
-	printf("\n");
 }
 
 int prog_stm32swd(void)
@@ -91,9 +70,19 @@ int prog_stm32swd(void)
 	int option_prog=0;
 	int option_verify=0;
 	int option_readout=0;
+	int debug_ram=0;
+	int debug_flash=0;
 	int unsecure=0;
 	int ignore_id=0;
+	size_t dbg_len = 80;
+	char *dbg_line;
+	char *dbg_ptr;
+	char c;
+	unsigned long dbg_addr,dbg_val;
+
 	errc=0;
+	dbg_line=malloc(100);
+		
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
@@ -110,6 +99,8 @@ int prog_stm32swd(void)
 		printf("-- ii -- ignore ID\n");
 
 		printf("-- rr -- run code in RAM\n");
+		printf("-- dr -- debug code in RAM\n");
+		printf("-- df -- debug code in FLASH\n");
 		printf("-- st -- start device\n");
  		printf("-- d2 -- switch to device 2\n");
 
@@ -140,7 +131,28 @@ int prog_stm32swd(void)
 		{
 			run_ram=1;
 			printf("## Action: run code in RAM using %s\n",sfile);
+			goto STM32SWD_ORUN;
 		}
+	}
+	else if(find_cmd("dr"))
+	{
+		if(file_found < 2)
+		{
+			debug_ram = 0;
+			printf("## Action: debug code in RAM !! DISABLED BECAUSE OF NO FILE !!\n");
+		}
+		else
+		{
+			debug_ram = 1;
+			printf("## Action: debug code in RAM using %s\n",sfile);
+			goto STM32SWD_ORUN;
+		}
+	}
+	else if(find_cmd("df"))
+	{
+		debug_flash = 1;
+		printf("## Action: debug code in FLASH\n");
+		goto STM32SWD_ORUN;
 	}
 	else
 	{
@@ -203,6 +215,8 @@ int prog_stm32swd(void)
 	}
 	printf("\n");
 
+STM32SWD_ORUN:
+
 	//open file if read 
 	if((main_readout == 1) || ((option_readout == 1) && (algo_nr < 37)))
 	{
@@ -250,14 +264,54 @@ int prog_stm32swd(void)
 
 		if((main_erase == 1) && (errc == 0))
 		{
-			printf("ERASE FLASH\n");
-			errc=prg_comm(0x4e,0,4,0,0,param[8],0,0,0);	//erase direct
-//			show_data(0,4);
-			printf("RE-INIT\n");
-			errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
+			printf("ERASE FLASH (MODE=%d)\n",param[8]);
+			if(param[11] > 0)
+			{
+				errc=prg_comm(0x4e,0,4,0,0,param[8],0,0,param[11]);	//erase direct
+//				show_data(0,4);
+				if(memory[0] & 0x10) 
+				{
+					errc= 0x60;
+				}
+				else
+				{
+					printf("RE-INIT\n");
+//					prg_comm(0x0f,0,0,0,0,0,0,0,0);			//exit
+					errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
+				}
+			}
+			else
+			{
+
+				progress("FLASH ERASE",60,0);
+				errc=prg_comm(0x4e,0,4,0,0,param[8],0,0,2);	//erase direct, 1s timeout
+				
+				i=0;j=0;
+				
+				while(i==0)
+				{
+					progress("FLASH ERASE",60,j+1);
+					errc=prg_comm(0x194,0,4,0,0,0,0,0,0);		// read DRWX
+					j++;
+					if(j>60) i=1;
+					if(((memory[2] & 1) == 0) && (errc==0)) i=1;
+			
+				}
+				printf("\n");
+				
+				if(((memory[2] & 1) != 0) || (errc !=0))
+				{
+					errc= 0x61;
+				}
+				else
+				{
+					printf("RE-INIT\n");
+					prg_comm(0x0f,0,0,0,0,0,0,0,0);			//exit
+					errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
+				}
+			
+			}			
 		}
-
-
 
 
 
@@ -275,6 +329,7 @@ int prog_stm32swd(void)
 					case 36:	memory[j]=exec_stm32f3xx[j]; break;
 					case 37:	memory[j]=exec_stm32f4xx[j]; break;
 					case 52:	memory[j]=exec_stm32l4xx[j]; break;
+					case 65:	memory[j]=exec_stm32f7xx[j]; break;
 					default:	memory[j]=0xff;
 				}
 			}
@@ -314,7 +369,15 @@ int prog_stm32swd(void)
 		if((unsecure == 1) && (errc == 0) && (algo_nr == 37))
 		{
 			printf("UNSECURE DEVICE\n");
-			expar=0x00FFAAED;
+			expar=0x0FFFAAED;
+			have_expar=1;
+			option_prog = 1;
+		}
+
+		if((unsecure == 1) && (errc == 0) && (algo_nr == 65))
+		{
+			printf("UNSECURE DEVICE\n");
+			expar=0xC0FFAAFD;
 			have_expar=1;
 			option_prog = 1;
 		}
@@ -419,8 +482,7 @@ int prog_stm32swd(void)
 			show_data(0,16);
 			
 			//transfer data
-			errc=prg_comm(0xb2,256,0,maddr,0,
-			0x04,0x00,0x20,1);
+			errc=prg_comm(0xb2,256,0,maddr,0,0x04,0x00,0x20,1);
 
 			//execute prog
 			errc=prg_comm(0x59,0,0,0,0,
@@ -521,6 +583,56 @@ int prog_stm32swd(void)
 		}
 
 
+		if(((option_readout == 1) || (option_verify == 1)) && (errc == 0) && (algo_nr == 65))
+		{
+			addr=0x40023c00;
+
+//			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,algo_nr);
+			
+			errc=prg_comm(0xbf,0,256,0,ROFFSET,
+				(addr >> 8) & 0xff,
+				(addr >> 16) & 0xff,
+				(addr >> 24) & 0xff,
+				1);
+
+			printf("READ OPTIONBYTES BLOCK 1  : ");
+
+			printf(" %02X %02X %02X %02X\n",	memory[ROFFSET+0x17],
+							memory[ROFFSET+0x16],
+							memory[ROFFSET+0x15],
+							memory[ROFFSET+0x14]);
+
+
+			printf("READ OPTIONBYTES BLOCK 2  : ");
+
+			printf(" %02X %02X %02X %02X\n",	memory[ROFFSET+0x1B],
+							memory[ROFFSET+0x1A],
+							memory[ROFFSET+0x19],
+							memory[ROFFSET+0x18]);
+
+			printf("\n");
+
+			addr=param[2];
+
+//			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,algo_nr);
+			
+			errc=prg_comm(0xbf,0,16,0,ROFFSET,
+				(addr >> 8) & 0xff,
+				(addr >> 16) & 0xff,
+				(addr >> 24) & 0xff,
+				1);
+			
+			for(i=0;i<16;i++) printf(" %02X",memory[ROFFSET+i]);
+			printf("\n");
+			for(i=16;i<32;i++) printf(" %02X",memory[ROFFSET+i]);
+			printf("\n");
+			for(i=32;i<44;i++) printf(" %02X",memory[ROFFSET+i]);
+			printf("\n");
+
+			
+		}
+
+
 		if((option_readout == 1) && (errc == 0) && (algo_nr < 37))
 		{
 			writeblock_data(0,param[3],param[2]);
@@ -552,6 +664,8 @@ int prog_stm32swd(void)
 			writeblock_close();
 		}
 	}
+
+
 
 	if((run_ram == 1) && (errc == 0))
 	{
@@ -589,48 +703,18 @@ int prog_stm32swd(void)
 		
 		errc=prg_comm(0x128,8,12,0,0,0,0,0,0);	//set pc + sp	
 
-
-/*		errc=prg_comm(0x12a,0,100,0,0,0,0,0,0);	
-		show_stm32swd_registers();		
-
-
-		for(i=0;i<120;i++)
-		{
-			errc=prg_comm(0x129,0,100,0,0,0,0,0,0);	
-//			show_stm32swd_registers();		
-		}
-		
-*/
 		errc=prg_comm(0x12b,0,100,0,0,0,0,0,0);	
 
-/*		errc=prg_comm(0x129,0,100,0,0,0,0,0,0);	
-		show_stm32swd_registers();		
-
-*/
-
-//		printf("DHCSR: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
-//		printf("SP   : %02X%02X%02X%02X\n",memory[7],memory[6],memory[5],memory[4]);
-//		printf("PC   : %02X%02X%02X%02X\n",memory[11],memory[10],memory[9],memory[8]);		
-		
 		if(errc == 0)
 		{
 			waitkey();
 		}
 		
-
-		//read back
-/**		
-		addr=0x20000000;
-		
-		errc=prg_comm(0xbf,0,2048,0,ROFFSET,
-		(addr >> 8) & 0xff,
-		(addr >> 16) & 0xff,
-		(addr >> 24) & 0xff,
-		max_blocksize >> 8);
-
-		show_data(ROFFSET,16);
-**/		
 	}
+
+
+#include "dbg_cortex.c"
+
 
 	errc|=prg_comm(0x9A,0,0,0,0,0x00,0x00,0x00,0x00);			//exit debug
 

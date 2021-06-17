@@ -623,3 +623,20 @@ rl78_xgap_1:	dec	r21
 		brne	rl78_xgap_1
 		ret
 				
+				
+;-------------------------------------------------------------------------------
+; receive dump
+;-------------------------------------------------------------------------------
+rl78_gdump:	call	api_resetptr
+		ldi	XL,0
+		ldi	r24,0
+		ldi	r25,8
+		call	send2_38400s
+rl78_gdump_1:	call	recv2_38400
+		call	api_buf_bwrite
+		sbiw	r24,1
+		brne	rl78_gdump_1
+		jmp	main_loop_ok
+		
+		
+

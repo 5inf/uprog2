@@ -412,7 +412,7 @@ int prog_v850(void)
 	if(protect == 1)
 	{
 		printf("SECURE\n");
-		errc=prg_comm(0x167,0,0,0,0,0,0,0,0);				//chip erase
+		errc=prg_comm(0x167,0,0,0,0,0,0,0,0);
 	}
 
 V850_END:

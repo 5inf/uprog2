@@ -50,33 +50,6 @@ void print_s32kswd_error(int errc)
 	print_error();
 }
 
-void show_s32kswd_registers(void)
-{
-	int i;
-	for(i=0;i<13;i++)
-	{
-		printf("R%2d: %02X%02X%02X%02X\n",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	}
-	i=13;
-		printf("SP : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=14;
-		printf("LR : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=15;
-		printf("PC : %02X%02X%02X%02X --> ",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
-	i=16;
-		if((memory[i*4-4] & 0x02) == 0x02)
-		{
-			printf("%02X%02X %02X%02X %02X%02X\n",memory[67],memory[66],memory[69],memory[68],memory[71],memory[70]);
-		}
-		else
-		{
-			printf("%02X%02X %02X%02X %02X%02X\n",memory[65],memory[64],memory[67],memory[66],memory[69],memory[68]);
-		}
-		
-
-
-	printf("\n");
-}
 
 int prog_s32kswd(void)
 {
@@ -93,6 +66,20 @@ int prog_s32kswd(void)
 	int run_ram=0;
 	int unsecure=0;
 	int ignore_id=0;
+
+	
+	int debug_ram=0;
+	int debug_flash=0;
+	size_t dbg_len = 80;
+	char *dbg_line;
+	char *dbg_ptr;
+	char c;
+	unsigned long dbg_addr,dbg_val;
+
+	dbg_line=malloc(100);
+		
+
+
 	errc=0;
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
@@ -110,6 +97,8 @@ int prog_s32kswd(void)
 		printf("-- ii -- ignore ID\n");
 
 		printf("-- rr -- run code in RAM\n");
+		printf("-- dr -- debug code in RAM\n");
+		printf("-- df -- debug code in FLASH\n");
 		printf("-- st -- start device\n");
  		printf("-- d2 -- switch to device 2\n");
 
@@ -153,7 +142,28 @@ int prog_s32kswd(void)
 		{
 			run_ram=1;
 			printf("## Action: run code in RAM using %s\n",sfile);
+			goto S32KSWD_ORUN;
 		}
+	}
+	else if(find_cmd("dr"))
+	{
+		if(file_found < 2)
+		{
+			debug_ram = 0;
+			printf("## Action: debug code in RAM !! DISABLED BECAUSE OF NO FILE !!\n");
+		}
+		else
+		{
+			debug_ram = 1;
+			printf("## Action: debug code in RAM using %s\n",sfile);
+			goto S32KSWD_ORUN;
+		}
+	}
+	else if(find_cmd("df"))
+	{
+		debug_flash = 1;
+		printf("## Action: debug code in FLASH\n");
+		goto S32KSWD_ORUN;
 	}
 	else
 	{
@@ -189,6 +199,8 @@ int prog_s32kswd(void)
 		}
 	}
 	printf("\n");
+
+S32KSWD_ORUN:
 
 	//open file if read 
 	if((main_readout == 1) || (data_readout == 1))
@@ -485,49 +497,16 @@ int prog_s32kswd(void)
 		
 		errc=prg_comm(0x128,8,12,0,0,0,0,0,0);	//set pc + sp	
 
-/*
-		errc=prg_comm(0x12a,0,100,0,0,0,0,0,0);	
-		show_s32kswd_registers();		
-
-
-		for(i=0;i<24;i++)
-		{
-			errc=prg_comm(0x129,0,100,0,0,0,0,0,0);	
-			show_s32kswd_registers();		
-			waitkey();
-		}
-		
-*/
 		errc=prg_comm(0x12b,0,100,0,0,0,0,0,0);	
-/*
-		errc=prg_comm(0x129,0,100,0,0,0,0,0,0);	
-		show_s32kswd_registers();		
-
-*/
-
-//		printf("DHCSR: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
-//		printf("SP   : %02X%02X%02X%02X\n",memory[7],memory[6],memory[5],memory[4]);
-//		printf("PC   : %02X%02X%02X%02X\n",memory[11],memory[10],memory[9],memory[8]);		
 		
 		if(errc == 0)
 		{
 			waitkey();
-		}
-		
-
-		//read back
-		addr=0x20000000;
-		
-		errc=prg_comm(0xbf,0,2048,0,ROFFSET,
-		(addr >> 8) & 0xff,
-		(addr >> 16) & 0xff,
-		(addr >> 24) & 0xff,
-		1);
-
-//		show_data(ROFFSET,16);
-		
+		}		
 
 	}
+
+#include "dbg_cortex.c"
 
 	errc|=prg_comm(0x9A,0,0,0,0,0x00,0x00,0x00,0x00);			//exit debug
 

@@ -120,7 +120,7 @@ prog_opt:		ldr	r2, =0x08192A3B		//key 1
 			str	r3,[r4,#FLASH_CR]
 
 prog_opt_1:		ldr	r0,[r1,#0]		//get data
-			ldr	r2, = 0x80FFFFEC
+			ldr	r2, = 0x8FFFFFEC
 			and	r0,r2
 			str	r0,[r4,#FLASH_OPTCR]
 			mov	r2,#0x02

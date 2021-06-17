@@ -47,6 +47,12 @@ void print_rh850_error(int errc)
 		case 0xC1:	set_error("(packet error)",errc);
 				break;
 
+		case 0xC2:	set_error("(checksum error)",errc);
+				break;
+
+		case 0xC3:	set_error("(flow error)",errc);
+				break;
+
 		case 0xD0:	set_error("(address error)",errc);
 				break;
 
@@ -57,6 +63,12 @@ void print_rh850_error(int errc)
 				break;
 
 		case 0xD5:	set_error("(area error)",errc);
+				break;
+
+		case 0xDB:	set_error("(wrong ID error)",errc);
+				break;
+
+		case 0xDC:	set_error("(serial programming disabled)",errc);
 				break;
 
 		case 0xDA:	set_error("(protection error)",errc);
@@ -130,7 +142,7 @@ int prog_rh850(void)
 {
 //	unsigned long flashblock_a[32];
 //	unsigned int flashblocks;
-	int errc,blocks,bsize;
+	int errc,blocks,bsize,stmp;
 	unsigned long addr,len,maddr,i,j,freq;
 	int main_blank=0;
 	int main_erase=0;
@@ -164,7 +176,16 @@ int prog_rh850(void)
 	float dfreq;
 	int verify_mode=0;
 	int run_ram=0;
+	int set_id=0;
+	int prog_id=0;
+	int check_id=0;
+	int authmode=-1;
 	unsigned long p6=0,p7=0;
+	unsigned char devtype[16];
+	unsigned char idkey[32];
+	unsigned char idset[32];
+	char hexbyte[4];
+	char* parptr;
 
 	errc=0;
 
@@ -213,6 +234,12 @@ int prog_rh850(void)
 //		printf("-- rr -- run code in RAM\n");
 		printf("-- st -- start device\n");
  		printf("-- d2 -- switch to device 2\n");
+
+		printf("-- cid: -- check ID (16 Bytes hex)\n");
+		printf("-- sid: -- set ID without SPIE (16 Bytes hex)\n");
+		printf("-- pid: -- program ID with SPIE (16 Bytes hex)\n");
+
+		printf("-- em -- main flash erase\n");
 
 		return 0;
 	}
@@ -403,6 +430,87 @@ int prog_rh850(void)
 		goto RH850_START;
 	}
 
+
+	if((strstr(cmd,"sid:")) && ((strstr(cmd,"sid:") - cmd) % 2 == 1))
+	{
+		strcat(cmd,"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+		parptr=strstr(cmd,"sid:");
+		strncpy(&hexbyte[0],parptr + 4 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[0]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 6 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[1]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 8 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[2]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 10 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[3]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 12 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[4]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 14 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[5]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 16 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[6]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 18 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[7]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 20 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[8]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 22 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[9]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 24 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[10]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 26 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[11]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 28 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[12]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 30 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[13]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 32 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[14]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 34 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[15]=stmp & 0xff;
+		printf("## Action: set device ID using ");
+		for(i=0;i<16;i++) printf("%02X ",idset[i]);
+		printf("\n");
+		set_id=1;
+	}
+
+	if((strstr(cmd,"pid:")) && ((strstr(cmd,"pid:") - cmd) % 2 == 1))
+	{
+		strcat(cmd,"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+		parptr=strstr(cmd,"pid:");
+		strncpy(&hexbyte[0],parptr + 4 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[0]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 6 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[1]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 8 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[2]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 10 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[3]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 12 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[4]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 14 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[5]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 16 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[6]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 18 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[7]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 20 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[8]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 22 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[9]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 24 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[10]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 26 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[11]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 28 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[12]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 30 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[13]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 32 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[14]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 34 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idset[15]=stmp & 0xff;
+		printf("## Action: set device ID (with SPIE) using ");
+		for(i=0;i<16;i++) printf("%02X ",idset[i]);
+		printf("\n");
+		prog_id=1;
+	}
+
+	if((strstr(cmd,"cid:")) && ((strstr(cmd,"cid:") - cmd) % 2 == 1))
+	{
+		strcat(cmd,"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF");
+		parptr=strstr(cmd,"cid:");
+		strncpy(&hexbyte[0],parptr + 4 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[0]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 6 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[1]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 8 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[2]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 10 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[3]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 12 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[4]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 14 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[5]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 16 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[6]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 18 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[7]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 20 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[8]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 22 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[9]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 24 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[10]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 26 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[11]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 28 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[12]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 30 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[13]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 32 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[14]=stmp & 0xff;
+		strncpy(&hexbyte[0],parptr + 34 * sizeof(char),2);hexbyte[2]=0;sscanf(hexbyte,"%x",&stmp);idkey[15]=stmp & 0xff;
+		printf("## Action: check device ID using ");
+		for(i=0;i<16;i++) printf("%02X ",idkey[i]);
+		printf("\n");
+		check_id=1;
+	}
+
+
+
 RH850_INIT:
 		
 	printf("\n");
@@ -421,6 +529,14 @@ RH850_INIT:
 
 		errc=prg_comm(0x144,0,100,0,ROFFSET,0,0,0,0);				//get device info
 //		showframe_rh850(0);
+
+		printf(">> TYPE   = ");
+		for(i=4;i<11;i++) 
+		{
+			devtype[i-3]=memory[ROFFSET+i];		// use array from 1..8 
+			printf("%02X ",memory[ROFFSET+i]);
+		}
+		printf("\n");
 		
 		freq=	(memory[ROFFSET+16] << 24) + 
 			(memory[ROFFSET+17] << 16) +
@@ -489,6 +605,27 @@ RH850_INIT:
 		switch(memory[ROFFSET+4])
 		{
 			case 0x00:	printf(">> ID authentication mode\n");
+					if(check_id == 1)
+					{
+						printf(">> UNLOCK WITH ID...");
+						for(i=0;i<16;i++) memory[i]=idkey[i];
+						errc=prg_comm(0x20A,32,0,0,0,0,0,0,0);	//ID set
+						if(errc!=0) 
+						{					
+							printf("!!! CHECK DEVICE ID FAILED !!!\n");
+							goto RH850_END;
+						}
+						else
+						{					
+							printf("SUCCESS !\n");
+						}
+						
+					}
+					else
+					{					
+						printf("!!! CHECK DEVICE ID NEEDED !!!\n");
+						goto RH850_END;
+					}
 					break;
 
 			case 0x55:	printf(">> command protection mode (incomplete)\n");
@@ -499,14 +636,21 @@ RH850_INIT:
 
 			default:	printf(">> unsupported mode\n");
 		}
+		authmode=memory[ROFFSET+4];
 
 		errc=prg_comm(0x148,0,100,0,ROFFSET,0,0,0,0);				//signature
-		if(errc!=0) goto RH850_END;
-//		showframe_rh850(0);
+		if(errc!=0)
+		{
+			errc=memory[ROFFSET+4];
+			goto RH850_END;
+		}
 
 		printf(">> DEVICE = ");
 		for(i=4;i<21;i++) printf("%c",memory[ROFFSET+i]);
 		printf("\n");
+		
+
+		if(check_id ==1 ) goto RH850_NCHK;
 		
 /*
 		j=6;		
@@ -547,9 +691,15 @@ RH850_INIT:
 	if(param[13] == 1)
 	{
 		errc=prg_comm(0x149,0,100,0,ROFFSET,0,0,0,0);				//lockbit enable
-		if(errc!=0) goto RH850_END;
 		showframe_rh850(0);
+		if(errc!=0)
+		{
+			errc=memory[ROFFSET+4];
+			goto RH850_END;
+		}
 	}
+
+//	waitkey();
 
 	errc=prg_comm(0x15c,0,2,0,ROFFSET,0,0,0,0);				//get prot status
 	printf(">> PROT STATUS  = 0x%02X\n",memory[ROFFSET]);
@@ -566,11 +716,26 @@ RH850_INIT:
 		printf("   * WRITE DISABLED\n");
 	
 	if(memory[ROFFSET] & 0x20)
-		printf("   * ERASE ENABLED\n\n");
+		printf("   * ERASE ENABLED\n");
 	else
-		printf("   * ERASE DISABLED\n\n");
+		printf("   * ERASE DISABLED\n");
 		
 	get_prot=memory[ROFFSET];
+
+
+	errc=prg_comm(0x209,0,100,0,ROFFSET,0,0,0,0);				//get ID
+	if(errc!=0)
+	{
+		errc=memory[ROFFSET+4];
+		goto RH850_END;
+	}
+//	showframe_rh850(0);
+	printf(">> ID = ");
+	for(i=4;i<19;i++) printf("%02X ",memory[ROFFSET+i]);
+	printf("\n\n");
+
+RH850_NCHK:
+
 
 	if((errc == 0) && (dev_start == 0))
 	{
@@ -755,7 +920,7 @@ RH850_INIT:
 						printf("\n Error at addr %08lX\n",addr);
 						goto RH850_END;
 					}
-					addr+=2048;
+					addr+=1024;
 					progress("DFLASH ERASE   ",blocks,i+1);
 				}
 				printf("\n");
@@ -1697,6 +1862,66 @@ nbx:
 		printf("SET PROTECTION TO 0x%02X\n",(set_prot & get_prot));
 		errc=prg_comm(0x159,0,0,0,0,0,0,0,(set_prot & get_prot));
 	}	
+
+	if((set_id == 1) & (errc == 0))
+	{
+		printf("SET DEVICE ID WITHOUT SPIE\n");
+		for(i=0;i<16;i++) memory[i]=idset[i];
+		errc=prg_comm(0x20B,16,32,0,ROFFSET,0,0,0,0);	//ID set
+		if(memory[ROFFSET+3] != 0x2A)
+		{
+			errc=memory[ROFFSET+4];
+			goto RH850_END;
+		}
+
+		if(authmode != 0)
+		{
+			errc=prg_comm(0x209,0,100,0,ROFFSET,0,0,0,0);				//get ID
+			if(errc!=0) 
+			{
+				printf("GET DEVICE ID FAILED\n\n");
+				errc=memory[ROFFSET+4];
+			}
+			else
+			{
+				printf("GET DEVICE ID = ");
+				for(i=4;i<20;i++) printf("%02X ",memory[ROFFSET+i]);
+				printf("\n\n");
+			}
+		}
+	}	
+
+
+
+	if((prog_id == 1) & (errc == 0))
+	{
+		printf("SET DEVICE ID WITH SPIE\n");
+		for(i=0;i<16;i++) memory[i]=idset[i];
+		errc=prg_comm(0x208,32,32,0,ROFFSET,0,0,0,0);	//ID set
+		if(memory[ROFFSET+3] != 0x28)
+		{
+			errc=memory[ROFFSET+4];
+			goto RH850_END;
+		}
+
+		if(authmode != 0)
+		{
+			errc=prg_comm(0x209,0,100,0,ROFFSET,0,0,0,0);				//get ID
+			if(errc!=0) 
+			{
+				printf("GET DEVICE ID FAILED\n\n");
+				errc=memory[ROFFSET+4];
+			}
+			else
+			{
+				printf("GET DEVICE ID = ");
+				for(i=4;i<20;i++) printf("%02X ",memory[ROFFSET+i]);
+				printf("\n\n");
+			}
+		}
+	}	
+
+
 
 RH850_START:
 

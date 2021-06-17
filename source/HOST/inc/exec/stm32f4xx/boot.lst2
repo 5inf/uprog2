@@ -179,7 +179,7 @@ Disassembly of section .text:
   c0:	00010000 	andeq	r0, r1, r0
   c4:	08192a3b 	ldmdaeq	r9, {r0, r1, r3, r4, r5, r9, fp, sp}
   c8:	4c5d6e7f 	mrrcmi	14, 7, r6, sp, cr15
-  cc:	80ffffec 	rscshi	pc, pc, ip, ror #31
+  cc:	8fffffec 	svchi	0x00ffffec
   d0:	80000000 	andhi	r0, r0, r0
   d4:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
   d8:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 38c <main_unlock_1+0x2ec>

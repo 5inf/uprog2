@@ -1,3 +1,15 @@
+# 12.1.2021 Version 1.39
+* System-Version ist jetzt 0017, Update erfolgt automatisch
+* Feature: Debug-Funktionen für ARM Cortex basierte Controller
+* Feature: Dump-Funktionen für die RL78 Familie
+* Feature: ID-Funktionen für die RH870 Familie
+* Neue Devices: STM32F7xx
+* Neues Device: DS28E07
+* Modellpflege: Neue Devices beim R8C
+* Bugfix: Beim STM32F4xx blieb das Erase manchmal in einer Endlosschleife
+* Bugfix: falsche Maske für Option-Bytes beim STM32F4xx
+* diverse kleinere Bugfixes
+
 # 26.10.2020 Version 1.38
 *  System-Version ist jetzt 0016, Update erfolgt automatisch
 *  Bugfix: Bei S08 und S12X wurde die BDM-Frequenz zu niedrig erkannt (nur ca. 1/3)

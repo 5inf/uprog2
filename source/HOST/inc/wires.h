@@ -195,11 +195,11 @@ const char * const cables[]=
 	// 64 EFM32 
 	"(1=VSS  2=VDD  3=RST  4=SWDCK  5=SWDIO)",
 	
-	// 65 
-	"no connections",
+	// 65 STM32F7 
+	"(1=VSS  2=VDD  3=RST  4=SWDCK  5=SWDIO)",
 	
-	// 66 
-	"no connections",
+	// 66 DS28E07
+	"(1=VSS  3=IO",
 	
 	// 67 
 	"no connections",

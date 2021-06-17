@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2010-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2021 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -71,9 +71,9 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.38                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.39                                                  #\n");
 	printf("#                                                                               #\n");
-	printf("#  (c) 2012-2020 Joerg Wolfram                                                  #\n");
+	printf("#  (c) 2012-2021 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  usage: uprog2 device -commands [up to 4 files/data]                          #\n");
 	printf("#         uprog2 KILL                            kill active daemon             #\n");
@@ -472,6 +472,8 @@ int main(int argc, char *argv[])
 			case 62:	errcode=prog_s12z();		break;
 			case 63:	errcode=prog_ppcjtag4();	break;
 			case 64:	errcode=prog_efm32swd();	break;
+			case 65:	errcode=prog_stm32swd();	break;	//f7
+			case 66:	errcode=prog_onewire();		break;	//onewire EEPROM
 			case 89:	errcode=prog_dgen();		break;
 			case 97:	errcode=prog_fgen();		break;
 

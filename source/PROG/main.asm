@@ -28,7 +28,7 @@
 .def		const_1		= r3
 
 .equ		sysver_high	= 0x00	
-.equ		sysver_low	= 0x10
+.equ		sysver_low	= 0x11
 
 .equ		buffer		= 0x100		;data buffer
 .equ		stack		= 0x10ff	;system/return stack
@@ -142,6 +142,7 @@
 .include	"devices/at89s8252.asm"
 .include	"devices/s12z.asm"
 .include	"devices/efm32swd.asm"
+.include	"devices/onewire.asm"
 
 ;tables
 bdm_ctab:

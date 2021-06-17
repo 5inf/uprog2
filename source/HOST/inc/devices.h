@@ -176,6 +176,7 @@ devicedat valid_devices[1000] = {
 #include	"devices/devices_STM32F2.h"
 #include	"devices/devices_STM32F3.h"
 #include	"devices/devices_STM32F4.h"
+#include	"devices/devices_STM32F7.h"
 #include	"devices/devices_STM32L4.h"
 #include	"devices/devices_XC95xx.h"
 #include	"devices/devices_S12XD.h"
@@ -206,6 +207,7 @@ devicedat valid_devices[1000] = {
 #include	"devices/devices_AT89.h"
 #include	"devices/devices_S12Z.h"
 #include	"devices/devices_EFM32.h"
+#include	"devices/devices_ONEWIRE.h"
 
 	"END",0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 };

@@ -23,11 +23,16 @@ int must_prog(long mad,int blen);
 int must_prog_pic16(long mad,int blen);
 
 void waitkey(void);
+void waitkey_dbg2(void);
 int abortkey(void);
+int get_currentkey(void);
 
 int find_cmd(char *cptr);
 
 void show_data(long,int);
+void show_bdata(long,int,unsigned long);
+void show_wdata(long,int,unsigned long);
+void show_ldata(long,int,unsigned long);
 void show_data4_b(long,int);
 void show_data4_l(long,int);
 
@@ -45,3 +50,5 @@ void set_error2(char *, int,unsigned long);
 void print_error(void);
 
 int check_00(long,int);
+
+void show_cortex_registers(void);

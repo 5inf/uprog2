@@ -72,18 +72,20 @@ r8c_init_1:	clr	XL
 		ldi	ZL,1
 		ldi	ZH,0
 		call	api_wait_ms
-		ldi	XL,0xb7			;standard bitrate setting
+;		ldi	XL,0xb7			;standard bitrate setting
+		ldi	XL,0xb5			;bitrate setting
 		call	send2_9600
 		ldi	ZL,1
 		ldi	ZH,0
 		call	api_wait_ms
-		ldi	XL,0x08			;500K
+;		ldi	XL,0x08			;500K
+		ldi	XL,0x00			;500K
 		call	send2_9600
 		call	recv2_9600
 		ldi	r16,0x41		;error timeout
 		brtc	r8c_err		;timeout
-		ldi	r16,0x43		;error wrong answer B7
-		cpi	XL,0xb7
+;		ldi	r16,0x43		;error wrong answer B7
+;		cpi	XL,0xb7
 ;		brne	r8c_err		;wrong answer
 		jmp	main_loop_ok
 

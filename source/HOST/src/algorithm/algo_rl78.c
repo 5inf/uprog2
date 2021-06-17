@@ -23,6 +23,8 @@
 //###############################################################################
 
 #include <main.h>
+#include "exec/rl78_dump/rl78-dump-dflash.h"
+#include "exec/rl78_fdump/rl78-dump-flash.h"
 
 void print_rl78_error(int errc,unsigned long addr)
 {
@@ -69,16 +71,18 @@ void print_rl78_error(int errc,unsigned long addr)
 
 int prog_rl78(void)
 {
-	int errc,blocks,tblock,bsize;
+	int errc,blocks,tblock,bsize,j;
 	unsigned long addr=0,maddr;
 	int main_erase=0;
 	int main_prog=0;
 	int main_verify=0;
 	int main_bcheck=0;
+	int main_dump=0;
 	int dflash_erase=0;
 	int dflash_prog=0;
 	int dflash_verify=0;
 	int dflash_bcheck=0;
+	int dflash_dump=0;
 	int unsec=0;
 	int rsig=0;
 	int gsec=0;
@@ -99,11 +103,13 @@ int prog_rl78(void)
 		printf("-- bm -- main flash blank check\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
+		printf("-- dm -- main flash dump (will erase first 2K of main)\n");
 		
 		printf("-- ed -- data flash erase\n");
 		printf("-- bd -- data flash blank check\n");
 		printf("-- pd -- data flash program\n");
 		printf("-- vd -- data flash verify\n");
+		printf("-- dd -- data flash dump (will erase first 2K of main)\n");
 
 		printf("-- st -- start device\n");
 		printf("-- d2 -- switch to device 2\n");
@@ -128,6 +134,21 @@ int prog_rl78(void)
 		rsig=1;
 		printf("## Action: read silicon signature\n");
 	}
+
+	if(find_cmd("dm"))
+	{
+		main_dump=1;
+		printf("## Action: main flash dump\n");
+		goto ONLY_DD;	
+	}
+
+	if(find_cmd("dd"))
+	{
+		dflash_dump=1;
+		printf("## Action: data flash dump\n");
+		goto ONLY_DD;	
+	}
+
 
 	if(find_cmd("em"))
 	{
@@ -172,6 +193,7 @@ int prog_rl78(void)
 	main_verify=check_cmd_verify("vm","code flash");
 	dflash_verify=check_cmd_verify("vd","data flash");
 
+ONLY_DD:
 
 	if((strstr(cmd,"st")) && ((strstr(cmd,"st") - cmd) % 2 == 1))
 	{
@@ -206,6 +228,20 @@ int prog_rl78(void)
 		blocks=param[1] / 1024;
 		addr=param[0];
 		printf("ERASE %d BLOCKS OF MAIN FLASH\n",blocks);
+		errc=prg_comm(0x6a,0,7,0,0,(addr >> 8) & 0xff,(addr >> 16) & 0xff,blocks,0);	//program
+//		printf("ADDR= %08lx\n",addr);
+		if(errc != 0)
+		{
+			printf("RESP(%02X) = %02X %02X %02X %02X %02X\n",errc,memory[2],memory[3],memory[4],memory[5],memory[6]);
+		}
+	}
+
+	//erase
+	if ((errc == 0) && ((dflash_dump == 1) || (main_dump == 1)))
+	{
+		blocks=2;
+		addr=param[0];
+		printf("ERASE %d BLOCKS OF MAIN FLASH FOR DUMPER CODE\n",blocks);
 		errc=prg_comm(0x6a,0,7,0,0,(addr >> 8) & 0xff,(addr >> 16) & 0xff,blocks,0);	//program
 //		printf("ADDR= %08lx\n",addr);
 		if(errc != 0)
@@ -291,6 +327,7 @@ int prog_rl78(void)
 		errc=prg_comm(0x6a,0,0,0,0,(addr >> 8) & 0xff,(addr >> 16) & 0xff,blocks,0);	//program
 	}
 
+
 	//blankcheck main
 	if ((errc == 0) && (main_bcheck == 1))
 	{
@@ -349,6 +386,76 @@ int prog_rl78(void)
 		}
 		printf("\n");
 	}
+
+	//program dumper
+	if ((errc == 0) && (dflash_dump == 1))
+	{
+		bsize = 2048;
+		if(bsize > param[1]) bsize=param[1];
+		addr=param[0];
+		blocks=1;
+		maddr=0;
+
+		for(j=0;j<2048;j++)
+		{
+			memory[j] = rl78_dump[j];
+		}
+
+		progress("DUMP PROG   ",blocks,0);
+		for(tblock=0;tblock<blocks;tblock++)
+		{
+			if((must_prog(maddr,bsize)) && (errc == 0))
+			{
+				//printf("ADDR = %08lX\n",addr);
+				errc=prg_comm(0x6b,bsize,7,maddr,0,
+					(addr >> 8) & 0xff,(addr >> 16) & 0xff,0,0);	//program
+				if(errc!=0) 
+				{
+					printf("RESP = %02X %02X %02X %02X %02X\n",memory[2],memory[3],memory[4],memory[5],memory[6]);		
+				}
+			}
+			maddr+=bsize;
+			addr+=bsize;
+			progress("DUMP PROG   ",blocks,tblock+1);
+		}
+		printf("\n");
+	}
+
+	//program dumper
+	if ((errc == 0) && (main_dump == 1))
+	{
+		bsize = 2048;
+		if(bsize > param[1]) bsize=param[1];
+		addr=param[0];
+		blocks=1;
+		maddr=0;
+
+		for(j=0;j<2048;j++)
+		{
+			memory[j] = rl78_fdump[j];
+		}
+
+		progress("DUMP PROG   ",blocks,0);
+		for(tblock=0;tblock<blocks;tblock++)
+		{
+			if((must_prog(maddr,bsize)) && (errc == 0))
+			{
+				//printf("ADDR = %08lX\n",addr);
+				errc=prg_comm(0x6b,bsize,7,maddr,0,
+					(addr >> 8) & 0xff,(addr >> 16) & 0xff,0,0);	//program
+				if(errc!=0) 
+				{
+					printf("RESP = %02X %02X %02X %02X %02X\n",memory[2],memory[3],memory[4],memory[5],memory[6]);		
+				}
+			}
+			maddr+=bsize;
+			addr+=bsize;
+			progress("DUMP PROG   ",blocks,tblock+1);
+		}
+		printf("\n");
+	}
+
+
 
 	//verify main
 	if ((errc == 0) && (main_verify == 1))
@@ -460,6 +567,50 @@ int prog_rl78(void)
 RL78_END:
 
 	prg_comm(0x65,0,0,0,0,8,0,0,0);	//exit
+
+	if ((errc == 0) && (dflash_dump == 1))
+	{
+		bsize=2048;
+		sleep(1);
+		errc=writeblock_open();
+		if(errc == 0) errc=prg_comm(0x0e,0,0,0,0,0,0,0,0);			//init
+		maddr=0;
+		blocks=param[3]/bsize;
+		
+		progress("READ DUMP   ",blocks,0);
+		for(j=0;j<blocks;j++)
+		{
+			errc=prg_comm(0x193,0,bsize,0,ROFFSET+maddr,0,0,0,0);
+			maddr+=bsize;
+			progress("READ DUMP   ",blocks,j+1);
+		}
+		writeblock_data(0,param[3],param[2]);
+		writeblock_close();
+		prg_comm(0x65,0,0,0,0,8,0,0,0);	//exit
+	}
+
+
+	if ((errc == 0) && (main_dump == 1))
+	{
+		bsize=2048;
+		sleep(1);
+		errc=writeblock_open();
+		if(errc == 0) errc=prg_comm(0x0e,0,0,0,0,0,0,0,0);			//init
+		maddr=0;
+		blocks=param[1]/bsize;
+		
+		progress("READ DUMP   ",blocks,0);
+		for(j=0;j<blocks;j++)
+		{
+			errc=prg_comm(0x193,0,bsize,0,ROFFSET+maddr,0,0,0,0);
+			maddr+=bsize;
+			progress("READ DUMP   ",blocks,j+1);
+		}
+		writeblock_data(0,param[1],param[0]);
+		writeblock_close();
+		prg_comm(0x65,0,0,0,0,8,0,0,0);	//exit
+	}
+
 
 	prg_comm(0x2ef,0,0,0,0,0,0,0,0);	//dev 1
 	print_rl78_error(errc,addr);

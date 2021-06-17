@@ -188,6 +188,79 @@ rh850_getdev_data:	.db	0x01,0x38			;get status
 
 
 ;------------------------------------------------------------------------------
+; idcode check
+;------------------------------------------------------------------------------
+rh850_idcode_chk:	call	api_resetptr
+			rcall	rh850_send_soh		;SOH senden
+			ldi	XL,0x00			;LENH
+			rcall	rh850_sendbyte
+			ldi	XL,0x11			;LENL
+			rcall	rh850_sendbyte
+			ldi	XL,0x30			;idcode check command
+			rcall	rh850_sendbyte
+			
+rh850_idcode_chk_0:	ldi	r25,16
+rh850_idcode_chk_1:	call	api_buf_bread
+			rcall	rh850_sendbyte
+			dec	r25
+			brne	rh850_idcode_chk_1
+			rcall	rh850_send_csum
+			rcall	rh850_send_etx		;ETX senden
+			
+			call	api_resetptr
+			rcall	rh850_get_full_frame
+			jmp	main_loop_ok
+
+
+;------------------------------------------------------------------------------
+; idcode set
+;------------------------------------------------------------------------------
+rh850_idcode_set:	call	api_resetptr
+			rcall	rh850_send_soh		;SOH senden
+			ldi	XL,0x00			;LENH
+			rcall	rh850_sendbyte
+			ldi	XL,0x11			;LENL
+			rcall	rh850_sendbyte
+			ldi	XL,0x2A			;idcode set command
+			rcall	rh850_sendbyte
+			rjmp	rh850_idcode_chk_0
+
+
+;------------------------------------------------------------------------------
+; idcode +SPIE set
+;------------------------------------------------------------------------------
+rh850_idcode_prg:	call	api_resetptr
+			rcall	rh850_send_soh		;SOH senden
+			ldi	XL,0x00			;LENH
+			rcall	rh850_sendbyte
+			ldi	XL,0x11			;LENL
+			rcall	rh850_sendbyte
+			ldi	XL,0x28			;idcode set command
+			rcall	rh850_sendbyte
+			rjmp	rh850_idcode_chk_0
+
+;------------------------------------------------------------------------------
+; idcode get
+;------------------------------------------------------------------------------
+rh850_idcode_get:	call	api_resetptr
+			ldi	ZL,LOW(rh850_idget_data*2)
+			ldi	ZH,HIGH(rh850_idget_data*2)
+			ldi	XL,RH850_COMM_SOH
+			rcall	rh850_send_fframe
+			rcall	rh850_get_status
+			brts	rh850_getdev_e1
+
+			ldi	ZL,LOW(rh850_idget_data*2)
+			ldi	ZH,HIGH(rh850_idget_data*2)
+			mov	XL,r8
+			rcall	rh850_send_fframe
+			rcall	rh850_get_full_frame
+			jmp	main_loop_ok
+
+rh850_idget_data:	.db	0x01,0x2B			;get status
+		
+
+;------------------------------------------------------------------------------
 ; set frequency
 ; par4=set select
 ;------------------------------------------------------------------------------

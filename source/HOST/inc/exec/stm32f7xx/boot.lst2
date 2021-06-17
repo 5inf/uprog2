@@ -1,0 +1,190 @@
+
+a.out:     file format elf32-littlearm
+a.out
+architecture: armv4t, flags 0x00000010:
+HAS_SYMS
+start address 0x00000000
+private flags = 5000000: [Version5 EABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         000000dc  00000000  00000000  00000034  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .data         00000000  00000000  00000000  00000110  2**0
+                  CONTENTS, ALLOC, LOAD, DATA
+  2 .bss          00000000  00000000  00000000  00000110  2**0
+                  ALLOC
+  3 .ARM.attributes 00000014  00000000  00000000  00000110  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+00000000 l    d  .text	00000000 .text
+00000000 l    d  .data	00000000 .data
+00000000 l    d  .bss	00000000 .bss
+40023c00 l       *ABS*	00000000 FLASH_BASE
+00000000 l       *ABS*	00000000 FLASH_ACR
+00000004 l       *ABS*	00000000 FLASH_KEYR
+00000008 l       *ABS*	00000000 FLASH_OPTKEYR
+0000000c l       *ABS*	00000000 FLASH_SR
+00000010 l       *ABS*	00000000 FLASH_CR
+00000014 l       *ABS*	00000000 FLASH_OPTCR
+00000018 l       *ABS*	00000000 FLASH_OPTCR1
+0000001c l       *ABS*	00000000 FLASH_OPTCR2
+40023800 l       *ABS*	00000000 RCC_BASE
+00000030 l       *ABS*	00000000 RCC_AHB1ENR
+40020800 l       *ABS*	00000000 PORTC_BASE
+00000000 l       *ABS*	00000000 PORTC_MODER
+00000010 l       *ABS*	00000000 PORTC_IDR
+00000014 l       *ABS*	00000000 PORTC_ODR
+00000000 l       .text	00000000 reset_vector
+00000008 l       .text	00000000 main_start
+0000000e l       .text	00000000 main_loop
+00000014 l       .text	00000000 main_loop_wait
+00000032 l       .text	00000000 prog_flash
+00000030 l       .text	00000000 x_prog_opt
+0000002e l       .text	00000000 tloop
+00000064 l       .text	00000000 prog_opt
+0000008c l       .text	00000000 main_unlock
+0000003a l       .text	00000000 prog_flash_1
+0000005a l       .text	00000000 prog_flash_4
+00000054 l       .text	00000000 prog_flash_3
+00000074 l       .text	00000000 prog_opt_1
+00000084 l       .text	00000000 prog_opt_3
+000000a0 l       .text	00000000 main_unlock_1
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+
+
+
+Disassembly of section .text:
+
+00000000 <reset_vector>:
+   0:	20001000 	andcs	r1, r0, r0
+   4:	20000009 	andcs	r0, r0, r9
+
+00000008 <main_start>:
+   8:	4c27      	ldr	r4, [pc, #156]	; (a8 <main_unlock_1+0x8>)
+   a:	2331      	movs	r3, #49	; 0x31
+   c:	6023      	str	r3, [r4, #0]
+
+0000000e <main_loop>:
+   e:	4927      	ldr	r1, [pc, #156]	; (ac <main_unlock_1+0xc>)
+  10:	2200      	movs	r2, #0
+  12:	600a      	str	r2, [r1, #0]
+
+00000014 <main_loop_wait>:
+  14:	6808      	ldr	r0, [r1, #0]
+  16:	4290      	cmp	r0, r2
+  18:	d0fc      	beq.n	14 <main_loop_wait>
+  1a:	4c23      	ldr	r4, [pc, #140]	; (a8 <main_unlock_1+0x8>)
+  1c:	1c07      	adds	r7, r0, #0
+  1e:	4a24      	ldr	r2, [pc, #144]	; (b0 <main_unlock_1+0x10>)
+  20:	4017      	ands	r7, r2
+  22:	22ff      	movs	r2, #255	; 0xff
+  24:	4010      	ands	r0, r2
+  26:	2852      	cmp	r0, #82	; 0x52
+  28:	d003      	beq.n	32 <prog_flash>
+  2a:	2872      	cmp	r0, #114	; 0x72
+  2c:	d000      	beq.n	30 <x_prog_opt>
+
+0000002e <tloop>:
+  2e:	e7ee      	b.n	e <main_loop>
+
+00000030 <x_prog_opt>:
+  30:	e018      	b.n	64 <prog_opt>
+
+00000032 <prog_flash>:
+  32:	f000 f82b 	bl	8c <main_unlock>
+  36:	491f      	ldr	r1, [pc, #124]	; (b4 <main_unlock_1+0x14>)
+  38:	4e1f      	ldr	r6, [pc, #124]	; (b8 <main_unlock_1+0x18>)
+
+0000003a <prog_flash_1>:
+  3a:	6808      	ldr	r0, [r1, #0]
+  3c:	4b1f      	ldr	r3, [pc, #124]	; (bc <main_unlock_1+0x1c>)
+  3e:	4298      	cmp	r0, r3
+  40:	d00b      	beq.n	5a <prog_flash_4>
+  42:	6922      	ldr	r2, [r4, #16]
+  44:	4b1c      	ldr	r3, [pc, #112]	; (b8 <main_unlock_1+0x18>)
+  46:	431a      	orrs	r2, r3
+  48:	6122      	str	r2, [r4, #16]
+  4a:	2301      	movs	r3, #1
+  4c:	431a      	orrs	r2, r3
+  4e:	6122      	str	r2, [r4, #16]
+  50:	6038      	str	r0, [r7, #0]
+  52:	4b1b      	ldr	r3, [pc, #108]	; (c0 <main_unlock_1+0x20>)
+
+00000054 <prog_flash_3>:
+  54:	68e2      	ldr	r2, [r4, #12]
+  56:	421a      	tst	r2, r3
+  58:	d1fc      	bne.n	54 <prog_flash_3>
+
+0000005a <prog_flash_4>:
+  5a:	3704      	adds	r7, #4
+  5c:	3104      	adds	r1, #4
+  5e:	3e01      	subs	r6, #1
+  60:	d1eb      	bne.n	3a <prog_flash_1>
+  62:	e7d4      	b.n	e <main_loop>
+
+00000064 <prog_opt>:
+  64:	4a17      	ldr	r2, [pc, #92]	; (c4 <main_unlock_1+0x24>)
+  66:	4b18      	ldr	r3, [pc, #96]	; (c8 <main_unlock_1+0x28>)
+  68:	60a2      	str	r2, [r4, #8]
+  6a:	60a3      	str	r3, [r4, #8]
+  6c:	4911      	ldr	r1, [pc, #68]	; (b4 <main_unlock_1+0x14>)
+  6e:	4c0e      	ldr	r4, [pc, #56]	; (a8 <main_unlock_1+0x8>)
+  70:	2300      	movs	r3, #0
+  72:	6123      	str	r3, [r4, #16]
+
+00000074 <prog_opt_1>:
+  74:	6808      	ldr	r0, [r1, #0]
+  76:	4a15      	ldr	r2, [pc, #84]	; (cc <main_unlock_1+0x2c>)
+  78:	4010      	ands	r0, r2
+  7a:	6160      	str	r0, [r4, #20]
+  7c:	2202      	movs	r2, #2
+  7e:	4310      	orrs	r0, r2
+  80:	6160      	str	r0, [r4, #20]
+  82:	4b0f      	ldr	r3, [pc, #60]	; (c0 <main_unlock_1+0x20>)
+
+00000084 <prog_opt_3>:
+  84:	68e2      	ldr	r2, [r4, #12]
+  86:	421a      	tst	r2, r3
+  88:	d1fc      	bne.n	84 <prog_opt_3>
+  8a:	e7c0      	b.n	e <main_loop>
+
+0000008c <main_unlock>:
+  8c:	4c06      	ldr	r4, [pc, #24]	; (a8 <main_unlock_1+0x8>)
+  8e:	6922      	ldr	r2, [r4, #16]
+  90:	4b0f      	ldr	r3, [pc, #60]	; (d0 <main_unlock_1+0x30>)
+  92:	401a      	ands	r2, r3
+  94:	4293      	cmp	r3, r2
+  96:	d103      	bne.n	a0 <main_unlock_1>
+  98:	4a0e      	ldr	r2, [pc, #56]	; (d4 <main_unlock_1+0x34>)
+  9a:	4b0f      	ldr	r3, [pc, #60]	; (d8 <main_unlock_1+0x38>)
+  9c:	6062      	str	r2, [r4, #4]
+  9e:	6063      	str	r3, [r4, #4]
+
+000000a0 <main_unlock_1>:
+  a0:	2300      	movs	r3, #0
+  a2:	6123      	str	r3, [r4, #16]
+  a4:	4770      	bx	lr
+  a6:	46c0      	nop			; (mov r8, r8)
+  a8:	40023c00 	andmi	r3, r2, r0, lsl #24
+  ac:	20000c00 	andcs	r0, r0, r0, lsl #24
+  b0:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
+  b4:	20000400 	andcs	r0, r0, r0, lsl #8
+  b8:	00000200 	andeq	r0, r0, r0, lsl #4
+  bc:	ffffffff 			; <UNDEFINED> instruction: 0xffffffff
+  c0:	00010000 	andeq	r0, r1, r0
+  c4:	08192a3b 	ldmdaeq	r9, {r0, r1, r3, r4, r5, r9, fp, sp}
+  c8:	4c5d6e7f 	mrrcmi	14, 7, r6, sp, cr15
+  cc:	fffffffc 			; <UNDEFINED> instruction: 0xfffffffc
+  d0:	80000000 	andhi	r0, r0, r0
+  d4:	45670123 	strbmi	r0, [r7, #-291]!	; 0xfffffedd
+  d8:	cdef89ab 	stclgt	9, cr8, [pc, #684]!	; 38c <main_unlock_1+0x2ec>
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00001341 	andeq	r1, r0, r1, asr #6
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000009 	andeq	r0, r0, r9
+  10:	01090206 	tsteq	r9, r6, lsl #4

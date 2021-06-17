@@ -56,6 +56,7 @@
 #include <algorithm/algo_at89s8252.h>
 #include <algorithm/algo_s12z.h>
 #include <algorithm/algo_efm32swd.h>
+#include <algorithm/algo_onewire.h>
 
 
 #include <algorithm/algo_xc9500.h>

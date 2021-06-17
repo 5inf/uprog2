@@ -158,7 +158,7 @@ ARM GAS  boot.asm 			page 1
  120 0072 2361     				str	r3,[r4,#FLASH_CR]
  121              	
  122 0074 0868     	prog_opt_1:		ldr	r0,[r1,#0]		//get data
- 123 0076 154A     				ldr	r2, = 0x80FFFFEC
+ 123 0076 154A     				ldr	r2, = 0x8FFFFFEC
  124 0078 1040     				and	r0,r2
  125 007a 6061     				str	r0,[r4,#FLASH_OPTCR]
  126 007c 0222     				mov	r2,#0x02

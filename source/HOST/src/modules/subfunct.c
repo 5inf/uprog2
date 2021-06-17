@@ -24,6 +24,7 @@
 
 #include <main.h>
 #include <poll.h>
+#include <termios.h>
 
 //----------------------------------------------------------------------------------
 // send a command to programmer
@@ -227,6 +228,35 @@ void waitkey(void)
 		getchar();
 }
 
+int get_currentkey(void) 
+{
+    int character;
+    struct termios orig_term_attr;
+    struct termios new_term_attr;
+
+    /* set the terminal to raw mode */
+    tcgetattr(fileno(stdin), &orig_term_attr);
+    memcpy(&new_term_attr, &orig_term_attr, sizeof(struct termios));
+    new_term_attr.c_lflag &= ~(ECHO|ICANON);
+    new_term_attr.c_cc[VTIME] = 0;
+    new_term_attr.c_cc[VMIN] = 0;
+    tcsetattr(fileno(stdin), TCSANOW, &new_term_attr);
+    
+    character = fgetc(stdin);
+
+    /* restore the original terminal attributes */
+    tcsetattr(fileno(stdin), TCSANOW, &orig_term_attr);
+
+    return character;
+}
+
+
+void waitkey_dbg2(void)
+{
+		printf("\nPRESS ENTER TO BREAK\n");
+		getchar();
+}
+
 
 int abortkey(void)
 {
@@ -273,6 +303,51 @@ void show_data(long addr, int len)
 		printf("ADDR= %08lX  DATA= %02X\n",addr+i,memory[addr+i]);
 	}
 }
+
+void show_bdata(long addr, int len, unsigned long maddr)
+{
+	int i;
+
+	printf("0x%08lX  : ",maddr);
+	
+	for(i=0;i<len;i++)
+	{
+		printf(" %02X",memory[addr+i]);
+	}
+	printf("\n");
+	
+}
+
+
+void show_wdata(long addr, int len, unsigned long maddr)
+{
+	int i;
+
+	printf("0x%08lX  : ",maddr);
+	
+	for(i=0;i<len;i+=2)
+	{
+		printf(" %04X",memory[addr+i] + (memory[addr+i+1] << 8));
+	}
+	printf("\n");
+	
+}
+
+
+void show_ldata(long addr, int len, unsigned long maddr)
+{
+	int i;
+
+	printf("0x%08lX  : ",maddr);
+	
+	for(i=0;i<len;i+=4)
+	{
+		printf(" %08lX",memory[addr+i] + (memory[addr+i+1] << 8) + (memory[addr+i+2] << 16)+ (memory[addr+i+3] << 24));
+	}
+	printf("\n");
+	
+}
+
 
 void show_data4_b(long addr, int len)
 {

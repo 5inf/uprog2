@@ -104,8 +104,8 @@ prg_exec_jtab1:	jmp	prg_exec_e1		;code 00 unknown
 		jmp	s12xe_setpll		;code 4b s12xe set PLL
 		jmp	s12xe_merase		;code 4c s12xe main erase
 		jmp	s12xe_derase		;code 4d s12xe dflash erase
-		jmp	swd32_erase1		;code 4e erase STM32F0/F1/F2/F3
-		jmp	swd32_readregs		;code 4f unknown
+		jmp	swd32_erase1		;code 4e erase STM32F0/F1/F2/F3/F4
+		jmp	swd32_readregs		;code 4f stm32 read registers
 
 		jmp	init_swim		;code 50 STM8 SWIM init
 		jmp	exit_swim		;code 51 STM8 SWIM exit
@@ -437,8 +437,8 @@ prg_exec_jtab2:
 		jmp	la1m_start		;code 190 logic analyzer, 1M sample freq
 		jmp	freq_gen_start		;code 191 frequency generator
 		jmp	la100k_start		;code 192 logic analyzer, 100k sample freq
-		jmp	prg_exec_e1		;code 193 unknown
-		jmp	prg_exec_e1		;code 194 unknown
+		jmp	rl78_gdump		;code 193 RL78 get 1024 bytes dump data
+		jmp	swd32_erase_chk		;code 194 SWD read DRW
 		jmp	prg_exec_e1		;code 195 unknown
 		jmp	spieeprom_read1		;code 196 AT25xxx EEPROM read (16 bit addr)
 		jmp	spieeprom_write1	;code 197 AT25xxx EEPROM write (16 bit addr)
@@ -549,10 +549,10 @@ prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
 		jmp	s08_go			;code 205 HCS08 exec PC
 		jmp	prg_exec_e1		;code 206 unknown
 		jmp	prg_exec_e1		;code 207 unknown
-		jmp	prg_exec_e1		;code 208 unknown
-		jmp	prg_exec_e1		;code 209 unknown
-		jmp	prg_exec_e1		;code 20a unknown
-		jmp	prg_exec_e1		;code 20b unknown
+		jmp	rh850_idcode_prg	;code 208 RH850 set ID code and SPIE
+		jmp	rh850_idcode_get	;code 209 RH850 get ID code
+		jmp	rh850_idcode_chk	;code 20a RH850 check against ID code
+		jmp	rh850_idcode_set	;code 20b RH850 set ID code
 		jmp	rh850_bst_start		;code 20c unknown
 		jmp	rh850_bst_block		;code 20d unknown
 		jmp	rh850_vfy_start		;code 20e RH850 verify start
@@ -592,22 +592,22 @@ prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
 		jmp	init_bdmz		;code 22e unknown
 		jmp	bdm_setfreqz		;code 22f unknown
 
-		jmp	prg_exec_e1		;code 230 unknown
-		jmp	prg_exec_e1		;code 231 unknown
-		jmp	prg_exec_e1		;code 232 unknown
-		jmp	prg_exec_e1		;code 233 unknown
-		jmp	prg_exec_e1		;code 234 unknown
+		jmp	onewire_init		;code 230 init+reset onewire
+		jmp	onewire_exit		;code 231 exit onewire (clear Pull-Up)
+		jmp	onewire_read_id		;code 232 read ROM data
+		jmp	onewire_read_mem	;code 233 read memory data
+		jmp	onewire_write_mem	;code 234 write memory data
 		jmp	prg_exec_e1		;code 235 unknown
-		jmp	prg_exec_e1		;code 236 unknown
-		jmp	prg_exec_e1		;code 237 unknown
-		jmp	prg_exec_e1		;code 238 unknown
-		jmp	prg_exec_e1		;code 239 unknown
-		jmp	prg_exec_e1		;code 23a unknown
-		jmp	prg_exec_e1		;code 23b unknown
-		jmp	prg_exec_e1		;code 23c unknown
-		jmp	prg_exec_e1		;code 23d unknown
-		jmp	prg_exec_e1		;code 23e unknown
-		jmp	prg_exec_e1		;code 23f unknown
+		jmp	swd32_wreg		;code 236 SWD write register
+		jmp	swd32_cont		;code 237 SWD continue at address
+		jmp	swd32_setbrk		;code 238 SWD set breakpoint
+		jmp	swd32_clrbrk		;code 239 SWD clear breakpoint
+		jmp	swd32_dbgcheck		;code 23a SWD check if in debug mode
+		jmp	swd32_halt		;code 23b SWD halt processor
+		jmp	swd32_nread		;code 23c SWD read n longs
+		jmp	swd32_wlong		;code 23d SWD write long
+		jmp	swd32_wword		;code 23e SWD write word
+		jmp	swd32_wbyte		;code 23f SWD write byte
 
 		jmp	prg_exec_e1		;code 240 unknown
 		jmp	prg_exec_e1		;code 241 unknown
