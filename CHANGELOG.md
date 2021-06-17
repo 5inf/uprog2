@@ -1,3 +1,8 @@
+# 26.10.2020 Version 1.38
+*  System-Version ist jetzt 0016, Update erfolgt automatisch
+*  Bugfix: Bei S08 und S12X wurde die BDM-Frequenz zu niedrig erkannt (nur ca. 1/3)
+*  Bugfix: Dateiname bei make install korrigiert
+
 # 28.9.2020 Version 1.37
 *  System-Version ist jetzt 0015, Update erfolgt automatisch
 *  Die 32-Bit Version (X86 Binary) habe ich eingestellt

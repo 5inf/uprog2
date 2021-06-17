@@ -42,7 +42,7 @@ dir:
 	mkdir -p build
 
 install:	bin
-	cp -f uprog2-64 /usr/local/bin/uprog2
+	cp -f uprog2 /usr/local/bin/uprog2
 
 clean:
 	@rm -rf build

@@ -589,8 +589,8 @@ prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
 		jmp	s12z_step		;code 22b S12Z single step
 		jmp	s12z_readregs		;code 22c S12Z read registers
 		jmp	s12z_writereg		;code 22d S12Z write register
-		jmp	prg_exec_e1		;code 22e unknown
-		jmp	prg_exec_e1		;code 22f unknown
+		jmp	init_bdmz		;code 22e unknown
+		jmp	bdm_setfreqz		;code 22f unknown
 
 		jmp	prg_exec_e1		;code 230 unknown
 		jmp	prg_exec_e1		;code 231 unknown

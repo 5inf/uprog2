@@ -28,7 +28,7 @@
 .def		const_1		= r3
 
 .equ		sysver_high	= 0x00	
-.equ		sysver_low	= 0x0F
+.equ		sysver_low	= 0x10
 
 .equ		buffer		= 0x100		;data buffer
 .equ		stack		= 0x10ff	;system/return stack

@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.37                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.38                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  (c) 2012-2020 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");

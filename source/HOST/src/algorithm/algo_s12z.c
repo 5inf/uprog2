@@ -207,7 +207,7 @@ int prog_s12z(void)
 
 	if(dev_start == 0)
 	{
-		errc=prg_comm(0x10,0,1,0,0,0,0,0,res_norel);					//BDM init
+		errc=prg_comm(0x22e,0,1,0,0,0,0,0,res_norel);					//BDM init
 		if(errc == 0)
 		{
 			bdmfreq=171/memory[0];			
@@ -218,7 +218,7 @@ int prog_s12z(void)
 			errc=prg_comm(0x220,0,2,0,0,fcdiv,bfreq-1,0,1);
 //			printf("FCLKDIV      = %02X\n",memory[0]);
 
-			if(errc == 0) errc=prg_comm(0x1f,0,4,0,0,5,0,0,0);				//resync
+			if(errc == 0) errc=prg_comm(0x22f,0,4,0,0,5,0,0,0);				//resync
 
 			bdmfreq=171/memory[0];			
 			freq=bdmfreq;			//bus clock

@@ -232,7 +232,7 @@ int prog_s08(void)
 		prdiv8=0;
 		if(errc == 0)
 		{
-			bdmfreq=171/memory[0];
+			bdmfreq=512/memory[0];
 			if(force_4m==1)
 			{
 				printf("BDM FREQ = %2.1fMHz     FORCED TO = 4MHz\n",bdmfreq);
@@ -323,7 +323,7 @@ int prog_s08(void)
 		prdiv8=0;
 		if(errc == 0)
 		{
-			bdmfreq=171/memory[0];
+			bdmfreq=512/memory[0];
 			freq=bdmfreq;			//bus clock
 			if((freq) > 12.6)
 			{
@@ -345,7 +345,7 @@ int prog_s08(void)
 		prdiv8=0;
 		if(errc == 0)
 		{
-			bdmfreq=171/memory[0];
+			bdmfreq=512/memory[0];
 			freq=bdmfreq;			//bus clock
 			if((freq) > 12.6)
 			{

@@ -42,13 +42,11 @@
 .equ		BDM_SUB_WSTAT = 0xf8
 
 
-bdm_prepare:	push	r21
-		in	r21,CTRLPORT		;1
+bdm_prepare:	in	r21,CTRLPORT		;1
 		andi	r21,SIG2_AND		;1 clear SIG2
 		mov	r0,r21			;1 store for start bit
 		ori	r21,SIG2_OR		;1
 		mov	r1,r21			;1 set SIG2
-		pop	r21
 		ret
 
 bdm_wait_ack:	clr	r20
@@ -136,26 +134,6 @@ bdm_setfreq:	ldi	r18,HIGH(bdm_jtab)
 		rcall	reinit_bdm_nf
 		jmp	main_loop
 
-bdm_setfreqz:	ldi	r18,HIGH(bdm_jtab)
-		add	r16,r18
-		out	EEARL,r16
-		rcall	reinit_bdmz_nf
-		jmp	main_loop
-
-bdm_setfreq0:	ldi	r18,HIGH(bdm_jtab)
-		add	r16,r18
-		out	EEARL,r16
-		jmp	main_loop_ok
-		sbi	CTRLPORT,SIG2		;BKGD HIGH
-		sbi	CTRLDDR,SIG2		;activate BKGD
-		ldi	ZL,3			;5ms
-		clr	ZH
-		call	wait_ms
-		cbi	CTRLPORT,SIG2		;BKGD LOW
-		ldi	ZH,0x10		
-		rcall	reinit_bdm_s1		
-		jmp	main_loop_ok
-
 
 reinit_bdm:	cbi	CTRLPORT,SIG2		;BKGD LOW
 		cbi	CTRLPORT,SIG1		;RESET LOW
@@ -215,7 +193,7 @@ reinit_bdm_2:	sbic	CTRLPIN,SIG2		;2 wait for no sync
 		rjmp	reinit_bdm_3		;branch, sync is ended
 reinit_bdm_2a:	inc	XL			;1
 		brne	reinit_bdm_2		;2 no timeout
-		ldi	r16,0x33		;error-SYNC pulse too long
+		ldi	r16,0x32		;error-SYNC pulse too long
 		ret				;timeout -> no sync
 
 reinit_bdm_3:	call	api_resetptr		;reset buf ptr
@@ -223,85 +201,6 @@ reinit_bdm_3:	call	api_resetptr		;reset buf ptr
 		sbi	CTRLDDR,SIG2		;BKGD HIGH
 		clr	r16
 		ret
-
-
-reinit_bdmz:	cbi	CTRLPORT,SIG2		;BKGD LOW
-		cbi	CTRLPORT,SIG1		;RESET LOW
-		sbi	CTRLDDR,SIG2		;set to output
-		sbi	CTRLDDR,SIG1
-		ldi	ZL,50			;50ms wait for vcc
-		clr	ZH
-		call	wait_ms
-		sbi	CTRLPORT,SIG1		;RESET HIGH
-		cbi	CTRLDDR,SIG1		;realease reset
-		ldi	ZH,0
-		ldi	ZL,0
-reinit_bdmz_r0:	sbic	CTRLPIN,SIG1		;skip if reset is low
-		rjmp	reinit_bdmz_r1
-		sbiw	ZL,1
-		brne	reinit_bdmz_r0
-		ldi	r16,0x30		;RESET LOW
-		ret
-
-reinit_bdmz_rp:	ldi	r16,0x36		;RESET PULSE
-		ret
-
-reinit_bdmz_r1:	ldi	r20,200
-reinit_bdmz_r2:	sbis	CTRLPIN,SIG1
-		rjmp	reinit_bdmz_rp
-		ldi	ZL,1			;200 x 1ms
-		ldi	ZH,0
-		call	wait_ms
-		dec	r20
-		brne	reinit_bdmz_r2
-
-reinit_bdmz_nf:	sbi	CTRLPORT,SIG2		;BKGD HIGH
-		sbi	CTRLDDR,SIG2		;activate BKGD
-		ldi	ZL,3			;5ms
-		clr	ZH
-		call	wait_ms
-		cbi	CTRLPORT,SIG2		;BKGD LOW
-		ldi	ZH,0x40
-reinit_bdmz_s1:	ldi	ZL,19
-reinit_bdmz_s2:	dec	ZL
-		brne	reinit_bdmz_s2
-		dec	ZH
-		brne	reinit_bdmz_s1
-		sbi	CTRLPORT,SIG2		;BKGD HIGH
-		clr	XH			;clear wsync timeout
-		clr	XL			;clear msync timeout
-		cbi	CTRLDDR,SIG2		;release BKGD
-
-reinit_bdmz_1:	sbis	CTRLPIN,SIG2		;2 wait for sync
-		rjmp	reinit_bdmz_2a		;branch, sync is started
-		inc	XH			;1
-		brne	reinit_bdmz_1		;2 no timeout
-		ldi	r16,0x31		;error-no sync pulse, BKGD remains high
-		ret				;timeout -> no sync
-
-reinit_bdmz_2:	sbic	CTRLPIN,SIG2		;2 wait for no sync
-		rjmp	reinit_bdmz_3		;branch, sync is ended
-reinit_bdmz_2a:	inc	XL			;1
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop		
-		brne	reinit_bdmz_2		;2 no timeout
-		ldi	r16,0x33		;error-SYNC pulse too long
-		ret				;timeout -> no sync
-
-reinit_bdmz_3:	call	api_resetptr		;reset buf ptr
-		call	api_buf_lwrite
-		sbi	CTRLDDR,SIG2		;BKGD HIGH
-		clr	r16
-		ret
-
 
 
 ;------------------------------------------------------------------------------
@@ -378,93 +277,6 @@ init_bdm_3:	call	api_resetptr
 		call	api_buf_lwrite
 		sbi	CTRLDDR,SIG2		;BKGD HIGH
 		jmp	main_loop_ok
-
-;------------------------------------------------------------------------------
-; bdm Initialisierung
-;------------------------------------------------------------------------------
-init_bdmz:	cbi	CTRLPORT,SIG2		;BKGD LOW
-		cbi	CTRLPORT,SIG1		;RESET LOW
-		sbi	CTRLDDR,SIG2		;set to output
-		sbi	CTRLDDR,SIG1
-		call	api_vcc_off
-		ldi	ZL,50			;20ms
-		clr	ZH
-		call	wait_ms
-		call	api_vcc_on
-		ldi	ZL,200			;250ms wait for vcc
-		clr	ZH
-		call	wait_ms
-		sbi	CTRLPORT,SIG1		;RESET HIGH
-		sbrs	r19,7			;skip release if PAR4 > 127
-		cbi	CTRLDDR,SIG1		;realease reset
-		ldi	ZH,0
-		ldi	ZL,0
-init_bdmz_r0:	sbic	CTRLPIN,SIG1		;skip if reset is low
-		rjmp	init_bdmz_r1
-		sbiw	ZL,1
-		brne	init_bdmz_r0
-		ldi	r16,0x30		;RESET LOW
-		jmp	main_loop
-
-init_bdmz_rp:	ldi	r16,0x36		;RESET PULSE
-		jmp	main_loop
-
-init_bdmz_r1:	ldi	r20,200
-init_bdmz_r2:	sbis	CTRLPIN,SIG1
-		rjmp	init_bdmz_rp
-		ldi	ZL,1			;200 x 1ms
-		ldi	ZH,0
-		call	wait_ms
-		dec	r20
-		brne	init_bdmz_r2
-
-		sbi	CTRLPORT,SIG2		;BKGD HIGH
-		sbi	CTRLDDR,SIG2		;activate BKGD
-		ldi	ZL,3			;5ms
-		clr	ZH
-		call	wait_ms
-		cbi	CTRLPORT,SIG2		;BKGD LOW
-		ldi	ZH,0x40
-init_bdmz_s1:	ldi	ZL,19
-init_bdmz_s2:	dec	ZL
-		brne	init_bdmz_s2
-		dec	ZH
-		brne	init_bdmz_s1
-		sbi	CTRLPORT,SIG2		;BKGD HIGH
-		clr	XH			;clear wsync timeout
-		clr	XL			;clear msync timeout
-		cbi	CTRLDDR,SIG2		;release BKGD
-
-init_bdmz_1:	sbis	CTRLPIN,SIG2		;2 wait for sync
-		rjmp	init_bdmz_2a		;branch, sync is started
-		inc	XH			;1
-		brne	init_bdmz_1		;2 no timeout
-		ldi	r16,0x31		;error-no sync pulse, BKGD remains high
-		jmp	main_loop		;timeout -> no sync
-
-init_bdmz_2:	sbic	CTRLPIN,SIG2		;2 wait for no sync
-		rjmp	init_bdmz_3		;branch, sync is ended
-init_bdmz_2a:	inc	XL			;1
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop		
-
-		brne	init_bdmz_2		;2 no timeout
-		ldi	r16,0x32		;error-SYNC pulse too long
-		jmp	main_loop		;timeout -> no sync
-
-init_bdmz_3:	call	api_resetptr
-		call	api_buf_lwrite
-		sbi	CTRLDDR,SIG2		;BKGD HIGH
-		jmp	main_loop_ok
-
 
 ;------------------------------------------------------------------------------
 ; bdm beenden
