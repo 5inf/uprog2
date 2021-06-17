@@ -7,20 +7,20 @@ start address 0x20000000
 
 Program Header:
     LOAD off    0x00010000 vaddr 0x20000000 paddr 0x20000000 align 2**16
-         filesz 0x000000e8 memsz 0x000001e8 flags rwx
+         filesz 0x000001e8 memsz 0x000002e8 flags rwx
 private flags = 5000200: [Version5 EABI] [soft-float ABI]
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000000e8  20000000  20000000  00010000  2**2
+  0 .text         000001e8  20000000  20000000  00010000  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .heap         00000100  200000e8  200000e8  000100e8  2**0
+  1 .heap         00000100  200001e8  200001e8  000101e8  2**0
                   ALLOC
-  2 .ARM.attributes 00000021  00000000  00000000  000100e8  2**0
+  2 .ARM.attributes 00000021  00000000  00000000  000101e8  2**0
                   CONTENTS, READONLY
 SYMBOL TABLE:
 20000000 l    d  .text	00000000 .text
-200000e8 l    d  .heap	00000000 .heap
+200001e8 l    d  .heap	00000000 .heap
 00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
 00000000 l    df *ABS*	00000000 build/src/boot.o
 40052000 l       *ABS*	00000000 WDOG_BASE
@@ -157,32 +157,54 @@ c0000000 l       *ABS*	00000000 PCC_ACTIVE
 0000002e l       *ABS*	00000000 FERSTAT
 0000002f l       *ABS*	00000000 FERCNFG
 20000000 l       .text	00000000 reset_vector
+00000000 l       *ABS*	00000000 LED_DEBUG
 20000008 l       .text	00000000 main_start
-20000028 l       .text	00000000 main_loop
-20000034 l       .text	00000000 main_loop_wait
-2000004e l       .text	00000000 prog_flash
-20000092 l       .text	00000000 read_flash
-20000058 l       .text	00000000 prog_flash_1
-20000062 l       .text	00000000 prog_row
-20000086 l       .text	00000000 prog_row_loop
-20000096 l       .text	00000000 read_flash_1
+20000014 l       .text	00000000 main_loop
+2000001a l       .text	00000000 main_loop_wait
+2000005a l       .text	00000000 prog_flash
+20000068 l       .text	00000000 check_flash
+200000bc l       .text	00000000 erase_sector
+20000112 l       .text	00000000 read_flash
+20000124 l       .text	00000000 part_dflash
+20000052 l       .text	00000000 set_flexram_x
+20000054 l       .text	00000000 wait_ee_rdy_x
+20000056 l       .text	00000000 wait_fl_rdy_x
+20000058 l       .text	00000000 write_eep_x
+20000168 l       .text	00000000 set_flexram
+20000194 l       .text	00000000 wait_ee_rdy
+200001a0 l       .text	00000000 wait_fl_rdy
+200001ac l       .text	00000000 write_eep
+2000005e l       .text	00000000 prog_flash_1
+200000e2 l       .text	00000000 prog_row
+2000006c l       .text	00000000 check_flash_1
+20000076 l       .text	00000000 check_row
+20000098 l       .text	00000000 check_row_loop
+200000ac l       .text	00000000 check_row_err
+200000d8 l       .text	00000000 erase_sector_loop
+20000106 l       .text	00000000 prog_row_loop
+20000116 l       .text	00000000 read_flash_1
+2000014a l       .text	00000000 part_dflash_loop
+2000015a l       .text	00000000 part_dflash_err
+2000017a l       .text	00000000 set_flexram_noee_l1
+2000018a l       .text	00000000 set_flexram_noee_l2
+200001b0 l       .text	00000000 write_eep_1
 00000000         *UND*	00000000 reset_addr
 00000100 g       *ABS*	00000000 heap_size
 00000000 g       *ABS*	00000000 _sidata
-200000e8 g       .text	00000000 __exidx_end
-200000e8 g       .text	00000000 _etext
-200000e8 g       .text	00000000 _sbss
-200000e8 g       .text	00000000 __bss_start__
-200000e8 g       .text	00000000 _sdata
-200001e8 g       .heap	00000000 _heap_end
-200000e8 g       .text	00000000 __exidx_start
-200000e8 g       .text	00000000 _ebss
-200000e8 g       .heap	00000000 _heap_start
-200000e8 g       .text	00000000 __bss_end__
+200001e8 g       .text	00000000 __exidx_end
+200001e8 g       .text	00000000 _etext
+200001e8 g       .text	00000000 _sbss
+200001e8 g       .text	00000000 __bss_start__
+200001e8 g       .text	00000000 _sdata
+200002e8 g       .heap	00000000 _heap_end
+200001e8 g       .text	00000000 __exidx_start
+200001e8 g       .text	00000000 _ebss
+200001e8 g       .heap	00000000 _heap_start
+200001e8 g       .text	00000000 __bss_end__
 00000400 g       *ABS*	00000000 stack_size
 20002c00 g       *ABS*	00000000 _stack_end
 20003000 g       *ABS*	00000000 _stack_start
-200000e8 g       .text	00000000 _edata
+200001e8 g       .text	00000000 _edata
 
 
 
@@ -194,119 +216,296 @@ Disassembly of section .text:
 
 20000008 <main_start>:
 20000008:	b662      	cpsie	i
-2000000a:	4d26      	ldr	r5, [pc, #152]	; (200000a4 <read_flash_1+0xe>)
-2000000c:	4b26      	ldr	r3, [pc, #152]	; (200000a8 <read_flash_1+0x12>)
-2000000e:	4c27      	ldr	r4, [pc, #156]	; (200000ac <read_flash_1+0x16>)
+2000000a:	4d6d      	ldr	r5, [pc, #436]	; (200001c0 <write_eep_1+0x10>)
+2000000c:	4b6d      	ldr	r3, [pc, #436]	; (200001c4 <write_eep_1+0x14>)
+2000000e:	4c6e      	ldr	r4, [pc, #440]	; (200001c8 <write_eep_1+0x18>)
 20000010:	602b      	str	r3, [r5, #0]
 20000012:	60ac      	str	r4, [r5, #8]
-20000014:	4d26      	ldr	r5, [pc, #152]	; (200000b0 <read_flash_1+0x1a>)
-20000016:	4a27      	ldr	r2, [pc, #156]	; (200000b4 <read_flash_1+0x1e>)
-20000018:	626a      	str	r2, [r5, #36]	; 0x24
-2000001a:	4d27      	ldr	r5, [pc, #156]	; (200000b8 <read_flash_1+0x22>)
-2000001c:	4a27      	ldr	r2, [pc, #156]	; (200000bc <read_flash_1+0x26>)
-2000001e:	62aa      	str	r2, [r5, #40]	; 0x28
-20000020:	62ea      	str	r2, [r5, #44]	; 0x2c
-20000022:	4d27      	ldr	r5, [pc, #156]	; (200000c0 <read_flash_1+0x2a>)
-20000024:	4a27      	ldr	r2, [pc, #156]	; (200000c4 <read_flash_1+0x2e>)
-20000026:	616a      	str	r2, [r5, #20]
 
-20000028 <main_loop>:
-20000028:	4d25      	ldr	r5, [pc, #148]	; (200000c0 <read_flash_1+0x2a>)
-2000002a:	4a27      	ldr	r2, [pc, #156]	; (200000c8 <read_flash_1+0x32>)
-2000002c:	602a      	str	r2, [r5, #0]
-2000002e:	4927      	ldr	r1, [pc, #156]	; (200000cc <read_flash_1+0x36>)
-20000030:	2200      	movs	r2, #0
-20000032:	600a      	str	r2, [r1, #0]
+20000014 <main_loop>:
+20000014:	496d      	ldr	r1, [pc, #436]	; (200001cc <write_eep_1+0x1c>)
+20000016:	2200      	movs	r2, #0
+20000018:	600a      	str	r2, [r1, #0]
 
-20000034 <main_loop_wait>:
-20000034:	6808      	ldr	r0, [r1, #0]
-20000036:	4290      	cmp	r0, r2
-20000038:	d0fc      	beq.n	20000034 <main_loop_wait>
-2000003a:	1c03      	adds	r3, r0, #0
-2000003c:	4a24      	ldr	r2, [pc, #144]	; (200000d0 <read_flash_1+0x3a>)
-2000003e:	4013      	ands	r3, r2
-20000040:	22ff      	movs	r2, #255	; 0xff
-20000042:	4010      	ands	r0, r2
-20000044:	2852      	cmp	r0, #82	; 0x52
-20000046:	d002      	beq.n	2000004e <prog_flash>
-20000048:	2851      	cmp	r0, #81	; 0x51
-2000004a:	d022      	beq.n	20000092 <read_flash>
-2000004c:	e7ec      	b.n	20000028 <main_loop>
+2000001a <main_loop_wait>:
+2000001a:	7808      	ldrb	r0, [r1, #0]
+2000001c:	4290      	cmp	r0, r2
+2000001e:	6808      	ldr	r0, [r1, #0]
+20000020:	d0fb      	beq.n	2000001a <main_loop_wait>
+20000022:	1c03      	adds	r3, r0, #0
+20000024:	4a6a      	ldr	r2, [pc, #424]	; (200001d0 <write_eep_1+0x20>)
+20000026:	4013      	ands	r3, r2
+20000028:	22ff      	movs	r2, #255	; 0xff
+2000002a:	4010      	ands	r0, r2
+2000002c:	2852      	cmp	r0, #82	; 0x52
+2000002e:	d014      	beq.n	2000005a <prog_flash>
+20000030:	2854      	cmp	r0, #84	; 0x54
+20000032:	d019      	beq.n	20000068 <check_flash>
+20000034:	2853      	cmp	r0, #83	; 0x53
+20000036:	d041      	beq.n	200000bc <erase_sector>
+20000038:	2851      	cmp	r0, #81	; 0x51
+2000003a:	d06a      	beq.n	20000112 <read_flash>
+2000003c:	2858      	cmp	r0, #88	; 0x58
+2000003e:	d071      	beq.n	20000124 <part_dflash>
+20000040:	285a      	cmp	r0, #90	; 0x5a
+20000042:	d006      	beq.n	20000052 <set_flexram_x>
+20000044:	285c      	cmp	r0, #92	; 0x5c
+20000046:	d005      	beq.n	20000054 <wait_ee_rdy_x>
+20000048:	285d      	cmp	r0, #93	; 0x5d
+2000004a:	d004      	beq.n	20000056 <wait_fl_rdy_x>
+2000004c:	285e      	cmp	r0, #94	; 0x5e
+2000004e:	d003      	beq.n	20000058 <write_eep_x>
+20000050:	e7e0      	b.n	20000014 <main_loop>
 
-2000004e <prog_flash>:
-2000004e:	4d1c      	ldr	r5, [pc, #112]	; (200000c0 <read_flash_1+0x2a>)
-20000050:	4a20      	ldr	r2, [pc, #128]	; (200000d4 <read_flash_1+0x3e>)
-20000052:	602a      	str	r2, [r5, #0]
-20000054:	4c20      	ldr	r4, [pc, #128]	; (200000d8 <read_flash_1+0x42>)
-20000056:	4f21      	ldr	r7, [pc, #132]	; (200000dc <read_flash_1+0x46>)
+20000052 <set_flexram_x>:
+20000052:	e089      	b.n	20000168 <set_flexram>
 
-20000058 <prog_flash_1>:
-20000058:	f000 f803 	bl	20000062 <prog_row>
-2000005c:	3f01      	subs	r7, #1
-2000005e:	d1fb      	bne.n	20000058 <prog_flash_1>
-20000060:	e7e2      	b.n	20000028 <main_loop>
+20000054 <wait_ee_rdy_x>:
+20000054:	e09e      	b.n	20000194 <wait_ee_rdy>
 
-20000062 <prog_row>:
-20000062:	4d1f      	ldr	r5, [pc, #124]	; (200000e0 <read_flash_1+0x4a>)
-20000064:	2270      	movs	r2, #112	; 0x70
-20000066:	702a      	strb	r2, [r5, #0]
-20000068:	2207      	movs	r2, #7
-2000006a:	71ea      	strb	r2, [r5, #7]
-2000006c:	1c1a      	adds	r2, r3, #0
-2000006e:	712a      	strb	r2, [r5, #4]
-20000070:	0a12      	lsrs	r2, r2, #8
-20000072:	716a      	strb	r2, [r5, #5]
-20000074:	0a12      	lsrs	r2, r2, #8
-20000076:	71aa      	strb	r2, [r5, #6]
-20000078:	6822      	ldr	r2, [r4, #0]
-2000007a:	60aa      	str	r2, [r5, #8]
-2000007c:	6862      	ldr	r2, [r4, #4]
-2000007e:	60ea      	str	r2, [r5, #12]
-20000080:	2280      	movs	r2, #128	; 0x80
-20000082:	702a      	strb	r2, [r5, #0]
-20000084:	2180      	movs	r1, #128	; 0x80
+20000056 <wait_fl_rdy_x>:
+20000056:	e0a3      	b.n	200001a0 <wait_fl_rdy>
 
-20000086 <prog_row_loop>:
-20000086:	782a      	ldrb	r2, [r5, #0]
-20000088:	400a      	ands	r2, r1
-2000008a:	d0fc      	beq.n	20000086 <prog_row_loop>
-2000008c:	3308      	adds	r3, #8
-2000008e:	3408      	adds	r4, #8
-20000090:	4770      	bx	lr
+20000058 <write_eep_x>:
+20000058:	e0a8      	b.n	200001ac <write_eep>
 
-20000092 <read_flash>:
-20000092:	4c11      	ldr	r4, [pc, #68]	; (200000d8 <read_flash_1+0x42>)
-20000094:	4f13      	ldr	r7, [pc, #76]	; (200000e4 <read_flash_1+0x4e>)
+2000005a <prog_flash>:
+2000005a:	4c5e      	ldr	r4, [pc, #376]	; (200001d4 <write_eep_1+0x24>)
+2000005c:	4f5e      	ldr	r7, [pc, #376]	; (200001d8 <write_eep_1+0x28>)
 
-20000096 <read_flash_1>:
-20000096:	681a      	ldr	r2, [r3, #0]
-20000098:	6022      	str	r2, [r4, #0]
-2000009a:	3304      	adds	r3, #4
-2000009c:	3404      	adds	r4, #4
-2000009e:	3f01      	subs	r7, #1
-200000a0:	d1f9      	bne.n	20000096 <read_flash_1>
-200000a2:	e7c1      	b.n	20000028 <main_loop>
-200000a4:	40052000 	andmi	r2, r5, r0
-200000a8:	00002900 	andeq	r2, r0, r0, lsl #18
-200000ac:	0000ffff 	strdeq	pc, [r0], -pc	; <UNPREDICTABLE>
-200000b0:	40065100 	andmi	r5, r6, r0, lsl #2
-200000b4:	c0000000 	andgt	r0, r0, r0
-200000b8:	40049000 	andmi	r9, r4, r0
-200000bc:	00000140 	andeq	r0, r0, r0, asr #2
-200000c0:	400ff000 	andmi	pc, pc, r0
-200000c4:	00000c00 	andeq	r0, r0, r0, lsl #24
-200000c8:	00000400 	andeq	r0, r0, r0, lsl #8
-200000cc:	20000c00 	andcs	r0, r0, r0, lsl #24
-200000d0:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
-200000d4:	00000800 	andeq	r0, r0, r0, lsl #16
-200000d8:	20000400 	andcs	r0, r0, r0, lsl #8
-200000dc:	00000100 	andeq	r0, r0, r0, lsl #2
-200000e0:	40020000 	andmi	r0, r2, r0
-200000e4:	00000200 	andeq	r0, r0, r0, lsl #4
+2000005e <prog_flash_1>:
+2000005e:	f000 f840 	bl	200000e2 <prog_row>
+20000062:	3f01      	subs	r7, #1
+20000064:	d1fb      	bne.n	2000005e <prog_flash_1>
+20000066:	e7d5      	b.n	20000014 <main_loop>
+
+20000068 <check_flash>:
+20000068:	4c5a      	ldr	r4, [pc, #360]	; (200001d4 <write_eep_1+0x24>)
+2000006a:	4f5c      	ldr	r7, [pc, #368]	; (200001dc <write_eep_1+0x2c>)
+
+2000006c <check_flash_1>:
+2000006c:	f000 f803 	bl	20000076 <check_row>
+20000070:	3f01      	subs	r7, #1
+20000072:	d1fb      	bne.n	2000006c <check_flash_1>
+20000074:	e7ce      	b.n	20000014 <main_loop>
+
+20000076 <check_row>:
+20000076:	4d5a      	ldr	r5, [pc, #360]	; (200001e0 <write_eep_1+0x30>)
+20000078:	2270      	movs	r2, #112	; 0x70
+2000007a:	702a      	strb	r2, [r5, #0]
+2000007c:	2202      	movs	r2, #2
+2000007e:	71ea      	strb	r2, [r5, #7]
+20000080:	1c1a      	adds	r2, r3, #0
+20000082:	712a      	strb	r2, [r5, #4]
+20000084:	0a12      	lsrs	r2, r2, #8
+20000086:	716a      	strb	r2, [r5, #5]
+20000088:	0a12      	lsrs	r2, r2, #8
+2000008a:	71aa      	strb	r2, [r5, #6]
+2000008c:	2202      	movs	r2, #2
+2000008e:	72ea      	strb	r2, [r5, #11]
+20000090:	6822      	ldr	r2, [r4, #0]
+20000092:	60ea      	str	r2, [r5, #12]
+20000094:	2280      	movs	r2, #128	; 0x80
+20000096:	702a      	strb	r2, [r5, #0]
+
+20000098 <check_row_loop>:
+20000098:	782a      	ldrb	r2, [r5, #0]
+2000009a:	2180      	movs	r1, #128	; 0x80
+2000009c:	4011      	ands	r1, r2
+2000009e:	d0fb      	beq.n	20000098 <check_row_loop>
+200000a0:	217f      	movs	r1, #127	; 0x7f
+200000a2:	4011      	ands	r1, r2
+200000a4:	e002      	b.n	200000ac <check_row_err>
+200000a6:	3304      	adds	r3, #4
+200000a8:	3404      	adds	r4, #4
+200000aa:	4770      	bx	lr
+
+200000ac <check_row_err>:
+200000ac:	1c1e      	adds	r6, r3, #0
+200000ae:	0436      	lsls	r6, r6, #16
+200000b0:	0209      	lsls	r1, r1, #8
+200000b2:	430e      	orrs	r6, r1
+200000b4:	4945      	ldr	r1, [pc, #276]	; (200001cc <write_eep_1+0x1c>)
+200000b6:	600e      	str	r6, [r1, #0]
+200000b8:	2200      	movs	r2, #0
+200000ba:	e7ae      	b.n	2000001a <main_loop_wait>
+
+200000bc <erase_sector>:
+200000bc:	4d48      	ldr	r5, [pc, #288]	; (200001e0 <write_eep_1+0x30>)
+200000be:	2270      	movs	r2, #112	; 0x70
+200000c0:	702a      	strb	r2, [r5, #0]
+200000c2:	2209      	movs	r2, #9
+200000c4:	71ea      	strb	r2, [r5, #7]
+200000c6:	1c1a      	adds	r2, r3, #0
+200000c8:	712a      	strb	r2, [r5, #4]
+200000ca:	0a12      	lsrs	r2, r2, #8
+200000cc:	716a      	strb	r2, [r5, #5]
+200000ce:	0a12      	lsrs	r2, r2, #8
+200000d0:	71aa      	strb	r2, [r5, #6]
+200000d2:	2280      	movs	r2, #128	; 0x80
+200000d4:	702a      	strb	r2, [r5, #0]
+200000d6:	782a      	ldrb	r2, [r5, #0]
+
+200000d8 <erase_sector_loop>:
+200000d8:	782a      	ldrb	r2, [r5, #0]
+200000da:	2180      	movs	r1, #128	; 0x80
+200000dc:	4011      	ands	r1, r2
+200000de:	d1fb      	bne.n	200000d8 <erase_sector_loop>
+200000e0:	e798      	b.n	20000014 <main_loop>
+
+200000e2 <prog_row>:
+200000e2:	4d3f      	ldr	r5, [pc, #252]	; (200001e0 <write_eep_1+0x30>)
+200000e4:	2270      	movs	r2, #112	; 0x70
+200000e6:	702a      	strb	r2, [r5, #0]
+200000e8:	2207      	movs	r2, #7
+200000ea:	71ea      	strb	r2, [r5, #7]
+200000ec:	1c1a      	adds	r2, r3, #0
+200000ee:	712a      	strb	r2, [r5, #4]
+200000f0:	0a12      	lsrs	r2, r2, #8
+200000f2:	716a      	strb	r2, [r5, #5]
+200000f4:	0a12      	lsrs	r2, r2, #8
+200000f6:	71aa      	strb	r2, [r5, #6]
+200000f8:	6822      	ldr	r2, [r4, #0]
+200000fa:	60aa      	str	r2, [r5, #8]
+200000fc:	6862      	ldr	r2, [r4, #4]
+200000fe:	60ea      	str	r2, [r5, #12]
+20000100:	2280      	movs	r2, #128	; 0x80
+20000102:	702a      	strb	r2, [r5, #0]
+20000104:	2180      	movs	r1, #128	; 0x80
+
+20000106 <prog_row_loop>:
+20000106:	782a      	ldrb	r2, [r5, #0]
+20000108:	400a      	ands	r2, r1
+2000010a:	d0fc      	beq.n	20000106 <prog_row_loop>
+2000010c:	3308      	adds	r3, #8
+2000010e:	3408      	adds	r4, #8
+20000110:	4770      	bx	lr
+
+20000112 <read_flash>:
+20000112:	4c30      	ldr	r4, [pc, #192]	; (200001d4 <write_eep_1+0x24>)
+20000114:	4f31      	ldr	r7, [pc, #196]	; (200001dc <write_eep_1+0x2c>)
+
+20000116 <read_flash_1>:
+20000116:	681a      	ldr	r2, [r3, #0]
+20000118:	6022      	str	r2, [r4, #0]
+2000011a:	3304      	adds	r3, #4
+2000011c:	3404      	adds	r4, #4
+2000011e:	3f01      	subs	r7, #1
+20000120:	d1f9      	bne.n	20000116 <read_flash_1>
+20000122:	e777      	b.n	20000014 <main_loop>
+
+20000124 <part_dflash>:
+20000124:	4d2e      	ldr	r5, [pc, #184]	; (200001e0 <write_eep_1+0x30>)
+20000126:	2270      	movs	r2, #112	; 0x70
+20000128:	702a      	strb	r2, [r5, #0]
+2000012a:	2280      	movs	r2, #128	; 0x80
+2000012c:	71ea      	strb	r2, [r5, #7]
+2000012e:	2200      	movs	r2, #0
+20000130:	71aa      	strb	r2, [r5, #6]
+20000132:	716a      	strb	r2, [r5, #5]
+20000134:	726a      	strb	r2, [r5, #9]
+20000136:	722a      	strb	r2, [r5, #8]
+20000138:	1c1a      	adds	r2, r3, #0
+2000013a:	0a12      	lsrs	r2, r2, #8
+2000013c:	712a      	strb	r2, [r5, #4]
+2000013e:	0a12      	lsrs	r2, r2, #8
+20000140:	72ea      	strb	r2, [r5, #11]
+20000142:	0a12      	lsrs	r2, r2, #8
+20000144:	72aa      	strb	r2, [r5, #10]
+20000146:	2280      	movs	r2, #128	; 0x80
+20000148:	702a      	strb	r2, [r5, #0]
+
+2000014a <part_dflash_loop>:
+2000014a:	782a      	ldrb	r2, [r5, #0]
+2000014c:	2180      	movs	r1, #128	; 0x80
+2000014e:	4011      	ands	r1, r2
+20000150:	d0fb      	beq.n	2000014a <part_dflash_loop>
+20000152:	217f      	movs	r1, #127	; 0x7f
+20000154:	4011      	ands	r1, r2
+20000156:	d100      	bne.n	2000015a <part_dflash_err>
+20000158:	e75c      	b.n	20000014 <main_loop>
+
+2000015a <part_dflash_err>:
+2000015a:	0209      	lsls	r1, r1, #8
+2000015c:	4e21      	ldr	r6, [pc, #132]	; (200001e4 <write_eep_1+0x34>)
+2000015e:	4331      	orrs	r1, r6
+20000160:	4a1a      	ldr	r2, [pc, #104]	; (200001cc <write_eep_1+0x1c>)
+20000162:	6011      	str	r1, [r2, #0]
+20000164:	2200      	movs	r2, #0
+20000166:	e758      	b.n	2000001a <main_loop_wait>
+
+20000168 <set_flexram>:
+20000168:	4d1d      	ldr	r5, [pc, #116]	; (200001e0 <write_eep_1+0x30>)
+2000016a:	2270      	movs	r2, #112	; 0x70
+2000016c:	702a      	strb	r2, [r5, #0]
+2000016e:	2281      	movs	r2, #129	; 0x81
+20000170:	71ea      	strb	r2, [r5, #7]
+20000172:	0a1b      	lsrs	r3, r3, #8
+20000174:	71ab      	strb	r3, [r5, #6]
+20000176:	2280      	movs	r2, #128	; 0x80
+20000178:	702a      	strb	r2, [r5, #0]
+
+2000017a <set_flexram_noee_l1>:
+2000017a:	782a      	ldrb	r2, [r5, #0]
+2000017c:	2180      	movs	r1, #128	; 0x80
+2000017e:	4011      	ands	r1, r2
+20000180:	d0fb      	beq.n	2000017a <set_flexram_noee_l1>
+20000182:	217f      	movs	r1, #127	; 0x7f
+20000184:	4011      	ands	r1, r2
+20000186:	d1e8      	bne.n	2000015a <part_dflash_err>
+20000188:	0a1b      	lsrs	r3, r3, #8
+
+2000018a <set_flexram_noee_l2>:
+2000018a:	786a      	ldrb	r2, [r5, #1]
+2000018c:	2102      	movs	r1, #2
+2000018e:	401a      	ands	r2, r3
+20000190:	d0fb      	beq.n	2000018a <set_flexram_noee_l2>
+20000192:	e73f      	b.n	20000014 <main_loop>
+
+20000194 <wait_ee_rdy>:
+20000194:	4d12      	ldr	r5, [pc, #72]	; (200001e0 <write_eep_1+0x30>)
+20000196:	786a      	ldrb	r2, [r5, #1]
+20000198:	2101      	movs	r1, #1
+2000019a:	400a      	ands	r2, r1
+2000019c:	d0fa      	beq.n	20000194 <wait_ee_rdy>
+2000019e:	e739      	b.n	20000014 <main_loop>
+
+200001a0 <wait_fl_rdy>:
+200001a0:	4d0f      	ldr	r5, [pc, #60]	; (200001e0 <write_eep_1+0x30>)
+200001a2:	782a      	ldrb	r2, [r5, #0]
+200001a4:	2180      	movs	r1, #128	; 0x80
+200001a6:	400a      	ands	r2, r1
+200001a8:	d0fa      	beq.n	200001a0 <wait_fl_rdy>
+200001aa:	e733      	b.n	20000014 <main_loop>
+
+200001ac <write_eep>:
+200001ac:	4c09      	ldr	r4, [pc, #36]	; (200001d4 <write_eep_1+0x24>)
+200001ae:	4f0b      	ldr	r7, [pc, #44]	; (200001dc <write_eep_1+0x2c>)
+
+200001b0 <write_eep_1>:
+200001b0:	6821      	ldr	r1, [r4, #0]
+200001b2:	6019      	str	r1, [r3, #0]
+200001b4:	3304      	adds	r3, #4
+200001b6:	3404      	adds	r4, #4
+200001b8:	3f01      	subs	r7, #1
+200001ba:	d1f9      	bne.n	200001b0 <write_eep_1>
+200001bc:	e72a      	b.n	20000014 <main_loop>
+200001be:	20000000 	andcs	r0, r0, r0
+200001c2:	29004005 	stmdbcs	r0, {r0, r2, lr}
+200001c6:	ffff0000 			; <UNDEFINED> instruction: 0xffff0000
+200001ca:	0c000000 	stceq	0, cr0, [r0], {-0}
+200001ce:	ff002000 			; <UNDEFINED> instruction: 0xff002000
+200001d2:	0400ffff 	streq	pc, [r0], #-4095	; 0xfffff001
+200001d6:	01002000 	mrseq	r2, (UNDEF: 0)
+200001da:	02000000 	andeq	r0, r0, #0
+200001de:	00000000 	andeq	r0, r0, r0
+200001e2:	00004002 	andeq	r4, r0, r2
+200001e6:	Address 0x200001e6 is out of bounds.
+
 
 Disassembly of section .heap:
 
-200000e8 <_heap_start>:
+200001e8 <_heap_start>:
 	...
 
 Disassembly of section .ARM.attributes:

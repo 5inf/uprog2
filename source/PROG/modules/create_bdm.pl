@@ -289,12 +289,16 @@ sub pline
 {
 	if($_[0] eq "")
 	{
-		$temp = "\t\t";
+		$temp = "\t\t\t";
 	}
 	else
 	{
 		$temp="bdms".$frq."_".$_[0].":";
 		if(length($temp) < 8)
+		{
+			$temp.="\t";
+		}
+		if(length($temp) < 16)
 		{
 			$temp.="\t";
 		}
@@ -317,19 +321,19 @@ sub pline
 sub bneline
 {
 	$temp="bdms".$frq."_".$_[0];
-	printf FP "\t\tbrne\t$temp\n";
+	printf FP "\t\t\tbrne\t$temp\n";
 }
 
 sub rcall_line
 {
 	$temp="bdms".$frq."_".$_[0];
-	printf FP "\t\trcall\t$temp\n";
+	printf FP "\t\t\trcall\t$temp\n";
 }
 
 sub rjmp_line
 {
 	$temp="bdms".$frq."_".$_[0];
-	printf FP "\t\trjmp\t$temp\n";
+	printf FP "\t\t\trjmp\t$temp\n";
 }
 
 sub pwait

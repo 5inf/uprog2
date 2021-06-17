@@ -81,6 +81,8 @@ int prog_v850(void)
 	int data_prog=0;
 	int data_verify=0;
 	int blank_state=0;
+	int ignore_id=0;
+	unsigned char c1,c2;
 
 	
 	errc=0;
@@ -101,6 +103,7 @@ int prog_v850(void)
 		printf("-- bd -- data flash blank check\n");
 		printf("-- pd -- data flash program\n");
 		printf("-- vd -- data flash verify\n");
+		printf("-- ii -- ignore device ID\n");
 
 		printf("-- sc -- secure device (set write prohibition)\n");
 		printf("-- st -- start device\n");
@@ -124,7 +127,7 @@ int prog_v850(void)
 	if(find_cmd("fr04"))
 	{
 		osc_freq=4;		
-	printf("## assuming 4 MHz crystal\n");
+		printf("## assuming 4 MHz crystal\n");
 	}
 
 	if(find_cmd("fr05"))
@@ -144,6 +147,13 @@ int prog_v850(void)
 		osc_freq=12;		
 		printf("## assuming 12 MHz crystal\n");
 	}
+
+	if(find_cmd("ii"))
+	{
+		ignore_id=1;		
+		printf("## ignore device ID\n");
+	}
+
 
 	if(find_cmd("ea"))
 	{
@@ -178,14 +188,14 @@ int prog_v850(void)
 	if(find_cmd("st"))
 	{
 		printf("## Action: start device\n");
-		i=prg_comm(0x162,0,0,0,0,0,0,0,0);		//init
+		i=prg_comm(0x0E,0,0,0,0,0,0,0,0);		//init
 		waitkey();					//exit
 		goto V850_END;
 	}
 	printf("\n");
 
 	printf("INIT DEVICE \n");
-	errc=prg_comm(0x160,0,0,0,0,0,0,0,param[11]);				//init
+	errc=prg_comm(0x160,0,0,0,0,0,0,param[13],param[11]);				//init
 	if(errc!=0) goto V850_END;
 	errc=prg_comm(0x164,0,100,0,0,0,0,0,osc_freq);				//set osc freq
 	if(errc!=0) goto V850_END;
@@ -199,7 +209,29 @@ int prog_v850(void)
 	for(i=7;i<17;i++)
 	{
 		printf("%c",memory[i] & 0x7f);
-	} 
+	}
+
+
+	if(ignore_id == 0)
+	{
+		for(i=11;i<15;i++)
+		{
+			c1=(param[10] >> ((14-i)*8)) & 0xff;
+			c2=memory[i] & 0x7F;
+	//		printf("<%X %X>",c1,c2);
+			if (c1 != c2) errc=0x47;
+		}
+		for(i=15;i<17;i++)
+		{
+			c1=(param[12] >> ((18-i)*8)) & 0xff;
+			c2=memory[i] & 0x7F;
+	//		printf("<%X %X>",c1,c2);
+			if (c1 != c2) errc=0x47;
+		}
+	}
+	
+	if(errc != 0) goto V850_END;
+	
 	printf("\n");
 
 	if(main_blank == 1)

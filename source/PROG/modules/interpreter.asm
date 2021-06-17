@@ -42,7 +42,7 @@ prg_exec_jtab1:	jmp	prg_exec_e1		;code 00 unknown
 		jmp	init_bdm		;code 10 BDM entry
 		jmp	exit_bdm		;code 11 BDM exit
 		jmp	s08_fdiv		;code 12 set clock divider
-		jmp	s08_exec		;code 13 exec
+		jmp	prg_exec_e1		;code 13 unknown (was S08 exec)
 		jmp	s08_merase		;code 14 mass erase
 		jmp	s08_unsecure		;code 15 unsecure
 		jmp	s08_prog		;code 16 program
@@ -304,7 +304,7 @@ prg_exec_jtab2:
 		jmp	dataflash_write		;code 113 atmel dataflash program pages
 		jmp	dataflash_erase		;code 114 atmel dataflash erase
 		jmp	dataflash_getstat	;code 115 atmel dataflash get status
-		jmp	dataflash_param		;code 116 atmel dataflash set page parameters (size)
+		jmp	prg_exec_e1		;code 116 unknown
 		jmp	dataflash_fread		;code 117 atmel dataflash read full pages
 		jmp	dataflash_fwrite	;code 118 atmel dataflash program full pages
 		jmp	dataflash_setbin	;code 119 atmel dataflash set to binary
@@ -329,7 +329,7 @@ prg_exec_jtab2:
 		jmp	swd32_sgo		;code 12b STM32 run
 		jmp	prg_exec_e1		;code 12c unknown
 		jmp	spiflash_resquad	;code 12d reset quad mode on spi flash
-		jmp	la_stop			;code 12e logic analyzer stop
+		jmp	prg_exec_e1		;code 12e unknown
 		jmp	freq_gen_stop		;code 12f frequency generator stop
 
 		jmp	pdi_init		;code 130 pdi init
@@ -379,7 +379,7 @@ prg_exec_jtab2:
 		jmp	prg_exec_e2		;reserved
 		jmp	prg_exec_e2		;reserved
 		jmp	rh850_get_prot		;code 15c RH850 get command protection
-		jmp	prg_exec_e1		;code 15d unknown
+		jmp	rh850_aerase		;code 15d RH850 area erase
 		jmp	prg_exec_e2		;reserved
 		jmp	prg_exec_e2		;reserved
 
@@ -434,9 +434,9 @@ prg_exec_jtab2:
 		jmp	ppcjtag_xreset		;code 18e unknown
 		jmp	ppcjtag_nexus_pread	;code 18f PPC nexus read long withadditional pause
 
-		jmp	la1m_start		;code 190 logic analyzer, 1M sample freq
+		jmp	prg_exec_e1		;code 190 unknown
 		jmp	freq_gen_start		;code 191 frequency generator
-		jmp	la100k_start		;code 192 logic analyzer, 100k sample freq
+		jmp	prg_exec_e1		;code 192 unknown
 		jmp	rl78_gdump		;code 193 RL78 get 1024 bytes dump data
 		jmp	swd32_erase_chk		;code 194 SWD read DRW
 		jmp	prg_exec_e1		;code 195 unknown
@@ -451,14 +451,14 @@ prg_exec_jtab2:
 		jmp	prg_exec_e1		;code 19e unknown
 		jmp	prg_exec_e1		;code 19f this is the only check command wich never reaches programmer
 
-		jmp	prg_exec_e2		;reserved
-		jmp	prg_exec_e2		;reserved
-		jmp	prg_exec_e2		;reserved
-		jmp	prg_exec_e2		;reserved
-		jmp	prg_exec_e2		;reserved
+		jmp	prg_exec_e1		;code 1a0 unknown
+		jmp	prg_exec_e1		;code 1a1 unknown
+		jmp	prg_exec_e1		;code 1a2 unknown
+		jmp	prg_exec_e1		;code 1a3 unknown
+		jmp	prg_exec_e1		;code 1a4 unknown
 		jmp	prg_exec_e1		;code 1a5 unknown
 		jmp	prg_exec_e1		;code 1a6 unknown
-		jmp	prg_exec_e2		;reserved
+		jmp	prg_exec_e1		;code 1a7 unknown
 		jmp	prg_exec_e1		;code 1a8 unknown
 		jmp	prg_exec_e1		;code 1a9 unknown
 		jmp	prg_exec_e1		;code 1aa unknown
@@ -529,8 +529,8 @@ prg_exec_jtab2:
 		jmp	prg_exec_e1		;code 1e7 unknown
 		jmp	spiflash_read_conf	;code 1e8 SPIflash read config register
 		jmp	prg_exec_e1		;code 1e9 unknown
-		jmp	prg_exec_e1		;code 1ea unknown
-		jmp	prg_exec_e1		;code 1eb unknown
+		jmp	esp32_init		;code 1ea ESP32 init sequence
+		jmp	esp32_exit		;code 1eb ESP32 exit sequence
 		jmp	prg_exec_e1		;code 1ec unknown
 		jmp	prg_exec_e1		;code 1ed unknown
 		jmp	prg_exec_e1		;code 1ee unknown
@@ -541,20 +541,20 @@ prg_exec_jtab2:
 		.db	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 
 		;this table is reserved for debugging commands
-prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
+prg_exec_jtab3:	jmp	s08_cmd			;code 200 HCS08 single byte command
 		jmp	s08_read		;code 201 HCS08 read memory
 		jmp	s08_read_regs		;code 202 HCS08 read registers
 		jmp	s08_write		;code 203 HCS08 write memory
-		jmp	s08_write_regs		;code 204 HCS08 write registers
-		jmp	s08_go			;code 205 HCS08 exec PC
-		jmp	prg_exec_e1		;code 206 unknown
+		jmp	s08_wbyte		;code 204 HCS08 write byte (register)
+		jmp	s08_wword		;code 205 HCS08 write word (register)
+		jmp	s08_read_stat		;code 206 HCS08 read BDM status
 		jmp	prg_exec_e1		;code 207 unknown
 		jmp	rh850_idcode_prg	;code 208 RH850 set ID code and SPIE
 		jmp	rh850_idcode_get	;code 209 RH850 get ID code
 		jmp	rh850_idcode_chk	;code 20a RH850 check against ID code
 		jmp	rh850_idcode_set	;code 20b RH850 set ID code
-		jmp	rh850_bst_start		;code 20c unknown
-		jmp	rh850_bst_block		;code 20d unknown
+		jmp	rh850_bst_start		;code 20c RH850 bootstrap start
+		jmp	rh850_bst_block		;code 20d RH850 bootstrap block
 		jmp	rh850_vfy_start		;code 20e RH850 verify start
 		jmp	rh850_vfy_block		;code 20f RH850 verify block
 
@@ -572,8 +572,8 @@ prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
 		jmp	efm32_merase		;code 21b EFM32 mass erase direct
 		jmp	efm32_perase		;code 21c EFM32 page erase direct
 		jmp	prg_exec_e1		;code 21d unknown
-		jmp	prg_exec_e1		;code 21e unknown
-		jmp	prg_exec_e1		;code 21f unknown
+		jmp	rh850_otp_set		;code 21e RH850 OTP set
+		jmp	rh850_otp_get		;code 21f RH850 OTP get
 
 		jmp	s12z_entry		;code 220 S12Z entry
 		jmp	s12z_write		;code 221 S12Z write data to RAM
@@ -609,25 +609,25 @@ prg_exec_jtab3:	jmp	s08_active		;code 200 HCS08 active BDM
 		jmp	swd32_wword		;code 23e SWD write word
 		jmp	swd32_wbyte		;code 23f SWD write byte
 
-		jmp	prg_exec_e1		;code 240 unknown
-		jmp	prg_exec_e1		;code 241 unknown
-		jmp	prg_exec_e1		;code 242 unknown
-		jmp	prg_exec_e1		;code 243 unknown
-		jmp	prg_exec_e1		;code 244 unknown
-		jmp	prg_exec_e1		;code 245 unknown
-		jmp	prg_exec_e1		;code 246 unknown
-		jmp	prg_exec_e1		;code 247 unknown
-		jmp	prg_exec_e1		;code 248 unknown
-		jmp	prg_exec_e1		;code 249 unknown
-		jmp	prg_exec_e1		;code 24a unknown
-		jmp	prg_exec_e1		;code 24b unknown
-		jmp	prg_exec_e1		;code 24c unknown
-		jmp	prg_exec_e1		;code 24d unknown
-		jmp	prg_exec_e1		;code 24e unknown
-		jmp	prg_exec_e1		;code 24f unknown
+		jmp	avrjtag_init		;code 240 AVR JTAG init
+		jmp	avrjtag_exit		;code 241 AVR JTAG exit
+		jmp	avrjtag_reset		;code 242 AVR JTAG reset/unreset
+		jmp	avrjtag_break		;code 243 AVR JTAG force reak
+		jmp	avrjtag_run		;code 244 AVR JTAG run
+		jmp	avrjtag_instr		;code 245 AVR JTAG insert instruction
+		jmp	avrjtag_readpc		;code 246 AVR JTAG get pc value (+2/+4)
+		jmp	avrjtag_read_ocd	;code 247 AVR JTAG read OCD register
+		jmp	avrjtag_write_ocd	;code 248 AVR JTAG write OCD register
+		jmp	avrjtag_prgen		;code 249 AVR JTAG program enable
+		jmp	avrjtag_wpage		;code 24a AVR JTAG PAGELOAD
+		jmp	avrjtag_rpage		;code 24b AVR JTAG PAGEREAD
+		jmp	avrjtag_read_id		;code 24c AVR JTAG read ID
+		jmp	avrjtag_pcmd		;code 24d AVR JTAG programming CMD
+		jmp	avrjtag_pcmdr		;code 24e AVR JTAG additional programming CMD + get result 
+		jmp	avrjtag_read_ee		;code 24f AVR JTAG read EEPROM
 
-		jmp	prg_exec_e1		;code 250 unknown
-		jmp	prg_exec_e1		;code 251 unknown
+		jmp	avrjtag_write_ee	;code 250 AVR JTAG write EEPROM page
+		jmp	avrjtag_nop32		;code 251 AVR JTAG 32bit NOP instruction
 		jmp	prg_exec_e1		;code 252 unknown
 		jmp	prg_exec_e1		;code 253 unknown
 		jmp	prg_exec_e1		;code 254 unknown
@@ -924,4 +924,6 @@ prog_clr_dir:	in	XL,CTRLDDR
 		and	XL,r19
 		out	CTRLDDR,XL
 		jmp	main_loop_ok
+		
+		;this table is reserved for debugging commands
 		

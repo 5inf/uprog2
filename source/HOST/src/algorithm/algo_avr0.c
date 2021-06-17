@@ -62,6 +62,7 @@ int prog_avr0(void)
 	int dev_start=0;
 	int ignore_devid=0;
 	int eep_erase=0;
+	int rst_pulse=0;
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
@@ -82,6 +83,10 @@ int prog_avr0(void)
 		printf("-- WDTCFG  -- program fuse\n");
 		printf("-- BODCFG  -- program fuse\n");
 		printf("-- OSCCFG  -- program fuse\n");
+		
+		if(param[13] & 1)		
+			printf("-- TCD0CFG -- program fuse\n");
+
 		printf("-- SYSCFG0 -- program fuse\n");
 		printf("-- SYSCFG1 -- program fuse\n");
 		printf("-- APPEND  -- program fuse\n");
@@ -98,6 +103,12 @@ int prog_avr0(void)
 	{
 		errc=prg_comm(0xfb,0,0,0,0,0,0,0,0);	//5V mode
 		printf("## using 5V VDD\n");
+	}
+
+	if((find_cmd("p12v")) && (param[7] > 0))
+	{
+		printf("## usie 12V pulse on RESET/UPDI\n");
+		rst_pulse=1;
 	}
 
 	if(find_cmd("ii"))
@@ -159,6 +170,22 @@ int prog_avr0(void)
 		}
 	}
 
+	if((param[13] & 1) && (find_cmd("TCD0CFG")))		
+	{
+		if(have_expar < 1) 
+		{
+			fuse_prog = 0;
+			printf("## Action: fuse program !! DISABLED BECAUSE OF NO DATA !!\n");
+		}
+		else
+		{
+			fuse_prog=1;
+			expar2=expar & 0xFF;
+			expar=4;
+			printf("## Action: fuse (%01X) program with value 0x%02X\n",(int)(expar & 0x0f),(int)(expar2 & 0xff));
+			goto AVR0_NCMD;
+		}
+	}
 
 	if(find_cmd("SYSCFG0"))
 	{
@@ -314,13 +341,14 @@ AVR0_NCMD:
 	
 	if(param[7] > 0)
 	{
+		printf("VPP = %d\n",(int)param[7]);
 		errc=prg_comm(0xf5,0,0,0,0,0,0,0,0);		//VPP off
 		errc=prg_comm(0xf2,0,0,0,0,param[7],0,0,0);	//SET VPP
 		usleep(1000);
 		errc=prg_comm(0xf2,0,0,0,0,param[7],0,0,0);	//SET VPP
 	}
 
-	errc=prg_comm(0x01d8,0,16,0,0,0,0,0,param[7] & 0xff);	//INIT
+	errc=prg_comm(0x01d8,0,16,0,0,0,0,0,rst_pulse);	//INIT
 
 	if ((errc == 0) && ((chip_erase + user_blind) == 0))
 	{
@@ -359,6 +387,8 @@ AVR0_NCMD:
 		printf("  WDTCFG     = 0x%02X\n",memory[3]);
 		printf("  BODCFG     = 0x%02X\n",memory[4]);
 		printf("  OSCCFG     = 0x%02X\n",memory[5]);
+		if (param[13] & 1)
+		printf("  TCD0CFG    = 0x%02X\n",memory[7]);
 		printf("  SYSCFG0    = 0x%02X\n",memory[8]);
 		printf("  SYSCFG1    = 0x%02X\n",memory[9]);
 		printf("  APPEND     = 0x%02X\n",memory[10]);
@@ -407,6 +437,8 @@ AVR0_NCMD:
 			printf("  WDTCFG     = 0x%02X\n",memory[3]);
 			printf("  BODCFG     = 0x%02X\n",memory[4]);
 			printf("  OSCCFG     = 0x%02X\n",memory[5]);
+			if (param[13] & 1)
+			printf("  TCD0CFG    = 0x%02X\n",memory[7]);
 			printf("  SYSCFG0    = 0x%02X\n",memory[8]);
 			printf("  SYSCFG1    = 0x%02X\n",memory[9]);
 			printf("  APPEND     = 0x%02X\n",memory[10]);
@@ -653,9 +685,9 @@ AVR0_NCMD:
 AVR0_EXIT:
 
 	prg_comm(0x1d9,0,0,0,0,0,0,0,0);	//exit
-	prg_comm(0xfe,0,0,0,0,0,0,0,0);		//disable PU
 	prg_comm(0xf5,0,0,0,0,0,0,0,0);		//VPP off
 	prg_comm(0xf2,0,0,0,0,0,0,0,0);		//SET VPP=0
+	prg_comm(0xfe,0,0,0,0,0,0,0,0);		//disable PU
 	print_avr0_error(errc,eblock*max_blocksize);
 
 	return errc;

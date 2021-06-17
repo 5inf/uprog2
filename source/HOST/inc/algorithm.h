@@ -1,5 +1,6 @@
 #include <algorithm/algo_atxmega.h>
 #include <algorithm/algo_avr.h>
+#include <algorithm/algo_avrjtag.h>
 #include <algorithm/algo_avr0.h>
 #include <algorithm/algo_c2000.h>
 #include <algorithm/algo_cc25xx.h>

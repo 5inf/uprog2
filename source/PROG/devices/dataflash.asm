@@ -37,24 +37,6 @@ dataflash_exit:		call	spi_exit
 
 
 ;------------------------------------------------------------------------------
-; set param
-;------------------------------------------------------------------------------
-dataflash_param:	lds	r4,0x100	;page size low
-			lds	r5,0x101	;page size high
-		
-			lds	r6,0x102	;used size low
-			lds	r7,0x103	;used size high
-		
-			lds	r8,0x104	;page skip low
-			lds	r9,0x105	;page skip high
-			
-			lds	r10,0x106	;raw mode
-			lds	r11,0x107	;unused
-				
-			jmp	main_loop_ok
-
-
-;------------------------------------------------------------------------------
 ; read memory (only 2^n bytes)
 ; PAR1	=	ADDRM
 ; PAR2	=	ADDRH
@@ -345,15 +327,6 @@ dataflash_getstat:	call	spi_active
 			call	spi3_zerobyte
 			call	spi_inactive
 			mov	r16,XL			;copy to rval
-			sts	0x100,r4
-			sts	0x101,r5
-			sts	0x102,r6
-			sts	0x103,r7
-			sts	0x104,r8
-			sts	0x105,r9
-			sts	0x106,r10
-			sts	0x107,r11
-
 			jmp	main_loop
 
 

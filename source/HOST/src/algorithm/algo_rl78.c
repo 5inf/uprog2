@@ -77,18 +77,22 @@ int prog_rl78(void)
 	int main_prog=0;
 	int main_verify=0;
 	int main_bcheck=0;
+	int main_csum=0;
 	int main_dump=0;
 	int dflash_erase=0;
 	int dflash_prog=0;
 	int dflash_verify=0;
 	int dflash_bcheck=0;
 	int dflash_dump=0;
+	int dflash_csum=0;
 	int unsec=0;
 	int rsig=0;
 	int gsec=0;
 
 	int dev_start=0;
 	errc=0;
+	unsigned short checksum[1024];
+	unsigned long mcsum;
 
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
@@ -103,12 +107,14 @@ int prog_rl78(void)
 		printf("-- bm -- main flash blank check\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
+		printf("-- cm -- main flash checksum\n");
 		printf("-- dm -- main flash dump (will erase first 2K of main)\n");
 		
 		printf("-- ed -- data flash erase\n");
 		printf("-- bd -- data flash blank check\n");
 		printf("-- pd -- data flash program\n");
 		printf("-- vd -- data flash verify\n");
+		printf("-- cd -- data flash checksum\n");
 		printf("-- dd -- data flash dump (will erase first 2K of main)\n");
 
 		printf("-- st -- start device\n");
@@ -166,6 +172,18 @@ int prog_rl78(void)
 	{
 		dflash_erase=1;
 		printf("## Action: data flash erase\n");
+	}
+
+	if(find_cmd("cm"))
+	{
+		main_csum=1;
+		printf("## Action: main flash checksum calculation\n");
+	}
+
+	if(find_cmd("cd"))
+	{
+		dflash_csum=1;
+		printf("## Action: data flash checksum calculation\n");
 	}
 
 	if(find_cmd("bd"))
@@ -555,6 +573,83 @@ ONLY_DD:
 			}
 		}
 		printf("\n");
+	}
+
+
+	//checksum main
+	if ((errc == 0) && (main_csum == 1))
+	{
+		blocks=param[1]/1024;
+		addr=param[0];
+		maddr=addr+1024;
+		mcsum=0x80000000;
+		
+		progress("MAIN CHECKSUM ",blocks,0);
+		for(tblock=0;tblock<blocks;tblock++)
+		{
+			progress("MAIN CHHECKSUM ",blocks,tblock+1);
+			if(errc == 0)
+			{
+				errc=prg_comm(0x5d,0,8,0,0,(addr >> 8) & 0xff,(addr >> 16) & 0xff,(maddr >> 8) & 0xff,(maddr >> 16) & 0xff);
+				if(errc==0) 
+				{
+					checksum[tblock]=memory[4]+(memory[5] << 8);
+				}
+				addr+=1024;
+				maddr+=1024;
+			}
+		}
+		if(errc != 0) goto RL78_END;
+		addr=param[0];
+		for(tblock=0;tblock<blocks;tblock++)
+		{
+			if((tblock & 15) == 0)
+			{
+				printf("\n%06lX  ",addr);
+			}
+			printf("%04X ",checksum[tblock]);
+			mcsum -= checksum[tblock];
+			addr+=1024;
+		}
+		printf("\nMAIN FLASH CHECKSUM = 0x%04X\n\n",mcsum & 0xFFFF);		
+	}
+
+	//checksum data
+	if ((errc == 0) && (dflash_csum == 1))
+	{
+		blocks=param[3]/1024;
+		addr=param[2];
+		maddr=addr+1024;
+		mcsum=0x80000000;
+
+		progress("DATA CHECKSUM ",blocks,0);
+		for(tblock=0;tblock<blocks;tblock++)
+		{
+			progress("DATA CHHECKSUM ",blocks,tblock+1);
+			if(errc == 0)
+			{
+				errc=prg_comm(0x5d,0,8,0,0,(addr >> 8) & 0xff,(addr >> 16) & 0xff,(maddr >> 8) & 0xff,(maddr >> 16) & 0xff);
+				if(errc==0) 
+				{
+					checksum[tblock]=memory[4]+(memory[5] << 8);
+				}
+				addr+=1024;
+				maddr+=1024;
+			}
+		}
+		if(errc != 0) goto RL78_END;
+		addr=param[2];
+		for(tblock=0;tblock<blocks;tblock++)
+		{
+			if((tblock & 15) == 0)
+			{
+				printf("\n%06lX  ",addr);
+			}
+			printf("%04X ",checksum[tblock]);
+			mcsum -= checksum[tblock];
+			addr+=1024;
+		}
+		printf("\nDATA FLASH CHECKSUM = 0x%04X\n\n",mcsum & 0xFFFF);		
 	}
 
 

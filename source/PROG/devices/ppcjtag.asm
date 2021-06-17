@@ -62,9 +62,22 @@
 .macro		PPCJTAG_CLOCK	
 			sbi	CTRLPORT,JPPC_TCK	;2
 			nop				;1 filling
+			push	r0
 			cbi	CTRLPORT,JPPC_TCK	;2
+			pop	r0
+			nop
 .endmacro
 
+jtag_delay:		ret
+
+
+jtag_init_io:		out	CTRLPORT,const_0
+			sbi	CTRLDDR,JPPC_TMS
+			sbi	CTRLDDR,JPPC_TCK
+			sbi	CTRLDDR,JPPC_TDI
+			cbi	CTRLDDR,JPPC_TDO
+			sbi	CTRLDDR,JPPC_RESET	;set reset LO
+			ret
 
 ;-------------------------------------------------------------------------------
 ; init jtag and read device ID
@@ -79,7 +92,6 @@ ppcjtag_init2:		out	CTRLPORT,const_0
 			sbi	CTRLDDR,JPPC_RESET	;set reset LO NEW!!!
 			call	api_vcc_on
 			rjmp	jppc_init_0
-
 
 ;-------------------------------------------------------------------------------
 ; init jtag and read device ID
@@ -1213,13 +1225,14 @@ jppc_mshift_4:		cbi	CTRLPORT,JPPC_TCK		;2
 			dec	r24				;bit counter
 			brne	jppc_mshift_2			;shift loop
 
-			PPCJTAG_CLOCK				;-> UPDATE
+jppc_mshift_ex:		PPCJTAG_CLOCK				;-> UPDATE
 			cbi	CTRLPORT,JPPC_TMS		;
 			PPCJTAG_CLOCK				;-> run-test-idle
 			PPCJTAG_CLOCK				;-> additional clocks
 			PPCJTAG_CLOCK				;-> additional clocks
 
 jppc_mshift_5:		ret
+
 
 
 ;------------------------------------------------------------------------------
@@ -1238,4 +1251,62 @@ ppcjtag_xreset:		cbi	CTRLPORT,JPPC_RESET
 			out	CTRLDDR,const_0
 			jmp	main_loop_ok
 			
+
+;------------------------------------------------------------------------------
+; do DR SHIFT (1-256 Bytes write)
+; [buffer]	Data to send (starting with LSB first)
+; r24		Bytes to shift
+;------------------------------------------------------------------------------
+jtag_wshift:		call	api_buf_bread			;read first byte
+			rcall	jtag_xshift
+			dec	r24
+			brne	jtag_wshift
+			ret
+
+;------------------------------------------------------------------------------
+; do DR SHIFT (1-256 Bytes read)
+; [buffer]	Data to send (starting with LSB first)
+; r24		Bytes to shift
+;------------------------------------------------------------------------------	
+jtag_rshift:		ldi	XL,0xff
+			rcall	jtag_xshift
+			mov	XL,XH
+			call	api_buf_bwrite			;read first byte
+			dec	r24
+			brne	jtag_rshift
+			ret
+			
+;------------------------------------------------------------------------------
+; byte exchange shift (r25 used)
+; XL = IN
+; XH = OUT
+;------------------------------------------------------------------------------
+jtag_xshift:		ldi	r25,8				;bits per byte
+			clr	XH
+			sbi	CTRLPORT,JPPC_TMS
+			PPCJTAG_CLOCK				;-> DR-scan
+			cbi	CTRLPORT,JPPC_TMS
+			PPCJTAG_CLOCK				;-> CAPTURE
+			PPCJTAG_CLOCK				;-> SHIFT
+
+jtag_xshift_1:		sbrc	XL,0				;skip if zero
+			sbi	CTRLPORT,JPPC_TDI
+			sbrs	XL,0				;skip if one
+			cbi	CTRLPORT,JPPC_TDI
+			sbi	CTRLPORT,JPPC_TCK		;2			
+			lsr	XL
+			lsr	XH
+			sbic	CTRLPIN,JPPC_TDO
+			ori	XH,0x80				;set bit 7 in result
+			cbi	CTRLPORT,JPPC_TCK		;2			
+			cpi	r25,2
+			breq	jtag_xshift_2
+			dec	r25
+			brne	jtag_xshift_1
+			rjmp	jppc_mshift_ex			;update etc.		
+						
+jtag_xshift_2:		sbi	CTRLPORT,JPPC_TMS		;last bit -> exit DR
+			dec	r25
+			rjmp	jtag_xshift_1
+
 

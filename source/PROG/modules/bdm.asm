@@ -560,14 +560,11 @@ bdm_wstatus:	ldi	ZL,BDM_SUB_WSTAT
 		ijmp
 
 
-
 .org (pc + 255) & 0xff00
 
 bdm_jtab:
 ;------------------------------------------------------------------------------
-; bdm byte senden fuer 3 MHZ BDM Takt (XL/X=Data)
-; write 15/33/15
-; read 15/22/26
+; BDM functions table
 ;------------------------------------------------------------------------------
 .include	"modules/bdm_sub_1.asm"
 .include	"modules/bdm_sub_2.asm"

@@ -71,7 +71,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.39                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.40                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  (c) 2012-2021 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");
@@ -375,9 +375,6 @@ int main(int argc, char *argv[])
 		}	
 	}
 
-
-
-
 	
 	if(algo_nr == 110)
 	{
@@ -471,9 +468,10 @@ int main(int argc, char *argv[])
 			case 61:	errcode=prog_at89s8252();	break;
 			case 62:	errcode=prog_s12z();		break;
 			case 63:	errcode=prog_ppcjtag4();	break;
-			case 64:	errcode=prog_efm32swd();	break;
+			case 64:	errcode=prog_efm32swd();	break;	//EFM32
 			case 65:	errcode=prog_stm32swd();	break;	//f7
 			case 66:	errcode=prog_onewire();		break;	//onewire EEPROM
+			case 67:	errcode=prog_avrjtag();		break;	//AVR over JTAG
 			case 89:	errcode=prog_dgen();		break;
 			case 97:	errcode=prog_fgen();		break;
 

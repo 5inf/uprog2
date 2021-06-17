@@ -94,9 +94,9 @@ int prog_pic16b()
 		printf("-- vc -- configuration verify\n");
 		printf("-- rc -- configuration readout\n");
 
-		printf("-- pu -- cuser id program\n");
-		printf("-- vu -- cuser id verify\n");
-		printf("-- ru -- cuser id readout\n");
+		printf("-- pu -- user id program\n");
+		printf("-- vu -- user id verify\n");
+		printf("-- ru -- user id readout\n");
 
 		printf("-- ii -- ignore wrong ID\n");
 		printf("-- st -- start device\n");

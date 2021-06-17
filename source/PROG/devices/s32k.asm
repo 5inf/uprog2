@@ -257,8 +257,8 @@ s32k_data_exit:		.db S32K_WRITE_TAR,	0x00,	0xE0,0x00,0xED,0xF0	;DHCSR
 ;-------------------------------------------------------------------------------
 s32k_erase2:		ldi		ZL,LOW(s32k_data_erase2*2)
 			ldi		ZH,HIGH(s32k_data_erase2*2)
-
 			ldi		r24,6
+
 s32k_erase2_1:		rcall		s32k_write_dap_table
 			dec		r24
 			brne		s32k_erase2_1
@@ -271,33 +271,16 @@ s32k_erase2_2:		ldi		ZL,10
 			breq		s32k_erase2_3
 ;			rjmp		s32k_erase2_2
 			
-			ldi		XL,S32K_READ_CSW
-			rcall		s32k_read_dap		;first dummy read
-			ldi		XL,S32K_READ_CSW
-			rcall		s32k_read_dap		;flag read
+			rcall		s32k_read_drwx		;dummy value
 			mov		r16,r20
-			andi		r16,0x01
+			andi		r20,0x80
 			brne		s32k_erase2_2
-			sts		0x100,r20
-			sts		0x101,r21
-			sts		0x102,r22
-			sts		0x103,r23
-			ldi		ZL,0
-			ldi		ZH,5
-			call		api_wait_ms
-			jmp		main_loop_ok
-		
-s32k_erase2_3:		ldi		XL,S32K_READ_CSW
-			rcall		s32k_read_dap		;first dummy read
-			ldi		XL,S32K_READ_CSW
-			rcall		s32k_read_dap		;first dummy read
-			ldi		XL,S32K_READ_IDCODE
-			rcall		s32k_read_dap		;first dummy read
-	
-		;	rcall		s32k_read_drwx1		;read SR
-			ldi		r16,0x42			;erase timeout
+;			andi		r16,0x7f
+			mov		r16,r24
 			jmp		main_loop
-			
+		
+s32k_erase2_3:		ldi		r16,0x42			;erase timeout
+			jmp		main_loop
 			
 s32k_data_erase2:	.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x00	;FSTAT			
 			.db S32K_WRITE_DRW,	0x00,	0x70,0x00,0x00,0x80	;clear flags
@@ -305,7 +288,6 @@ s32k_data_erase2:	.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x00	;FSTAT
 			.db S32K_WRITE_DRW,	0x00,	0x0B,0x00,0x00,0x00	;start erase (was: 49)
 			.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x00	;FSTAT			
 			.db S32K_WRITE_DRW,	0x00,	0x80,0x00,0x00,0x80	;start erase
-
 
 ;-------------------------------------------------------------------------------
 ; erase
@@ -512,7 +494,7 @@ s32k_wd_1:		mov		r12,r14			;one
 			out		CTRLPORT,r12
 			rcall		s32k_wd_2
 			out		CTRLPIN,r15	
-s32k_wd_2:			ret
+s32k_wd_2:		ret
 
 ;-------------------------------------------------------------------------------
 ; read

@@ -1,6 +1,83 @@
+//###############################################################################
+//#										#
+//# UPROG2 universal programmer							#
+//#										#
+//# copyright (c) 2012-2021 Joerg Wolfram (joerg@jcwolfram.de)			#
+//#										#
+//#										#
+//# This program is free software; you can redistribute it and/or		#
+//# modify it under the terms of the GNU General Public License			#
+//# as published by the Free Software Foundation; either version 3		#
+//# of the License, or (at your option) any later version.			#
+//#										#
+//# This program is distributed in the hope that it will be useful,		#
+//# but WITHOUT ANY WARRANTY; without even the implied warranty of		#
+//# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU		#
+//# General Public License for more details.					#
+//#										#
+//# You should have received a copy of the GNU General Public			#
+//# License along with this library// if not, write to the			#
+//# Free Software Foundation, Inc., 59 Temple Place - Suite 330,		#
+//# Boston, MA 02111-1307, USA.							#
+//#										#
+//###############################################################################
+#include <main.h>
 
 
-	if((debug_ram == 1) && (errc == 0))
+void show_cortex_registers(void)
+{
+	int i;
+	i=0;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=1;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=2;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=3;printf("R%d : %02X%02X%02X%02X\n",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+
+	i=4;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=5;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=6;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=7;printf("R%d : %02X%02X%02X%02X\n",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+
+	i=8;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=9;printf("R%d : %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=10;printf("R%d: %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=11;printf("R%d: %02X%02X%02X%02X    ",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=12;printf("R%d: %02X%02X%02X%02X\n",i,memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+
+	i=13;printf("SP : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=14;printf("LR : %02X%02X%02X%02X\n",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+	i=15;printf("PC : %02X%02X%02X%02X --> ",memory[i*4+3],memory[i*4+2],memory[i*4+1],memory[i*4+0]);
+
+	i=16;
+		if((memory[i*4-4] & 0x02) == 0x02)
+		{
+			printf("%02X%02X %02X%02X %02X%02X\n",memory[67],memory[66],memory[69],memory[68],memory[71],memory[70]);
+		}
+		else
+		{
+			printf("%02X%02X %02X%02X %02X%02X\n",memory[65],memory[64],memory[67],memory[66],memory[69],memory[68]);
+		}
+
+	printf("\n");
+}
+
+
+void debug_armcortex(int mode)
+{
+	int errc,blocks,tblock,bsize,i,j,eblock=0;
+	unsigned long len,addr,maddr;
+
+	int debug_flash=0;
+	size_t dbg_len=80;
+	char *dbg_line;
+	char *dbg_ptr;
+	char c;
+	unsigned long dbg_addr,dbg_val;
+	
+	dbg_line=malloc(100);
+	
+
+	//debug code in RAM
+	if(mode == 0)
 	{
 		len = read_block(param[4],param[5],0);
 		printf("BYTES= %04lX\n",len);
@@ -38,6 +115,8 @@
 
 		errc=prg_comm(0x12a,0,100,0,0,0,0,0,0);	
 		show_cortex_registers();		
+
+		j=0;
 
 		do
 		{
@@ -1147,7 +1226,8 @@
 
 	}
 
-	if((debug_flash == 1) && (errc == 0))
+	//debug code in FLASH
+	if(mode == 1)
 	{
 		addr=param[0];
 	
@@ -1162,7 +1242,6 @@
 		printf("\nSTART CODE AT 0x%02x%02x%02x%02x\n",memory[7],memory[6],memory[5],memory[4] & 0xFE);
 		
 		errc=prg_comm(0x128,8,12,0,0,0,0,0,0);	//set pc + sp	
-
 		errc=prg_comm(0x12a,0,100,0,0,0,0,0,0);	
 		show_cortex_registers();		
 
@@ -2275,4 +2354,5 @@
 
 
 	errc|=prg_comm(0x9A,0,0,0,0,0x00,0x00,0x00,0x00);			//exit debug
+}
 

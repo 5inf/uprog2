@@ -74,15 +74,8 @@ int prog_stm32swd(void)
 	int debug_flash=0;
 	int unsecure=0;
 	int ignore_id=0;
-	size_t dbg_len = 80;
-	char *dbg_line;
-	char *dbg_ptr;
-	char c;
-	unsigned long dbg_addr,dbg_val;
 
 	errc=0;
-	dbg_line=malloc(100);
-		
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
@@ -264,7 +257,7 @@ STM32SWD_ORUN:
 
 		if((main_erase == 1) && (errc == 0))
 		{
-			printf("ERASE FLASH (MODE=%d)\n",param[8]);
+			printf("ERASE FLASH (MODE=%ld)\n",param[8]);
 			if(param[11] > 0)
 			{
 				errc=prg_comm(0x4e,0,4,0,0,param[8],0,0,param[11]);	//erase direct
@@ -498,7 +491,7 @@ STM32SWD_ORUN:
 
 		if((option_prog == 1) && (errc == 0) && (algo_nr == 37))
 		{
-			printf("PROGRAM OPTIONBYTES: ");
+//			printf("PROGRAM OPTIONBYTES: ");
 			memory[0]=expar & 0xff;
 			memory[1]=(expar >> 8) & 0xff;
 			memory[2]=(expar >> 16) & 0xff;
@@ -509,6 +502,23 @@ STM32SWD_ORUN:
 
 			//execute prog
 			errc=prg_comm(0x59,0,0,0,0,0x72,0,0,0);
+
+
+			for(i=0;i<60;i++)
+			{
+				progress("PROG OPTIONBYTES ",60,i);
+				memory[ROFFSET]=1;
+				//execute prog
+				errc=prg_comm(0x23c,4,4,ROFFSET,ROFFSET,0x00,0x0c,0x00,0x20);
+			//	show_data(ROFFSET,4);
+				if(memory[ROFFSET]==0) goto POEND;
+				sleep(1);
+			}	
+			
+POEND:					
+			printf("\n");
+
+
 
 			printf(" %02X %02X %02X %02X\n",memory[3],memory[2],memory[1],memory[0]);
 			printf("\n");
@@ -712,12 +722,8 @@ STM32SWD_ORUN:
 		
 	}
 
-
-#include "dbg_cortex.c"
-
-
-	errc|=prg_comm(0x9A,0,0,0,0,0x00,0x00,0x00,0x00);			//exit debug
-
+	if((debug_ram==1) && (errc==0)) debug_armcortex(0);
+	if((debug_flash==1) && (errc==0)) debug_armcortex(1);
 
 	if(dev_start == 1)
 	{

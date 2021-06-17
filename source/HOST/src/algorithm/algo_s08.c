@@ -70,7 +70,7 @@ void print_s08_error(int errc)
 
 int prog_s08(void)
 {
-	int errc,blocks,bsize,j,fbsize;
+	int errc,blocks,bsize,i,j,fbsize;
 	unsigned int ramsize,ramstart,addr;
 	int prdiv8,bfreq,fcdiv;
 	float freq,bdmfreq;
@@ -88,6 +88,10 @@ int prog_s08(void)
 	int force_8m=0;
 	int res_norel=0;
 	int trim_min,trim_max,trim_cyc=0;
+
+	int debug_ram=0;
+	int debug_flash=0;
+	
 	errc=0;
 
 
@@ -116,8 +120,9 @@ int prog_s08(void)
 		printf("-- t9 -- trim internal osc to 9 MHz\n");
 		printf("-- ta -- trim internal osc to 10 MHz\n");
 		printf("-- rr -- run code in RAM\n");
+		printf("-- dr -- debug code in RAM\n");
+		printf("-- df -- debug code in FLASH\n");
 		printf("-- st -- start device\n");
-
 		printf("-- d2 -- switch to device 2\n");
 
 		return 0;
@@ -166,8 +171,32 @@ int prog_s08(void)
 		{
 			run_ram=1;
 			printf("## Action: run code in RAM using %s\n",sfile);
+			goto S08_ORUN;
 		}
 	}
+
+	else if(find_cmd("dr"))
+	{
+		if(file_found < 2)
+		{
+			debug_ram = 0;
+			printf("## Action: debug code in RAM !! DISABLED BECAUSE OF NO FILE !!\n");
+		}
+		else
+		{
+			debug_ram=1;
+			printf("## Action: debug code in RAM using %s\n",sfile);
+			goto S08_ORUN;
+		}
+	}
+
+	else if(find_cmd("df"))
+	{
+		debug_flash=1;
+		printf("## Action: debug code in FLASH\n");
+		goto S08_ORUN;
+	}
+
 	else
 	{
 		if(find_cmd("em"))
@@ -220,6 +249,8 @@ int prog_s08(void)
 		}
 	}
 	printf("\n");
+
+S08_ORUN:
 
 	if(main_readout == 1)
 	{
@@ -567,13 +598,18 @@ int prog_s08(void)
 		read_block(param[8],param[9],param[8]);
 		ramstart = param[8];
 		ramsize = param[9];
+//		show_data(ramstart,8);
 		if(ramsize > max_blocksize) ramsize = max_blocksize;
-		if(errc == 0) errc=prg_comm(0x18,ramsize,0,ramstart,0,
-						ramstart & 0xff,ramstart >> 8,ramsize >> 1,ramsize >> 8);	//write words
-		if(errc == 0) errc=prg_comm(0x13,0,0,0,0,ramstart & 0xff,ramstart >> 8,0,0);			//start code
+		if(errc == 0) errc=prg_comm(0x18,ramsize,0,ramstart,0,ramstart & 0xff,ramstart >> 8,ramsize,ramsize >> 8);	//write bytes
+		if(errc == 0) errc=prg_comm(0x200,0,0,0,0,0,0,0,0x90);					//Background
+		if(errc == 0) errc=prg_comm(0x205,0,0,0,0,ramstart & 0xff,ramstart >> 8,0,0x4b);	//set PC
+		if(errc == 0) errc=prg_comm(0x200,0,0,0,0,0,0,0,0x08);					//Go
 		if(errc == 0) waitkey();
 	}
 
+	if((debug_ram==1) && (errc==0)) debug_s08(0);
+	if((debug_flash==1) && (errc==0)) debug_s08(1);
+		
 	if(dev_start == 1)
 	{
 		prg_comm(0x0e,0,0,0,0,0,0,0,0);		//init

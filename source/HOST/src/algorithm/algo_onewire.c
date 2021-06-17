@@ -237,23 +237,11 @@ int prog_onewire(void)
 
 	if(memory[0] != param[10])
 	{
-		printf("WRONG FAMILY CODE (%02X), SHOULD BE %02X\n",memory[0],param[10]);
+		printf("WRONG FAMILY CODE (%02X), SHOULD BE %02X\n",memory[0],(unsigned int)param[10]);
 		errc=0x42;
 		goto ONEWIRE_END;
 	
 	}
-/*
-	errc=prg_comm(0x233,0,512,0,ROFFSET,0,0,0,0);
-	printf("------------- STATUS ------------------\n");
-	printf("Protection Control Byte Page 0 = %02X\n",memory[ROFFSET+0x80]);
-	printf("Protection Control Byte Page 1 = %02X\n",memory[ROFFSET+0x81]);
-	printf("Protection Control Byte Page 2 = %02X\n",memory[ROFFSET+0x82]);
-	printf("Protection Control Byte Page 3 = %02X\n",memory[ROFFSET+0x83]);
-	printf("Copy Protection Byte           = %02X\n",memory[ROFFSET+0x84]);
-	printf("Factory Byte                   = %02X\n",memory[ROFFSET+0x85]);
-	printf("User Bytes / Manufacturer ID   = %02X %02X\n",memory[ROFFSET+0x86],memory[ROFFSET+0x87]);
-	printf("Chip Revision Code             = %02X\n\n",memory[ROFFSET+0xFF]);
-*/
 
 	//erase memory
 	if ((errc == 0) && (eeprom_erase == 1))

@@ -56,9 +56,9 @@ void list4group(int index1,int index2,int index3,char *dname)
 void list4_devices(void)
 {
 	list4group(3,0,0,"Atmel AVR");
-	list4group(60,0,0,"Atmel AVR0");
+	list4group(60,0,0,"Atmel AVR0/AVR1");
 	list4group(40,0,0,"Atmel ATxmega");
-	list4group(61,0,0,"Atmel AT98xxxx");
+	list4group(61,0,0,"Atmel AT89xxxx");
 	list4group(38,0,0,"Microchip PIC12");
 	list4group(14,15,0,"Microchip PIC16");
 	list4group(17,0,0,"Microchip PIC18");
@@ -78,18 +78,23 @@ void list4_devices(void)
 	list4group(8,0,0,"STMicro STM8");
 	list4group(16,0,0,"STMicro SPC56xx (BAM)");
 	list4group(44,45,0,"STMicro SPC56xx (JTAG)");
+	list4group(63,0,0,"STMicro SPC58xx (JTAG)");
 	list4group(33,0,0,"STMicro STM32F0xx");
 	list4group(34,0,0,"STMicro STM32F1xx");
 	list4group(35,0,0,"STMicro STM32F2xx");
 	list4group(36,0,0,"STMicro STM32F3xx");
 	list4group(37,0,0,"STMicro STM32F4xx");
+	list4group(65,0,0,"STMicro STM32F7xx");
 	list4group(52,0,0,"STMicro STM32L4xx");
 	list4group(56,0,0,"NXP S9KEA");
 	list4group(53,0,0,"NXP S32K");
+	list4group(62,0,0,"NXP S12Z");
+	list4group(54,0,0,"NXP MPC57xx (JTAG)");
+	list4group(64,0,0,"Silabs EFM32/EFR32");	
 	list4group(32,0,0,"Cypress PSoC4");
 	list4group(21,0,0,"I2C EEPROM");
 	list4group(22,0,0,"SPI Flash");
 	list4group(23,0,0,"DATA Flash");
+	list4group(66,0,0,"OneWire EEPROM");
 	list4group(30,0,0,"XC9500(XL) CPLD");
-
 }

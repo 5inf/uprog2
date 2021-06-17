@@ -201,8 +201,8 @@ const char * const cables[]=
 	// 66 DS28E07
 	"(1=VSS  3=IO",
 	
-	// 67 
-	"no connections",
+	// 67 AVR JTAG 
+	"(1=VSS  2=VDD  3=TMS  4=TCK  5=TDI  6=TDO)",
 	
 	// 68 
 	"no connections",

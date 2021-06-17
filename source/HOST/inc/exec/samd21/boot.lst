@@ -1,0 +1,416 @@
+
+boot.elf:     file format elf32-littlearm
+boot.elf
+architecture: arm, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x20000000
+
+Program Header:
+    LOAD off    0x00010000 vaddr 0x20000000 paddr 0x20000000 align 2**16
+         filesz 0x00000178 memsz 0x00000278 flags rwx
+private flags = 5000200: [Version5 EABI] [soft-float ABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000178  20000000  20000000  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .heap         00000100  20000178  20000178  00010178  2**0
+                  ALLOC
+  2 .ARM.attributes 00000021  00000000  00000000  00010178  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+20000000 l    d  .text	00000000 .text
+20000178 l    d  .heap	00000000 .heap
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+00000000 l    df *ABS*	00000000 build/src/boot.o
+40052000 l       *ABS*	00000000 WDOG_BASE
+00000000 l       *ABS*	00000000 WDOG_CS
+00000004 l       *ABS*	00000000 WDOG_CNT
+00000008 l       *ABS*	00000000 WDOG_TOVAL
+0000000c l       *ABS*	00000000 WDOG_WIN
+c0000000 l       *ABS*	00000000 PCC_ACTIVE
+80000000 l       *ABS*	00000000 PCC_INACTIVE
+40065000 l       *ABS*	00000000 PCC_BASE
+40065100 l       *ABS*	00000000 PCC_BASE2
+00000080 l       *ABS*	00000000 PCC_FTFC
+00000084 l       *ABS*	00000000 PCC_DMAMUX
+00000090 l       *ABS*	00000000 PCC_FLEXCAN0
+00000094 l       *ABS*	00000000 PCC_FLEXCAN1
+00000098 l       *ABS*	00000000 PCC_FTM3
+0000009c l       *ABS*	00000000 PCC_ADC1
+000000ac l       *ABS*	00000000 PCC_FLEXCAN2
+000000b0 l       *ABS*	00000000 PCC_LPSPI0
+000000b4 l       *ABS*	00000000 PCC_LPSPI1
+000000b8 l       *ABS*	00000000 PCC_LPSPI2
+000000c4 l       *ABS*	00000000 PCC_PDB1
+000000c8 l       *ABS*	00000000 PCC_CRC
+000000d8 l       *ABS*	00000000 PCC_PDB0
+000000dc l       *ABS*	00000000 PCC_LPIT
+000000e0 l       *ABS*	00000000 PCC_FTM0
+000000e4 l       *ABS*	00000000 PCC_FTM1
+000000e8 l       *ABS*	00000000 PCC_FTM2
+000000ec l       *ABS*	00000000 PCC_ADC0
+000000f4 l       *ABS*	00000000 PCC_RTC
+00000000 l       *ABS*	00000000 PCC_LPTMR0
+00000024 l       *ABS*	00000000 PCC_PORTA
+00000028 l       *ABS*	00000000 PCC_PORTB
+0000002c l       *ABS*	00000000 PCC_PORTC
+00000030 l       *ABS*	00000000 PCC_PORTD
+00000034 l       *ABS*	00000000 PCC_PORTE
+00000050 l       *ABS*	00000000 PCC_SAI0
+00000054 l       *ABS*	00000000 PCC_SAI1
+00000068 l       *ABS*	00000000 PCC_FLEXIO
+00000084 l       *ABS*	00000000 PCC_EWM
+00000098 l       *ABS*	00000000 PCC_LPI2C0
+0000009c l       *ABS*	00000000 PCC_LPI2C1
+000000a8 l       *ABS*	00000000 PCC_LPUART0
+000000ac l       *ABS*	00000000 PCC_LPUART1
+000000b0 l       *ABS*	00000000 PCC_LPUART2
+000000b8 l       *ABS*	00000000 PCC_FTM4
+000000bc l       *ABS*	00000000 PCC_FTM5
+000000c0 l       *ABS*	00000000 PCC_FTM6
+000000c4 l       *ABS*	00000000 PCC_FTM7
+000000cc l       *ABS*	00000000 PCC_CMP0
+000000d8 l       *ABS*	00000000 PCC_QSPI
+000000e4 l       *ABS*	00000000 PCC_ENET
+400ff000 l       *ABS*	00000000 GPIOA_BASE
+400ff480 l       *ABS*	00000000 GPIOB_BASE
+400ff080 l       *ABS*	00000000 GPIOC_BASE
+400ff0c0 l       *ABS*	00000000 GPIOD_BASE
+400ff100 l       *ABS*	00000000 GPIOE_BASE
+00000000 l       *ABS*	00000000 PDOR
+00000004 l       *ABS*	00000000 PSOR
+00000008 l       *ABS*	00000000 PCOR
+0000000c l       *ABS*	00000000 PTOR
+00000010 l       *ABS*	00000000 PDIR
+00000014 l       *ABS*	00000000 PDDR
+00000018 l       *ABS*	00000000 PIDR
+40049000 l       *ABS*	00000000 PORTA_BASE
+4004a000 l       *ABS*	00000000 PORTB_BASE
+4004b000 l       *ABS*	00000000 PORTC_BASE
+4004c000 l       *ABS*	00000000 PORTD_BASE
+4004d000 l       *ABS*	00000000 PORTE_BASE
+00000000 l       *ABS*	00000000 PCR0
+00000004 l       *ABS*	00000000 PCR1
+00000008 l       *ABS*	00000000 PCR2
+0000000c l       *ABS*	00000000 PCR3
+00000010 l       *ABS*	00000000 PCR4
+00000014 l       *ABS*	00000000 PCR5
+00000018 l       *ABS*	00000000 PCR6
+0000001c l       *ABS*	00000000 PCR7
+00000020 l       *ABS*	00000000 PCR8
+00000024 l       *ABS*	00000000 PCR9
+00000028 l       *ABS*	00000000 PCR10
+0000002c l       *ABS*	00000000 PCR11
+00000030 l       *ABS*	00000000 PCR12
+00000034 l       *ABS*	00000000 PCR13
+00000038 l       *ABS*	00000000 PCR14
+0000003c l       *ABS*	00000000 PCR15
+00000040 l       *ABS*	00000000 PCR16
+00000044 l       *ABS*	00000000 PCR17
+00000048 l       *ABS*	00000000 PCR18
+0000004c l       *ABS*	00000000 PCR19
+00000050 l       *ABS*	00000000 PCR20
+00000054 l       *ABS*	00000000 PCR21
+00000058 l       *ABS*	00000000 PCR22
+0000005c l       *ABS*	00000000 PCR23
+00000060 l       *ABS*	00000000 PCR24
+00000064 l       *ABS*	00000000 PCR25
+00000068 l       *ABS*	00000000 PCR26
+0000006c l       *ABS*	00000000 PCR27
+00000070 l       *ABS*	00000000 PCR28
+00000074 l       *ABS*	00000000 PCR29
+00000078 l       *ABS*	00000000 PCR30
+0000007c l       *ABS*	00000000 PCR31
+00000080 l       *ABS*	00000000 GPCLR
+00000084 l       *ABS*	00000000 GPCHR
+00000088 l       *ABS*	00000000 GICLR
+0000008c l       *ABS*	00000000 GICHR
+000000a0 l       *ABS*	00000000 ISFR
+000000c0 l       *ABS*	00000000 DFER
+000000c4 l       *ABS*	00000000 DFCR
+000000c8 l       *ABS*	00000000 DFWR
+40020000 l       *ABS*	00000000 FLASH_BASE
+00000000 l       *ABS*	00000000 FSTAT
+00000001 l       *ABS*	00000000 FCNFG
+00000002 l       *ABS*	00000000 FSEC
+00000003 l       *ABS*	00000000 FOPT
+00000004 l       *ABS*	00000000 FCCOB3
+00000005 l       *ABS*	00000000 FCCOB2
+00000006 l       *ABS*	00000000 FCCOB1
+00000007 l       *ABS*	00000000 FCCOB0
+00000008 l       *ABS*	00000000 FCCOB7
+00000009 l       *ABS*	00000000 FCCOB6
+0000000a l       *ABS*	00000000 FCCOB5
+0000000b l       *ABS*	00000000 FCCOB4
+0000000c l       *ABS*	00000000 FCCOBB
+0000000d l       *ABS*	00000000 FCCOBA
+0000000e l       *ABS*	00000000 FCCOB9
+0000000f l       *ABS*	00000000 FCCOB8
+00000010 l       *ABS*	00000000 FPROT3
+00000011 l       *ABS*	00000000 FPROT2
+00000012 l       *ABS*	00000000 FPROT1
+00000013 l       *ABS*	00000000 FPROT0
+00000016 l       *ABS*	00000000 FEPROT
+00000017 l       *ABS*	00000000 FDPROT
+0000002c l       *ABS*	00000000 FCSESTAT
+0000002e l       *ABS*	00000000 FERSTAT
+0000002f l       *ABS*	00000000 FERCNFG
+20000000 l       .text	00000000 reset_vector
+20000008 l       .text	00000000 main_start
+20000028 l       .text	00000000 main_loop
+20000034 l       .text	00000000 main_loop_wait
+20000058 l       .text	00000000 prog_flash
+2000006c l       .text	00000000 check_flash
+200000cc l       .text	00000000 erase_sector
+20000122 l       .text	00000000 read_flash
+20000062 l       .text	00000000 prog_flash_1
+200000f2 l       .text	00000000 prog_row
+20000076 l       .text	00000000 check_flash_1
+20000080 l       .text	00000000 check_row
+200000a2 l       .text	00000000 check_row_loop
+200000b6 l       .text	00000000 check_row_err
+200000e8 l       .text	00000000 erase_sector_loop
+20000116 l       .text	00000000 prog_row_loop
+20000126 l       .text	00000000 read_flash_1
+00000000         *UND*	00000000 reset_addr
+00000100 g       *ABS*	00000000 heap_size
+00000000 g       *ABS*	00000000 _sidata
+20000178 g       .text	00000000 __exidx_end
+20000178 g       .text	00000000 _etext
+20000178 g       .text	00000000 _sbss
+20000178 g       .text	00000000 __bss_start__
+20000178 g       .text	00000000 _sdata
+20000278 g       .heap	00000000 _heap_end
+20000178 g       .text	00000000 __exidx_start
+20000178 g       .text	00000000 _ebss
+20000178 g       .heap	00000000 _heap_start
+20000178 g       .text	00000000 __bss_end__
+00000400 g       *ABS*	00000000 stack_size
+20002c00 g       *ABS*	00000000 _stack_end
+20003000 g       *ABS*	00000000 _stack_start
+20000178 g       .text	00000000 _edata
+
+
+
+Disassembly of section .text:
+
+20000000 <reset_vector>:
+20000000:	20000ffc 	strdcs	r0, [r0], -ip
+20000004:	20000009 	andcs	r0, r0, r9
+
+20000008 <main_start>:
+20000008:	b662      	cpsie	i
+2000000a:	4d4a      	ldr	r5, [pc, #296]	; (20000134 <read_flash_1+0xe>)
+2000000c:	4b4a      	ldr	r3, [pc, #296]	; (20000138 <read_flash_1+0x12>)
+2000000e:	4c4b      	ldr	r4, [pc, #300]	; (2000013c <read_flash_1+0x16>)
+20000010:	602b      	str	r3, [r5, #0]
+20000012:	60ac      	str	r4, [r5, #8]
+20000014:	4d4a      	ldr	r5, [pc, #296]	; (20000140 <read_flash_1+0x1a>)
+20000016:	4a4b      	ldr	r2, [pc, #300]	; (20000144 <read_flash_1+0x1e>)
+20000018:	626a      	str	r2, [r5, #36]	; 0x24
+2000001a:	4d4b      	ldr	r5, [pc, #300]	; (20000148 <read_flash_1+0x22>)
+2000001c:	4a4b      	ldr	r2, [pc, #300]	; (2000014c <read_flash_1+0x26>)
+2000001e:	62aa      	str	r2, [r5, #40]	; 0x28
+20000020:	62ea      	str	r2, [r5, #44]	; 0x2c
+20000022:	4d4b      	ldr	r5, [pc, #300]	; (20000150 <read_flash_1+0x2a>)
+20000024:	4a4b      	ldr	r2, [pc, #300]	; (20000154 <read_flash_1+0x2e>)
+20000026:	616a      	str	r2, [r5, #20]
+
+20000028 <main_loop>:
+20000028:	4d49      	ldr	r5, [pc, #292]	; (20000150 <read_flash_1+0x2a>)
+2000002a:	4a4b      	ldr	r2, [pc, #300]	; (20000158 <read_flash_1+0x32>)
+2000002c:	602a      	str	r2, [r5, #0]
+2000002e:	494b      	ldr	r1, [pc, #300]	; (2000015c <read_flash_1+0x36>)
+20000030:	2200      	movs	r2, #0
+20000032:	600a      	str	r2, [r1, #0]
+
+20000034 <main_loop_wait>:
+20000034:	7808      	ldrb	r0, [r1, #0]
+20000036:	4290      	cmp	r0, r2
+20000038:	6808      	ldr	r0, [r1, #0]
+2000003a:	d0fb      	beq.n	20000034 <main_loop_wait>
+2000003c:	1c03      	adds	r3, r0, #0
+2000003e:	4a48      	ldr	r2, [pc, #288]	; (20000160 <read_flash_1+0x3a>)
+20000040:	4013      	ands	r3, r2
+20000042:	22ff      	movs	r2, #255	; 0xff
+20000044:	4010      	ands	r0, r2
+20000046:	2852      	cmp	r0, #82	; 0x52
+20000048:	d006      	beq.n	20000058 <prog_flash>
+2000004a:	2854      	cmp	r0, #84	; 0x54
+2000004c:	d00e      	beq.n	2000006c <check_flash>
+2000004e:	2853      	cmp	r0, #83	; 0x53
+20000050:	d03c      	beq.n	200000cc <erase_sector>
+20000052:	2851      	cmp	r0, #81	; 0x51
+20000054:	d065      	beq.n	20000122 <read_flash>
+20000056:	e7e7      	b.n	20000028 <main_loop>
+
+20000058 <prog_flash>:
+20000058:	4d3d      	ldr	r5, [pc, #244]	; (20000150 <read_flash_1+0x2a>)
+2000005a:	4a42      	ldr	r2, [pc, #264]	; (20000164 <read_flash_1+0x3e>)
+2000005c:	602a      	str	r2, [r5, #0]
+2000005e:	4c42      	ldr	r4, [pc, #264]	; (20000168 <read_flash_1+0x42>)
+20000060:	4f42      	ldr	r7, [pc, #264]	; (2000016c <read_flash_1+0x46>)
+
+20000062 <prog_flash_1>:
+20000062:	f000 f846 	bl	200000f2 <prog_row>
+20000066:	3f01      	subs	r7, #1
+20000068:	d1fb      	bne.n	20000062 <prog_flash_1>
+2000006a:	e7dd      	b.n	20000028 <main_loop>
+
+2000006c <check_flash>:
+2000006c:	4d38      	ldr	r5, [pc, #224]	; (20000150 <read_flash_1+0x2a>)
+2000006e:	4a3d      	ldr	r2, [pc, #244]	; (20000164 <read_flash_1+0x3e>)
+20000070:	602a      	str	r2, [r5, #0]
+20000072:	4c3d      	ldr	r4, [pc, #244]	; (20000168 <read_flash_1+0x42>)
+20000074:	4f3e      	ldr	r7, [pc, #248]	; (20000170 <read_flash_1+0x4a>)
+
+20000076 <check_flash_1>:
+20000076:	f000 f803 	bl	20000080 <check_row>
+2000007a:	3f01      	subs	r7, #1
+2000007c:	d1fb      	bne.n	20000076 <check_flash_1>
+2000007e:	e7d3      	b.n	20000028 <main_loop>
+
+20000080 <check_row>:
+20000080:	4d3c      	ldr	r5, [pc, #240]	; (20000174 <read_flash_1+0x4e>)
+20000082:	2270      	movs	r2, #112	; 0x70
+20000084:	702a      	strb	r2, [r5, #0]
+20000086:	2202      	movs	r2, #2
+20000088:	71ea      	strb	r2, [r5, #7]
+2000008a:	1c1a      	adds	r2, r3, #0
+2000008c:	712a      	strb	r2, [r5, #4]
+2000008e:	0a12      	lsrs	r2, r2, #8
+20000090:	716a      	strb	r2, [r5, #5]
+20000092:	0a12      	lsrs	r2, r2, #8
+20000094:	71aa      	strb	r2, [r5, #6]
+20000096:	2202      	movs	r2, #2
+20000098:	72ea      	strb	r2, [r5, #11]
+2000009a:	6822      	ldr	r2, [r4, #0]
+2000009c:	60ea      	str	r2, [r5, #12]
+2000009e:	2280      	movs	r2, #128	; 0x80
+200000a0:	702a      	strb	r2, [r5, #0]
+
+200000a2 <check_row_loop>:
+200000a2:	782a      	ldrb	r2, [r5, #0]
+200000a4:	217f      	movs	r1, #127	; 0x7f
+200000a6:	4011      	ands	r1, r2
+200000a8:	d105      	bne.n	200000b6 <check_row_err>
+200000aa:	2180      	movs	r1, #128	; 0x80
+200000ac:	4011      	ands	r1, r2
+200000ae:	d0f8      	beq.n	200000a2 <check_row_loop>
+200000b0:	3304      	adds	r3, #4
+200000b2:	3404      	adds	r4, #4
+200000b4:	4770      	bx	lr
+
+200000b6 <check_row_err>:
+200000b6:	1c1e      	adds	r6, r3, #0
+200000b8:	0436      	lsls	r6, r6, #16
+200000ba:	0209      	lsls	r1, r1, #8
+200000bc:	430e      	orrs	r6, r1
+200000be:	4d24      	ldr	r5, [pc, #144]	; (20000150 <read_flash_1+0x2a>)
+200000c0:	4a25      	ldr	r2, [pc, #148]	; (20000158 <read_flash_1+0x32>)
+200000c2:	602a      	str	r2, [r5, #0]
+200000c4:	4925      	ldr	r1, [pc, #148]	; (2000015c <read_flash_1+0x36>)
+200000c6:	600e      	str	r6, [r1, #0]
+200000c8:	2200      	movs	r2, #0
+200000ca:	e7b3      	b.n	20000034 <main_loop_wait>
+
+200000cc <erase_sector>:
+200000cc:	4d29      	ldr	r5, [pc, #164]	; (20000174 <read_flash_1+0x4e>)
+200000ce:	2270      	movs	r2, #112	; 0x70
+200000d0:	702a      	strb	r2, [r5, #0]
+200000d2:	2209      	movs	r2, #9
+200000d4:	71ea      	strb	r2, [r5, #7]
+200000d6:	1c1a      	adds	r2, r3, #0
+200000d8:	712a      	strb	r2, [r5, #4]
+200000da:	0a12      	lsrs	r2, r2, #8
+200000dc:	716a      	strb	r2, [r5, #5]
+200000de:	0a12      	lsrs	r2, r2, #8
+200000e0:	71aa      	strb	r2, [r5, #6]
+200000e2:	2280      	movs	r2, #128	; 0x80
+200000e4:	702a      	strb	r2, [r5, #0]
+200000e6:	782a      	ldrb	r2, [r5, #0]
+
+200000e8 <erase_sector_loop>:
+200000e8:	782a      	ldrb	r2, [r5, #0]
+200000ea:	2180      	movs	r1, #128	; 0x80
+200000ec:	4011      	ands	r1, r2
+200000ee:	d1fb      	bne.n	200000e8 <erase_sector_loop>
+200000f0:	e79a      	b.n	20000028 <main_loop>
+
+200000f2 <prog_row>:
+200000f2:	4d20      	ldr	r5, [pc, #128]	; (20000174 <read_flash_1+0x4e>)
+200000f4:	2270      	movs	r2, #112	; 0x70
+200000f6:	702a      	strb	r2, [r5, #0]
+200000f8:	2207      	movs	r2, #7
+200000fa:	71ea      	strb	r2, [r5, #7]
+200000fc:	1c1a      	adds	r2, r3, #0
+200000fe:	712a      	strb	r2, [r5, #4]
+20000100:	0a12      	lsrs	r2, r2, #8
+20000102:	716a      	strb	r2, [r5, #5]
+20000104:	0a12      	lsrs	r2, r2, #8
+20000106:	71aa      	strb	r2, [r5, #6]
+20000108:	6822      	ldr	r2, [r4, #0]
+2000010a:	60aa      	str	r2, [r5, #8]
+2000010c:	6862      	ldr	r2, [r4, #4]
+2000010e:	60ea      	str	r2, [r5, #12]
+20000110:	2280      	movs	r2, #128	; 0x80
+20000112:	702a      	strb	r2, [r5, #0]
+20000114:	2180      	movs	r1, #128	; 0x80
+
+20000116 <prog_row_loop>:
+20000116:	782a      	ldrb	r2, [r5, #0]
+20000118:	400a      	ands	r2, r1
+2000011a:	d0fc      	beq.n	20000116 <prog_row_loop>
+2000011c:	3308      	adds	r3, #8
+2000011e:	3408      	adds	r4, #8
+20000120:	4770      	bx	lr
+
+20000122 <read_flash>:
+20000122:	4c11      	ldr	r4, [pc, #68]	; (20000168 <read_flash_1+0x42>)
+20000124:	4f12      	ldr	r7, [pc, #72]	; (20000170 <read_flash_1+0x4a>)
+
+20000126 <read_flash_1>:
+20000126:	681a      	ldr	r2, [r3, #0]
+20000128:	6022      	str	r2, [r4, #0]
+2000012a:	3304      	adds	r3, #4
+2000012c:	3404      	adds	r4, #4
+2000012e:	3f01      	subs	r7, #1
+20000130:	d1f9      	bne.n	20000126 <read_flash_1>
+20000132:	e779      	b.n	20000028 <main_loop>
+20000134:	40052000 	andmi	r2, r5, r0
+20000138:	00002900 	andeq	r2, r0, r0, lsl #18
+2000013c:	0000ffff 	strdeq	pc, [r0], -pc	; <UNPREDICTABLE>
+20000140:	40065100 	andmi	r5, r6, r0, lsl #2
+20000144:	c0000000 	andgt	r0, r0, r0
+20000148:	40049000 	andmi	r9, r4, r0
+2000014c:	00000140 	andeq	r0, r0, r0, asr #2
+20000150:	400ff000 	andmi	pc, pc, r0
+20000154:	00000c00 	andeq	r0, r0, r0, lsl #24
+20000158:	00000400 	andeq	r0, r0, r0, lsl #8
+2000015c:	20000c00 	andcs	r0, r0, r0, lsl #24
+20000160:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
+20000164:	00000800 	andeq	r0, r0, r0, lsl #16
+20000168:	20000400 	andcs	r0, r0, r0, lsl #8
+2000016c:	00000100 	andeq	r0, r0, r0, lsl #2
+20000170:	00000200 	andeq	r0, r0, r0, lsl #4
+20000174:	40020000 	andmi	r0, r2, r0
+
+Disassembly of section .heap:
+
+20000178 <_heap_start>:
+	...
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00002041 	andeq	r2, r0, r1, asr #32
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000016 	andeq	r0, r0, r6, lsl r0
+  10:	726f4305 	rsbvc	r4, pc, #335544320	; 0x14000000
+  14:	2d786574 	cfldr64cs	mvdx6, [r8, #-464]!	; 0xfffffe30
+  18:	0600304d 	streq	r3, [r0], -sp, asr #32
+  1c:	094d070c 	stmdbeq	sp, {r2, r3, r8, r9, sl}^
+  20:	Address 0x00000020 is out of bounds.
+

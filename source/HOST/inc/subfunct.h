@@ -33,6 +33,8 @@ void show_data(long,int);
 void show_bdata(long,int,unsigned long);
 void show_wdata(long,int,unsigned long);
 void show_ldata(long,int,unsigned long);
+void show_bdata1(unsigned short,int,unsigned long);
+void show_wdata1(unsigned short,int,unsigned long);
 void show_data4_b(long,int);
 void show_data4_l(long,int);
 
@@ -51,4 +53,5 @@ void print_error(void);
 
 int check_00(long,int);
 
-void show_cortex_registers(void);
+void debug_avrjtag_t1(void);
+

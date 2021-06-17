@@ -86,6 +86,9 @@ void print_rh850_error(int errc)
 		case 0xE3:	set_error("(verify error)",errc);
 				break;
 
+		case 0xE7:	set_error("(sequencer error)",errc);
+				break;
+
 		default:	set_error("(unexpected error)",errc);
 	}
 	print_error();
@@ -114,7 +117,7 @@ void showframe_rh850(unsigned long faddr)
 	printf("CSUM = %02X    ETX= %02X\n\n",csum,etx);
 }
 
-unsigned long flashblocks_a[70]={	0x000000,0x002000,0x004000,0x006000,0x008000,0x00A000,0x00C000,0x00E000,
+unsigned long flashblocks_a[134]={	0x000000,0x002000,0x004000,0x006000,0x008000,0x00A000,0x00C000,0x00E000,
 					0x010000,0x018000,0x020000,0x028000,0x030000,0x038000,0x040000,0x048000,
 					0x050000,0x058000,0x060000,0x068000,0x070000,0x078000,0x080000,0x088000,
 					0x090000,0x098000,0x0A0000,0x0A8000,0x0B0000,0x0B8000,0x0C0000,0x0C8000,
@@ -123,9 +126,19 @@ unsigned long flashblocks_a[70]={	0x000000,0x002000,0x004000,0x006000,0x008000,0
 					0x110000,0x118000,0x120000,0x128000,0x130000,0x138000,0x140000,0x148000,
 					0x150000,0x158000,0x160000,0x168000,0x170000,0x178000,0x180000,0x188000,
 					0x190000,0x198000,0x1A0000,0x1A8000,0x1B0000,0x1B8000,0x1C0000,0x1C8000,
-					0x1D0000,0x1D8000,0x1E0000,0x1E8000,0x1F0000,0x1F8000};
+					0x1D0000,0x1D8000,0x1E0000,0x1E8000,0x1F0000,0x1F8000,
+					
+					0x200000,0x208000,0x210000,0x218000,0x220000,0x228000,0x230000,0x238000,
+					0x240000,0x248000,0x250000,0x258000,0x260000,0x268000,0x270000,0x278000,
+					0x280000,0x288000,0x290000,0x298000,0x2A0000,0x2A8000,0x2B0000,0x2B8000,
+					0x2C0000,0x2C8000,0x2D0000,0x2D8000,0x2E0000,0x2E8000,0x2F0000,0x2F8000,
 
-unsigned long flashblocks_b[64]={	0x800000,0x808000,0x810000,0x818000,0x820000,0x828000,0x830000,0x838000,
+					0x300000,0x308000,0x310000,0x318000,0x320000,0x328000,0x330000,0x338000,
+					0x340000,0x348000,0x350000,0x358000,0x360000,0x368000,0x370000,0x378000,
+					0x380000,0x388000,0x390000,0x398000,0x3A0000,0x3A8000,0x3B0000,0x3B8000,
+					0x3C0000,0x3C8000,0x3D0000,0x3D8000,0x3E0000,0x3E8000,0x3F0000,0x3F8000};
+
+unsigned long flashblocks_b[128]={	0x800000,0x808000,0x810000,0x818000,0x820000,0x828000,0x830000,0x838000,
 					0x840000,0x848000,0x850000,0x858000,0x860000,0x868000,0x870000,0x878000,
 					0x880000,0x888000,0x890000,0x898000,0x8A0000,0x8A8000,0x8B0000,0x8B8000,
 					0x8C0000,0x8C8000,0x8D0000,0x8D8000,0x8E0000,0x8E8000,0x8F0000,0x8F8000,
@@ -133,7 +146,17 @@ unsigned long flashblocks_b[64]={	0x800000,0x808000,0x810000,0x818000,0x820000,0
 					0x900000,0x908000,0x910000,0x918000,0x920000,0x928000,0x930000,0x938000,
 					0x940000,0x948000,0x950000,0x958000,0x960000,0x968000,0x970000,0x978000,
 					0x980000,0x988000,0x990000,0x998000,0x9A0000,0x9A8000,0x9B0000,0x9B8000,
-					0x9C0000,0x9C8000,0x9D0000,0x9D8000,0x9E0000,0x9E8000,0x9F0000,0x9F8000};
+					0x9C0000,0x9C8000,0x9D0000,0x9D8000,0x9E0000,0x9E8000,0x9F0000,0x9F8000,
+
+					0xA00000,0xA08000,0xA10000,0xA18000,0xA20000,0xA28000,0xA30000,0xA38000,
+					0xA40000,0xA48000,0xA50000,0xA58000,0xA60000,0xA68000,0xA70000,0xA78000,
+					0xA80000,0xA88000,0xA90000,0xA98000,0xAA0000,0xAA8000,0xAB0000,0xAB8000,
+					0xAC0000,0xAC8000,0xAD0000,0xAD8000,0xAE0000,0xAE8000,0xAF0000,0xAF8000,
+			
+					0xB00000,0xB08000,0xB10000,0xB18000,0xB20000,0xB28000,0xB30000,0xB38000,
+					0xB40000,0xB48000,0xB50000,0xB58000,0xB60000,0xB68000,0xB70000,0xB78000,
+					0xB80000,0xB88000,0xB90000,0xB98000,0xBA0000,0xBA8000,0xBB0000,0xBB8000,
+					0xBC0000,0xBC8000,0xBD0000,0xBD8000,0xBE0000,0xBE8000,0xBF0000,0xBF8000};
 					
 
 
@@ -181,7 +204,7 @@ int prog_rh850(void)
 	int check_id=0;
 	int authmode=-1;
 	unsigned long p6=0,p7=0;
-	unsigned char devtype[16];
+//	unsigned char devtype[16];
 	unsigned char idkey[32];
 	unsigned char idset[32];
 	char hexbyte[4];
@@ -212,7 +235,6 @@ int prog_rh850(void)
 		printf("-- rd -- data flash readout\n");
 		printf("-- cd -- data flash CRC\n");
 	
-
 		printf("-- ex -- ext user area erase\n");
 		printf("-- bx -- ext user area blank check\n");
 		printf("-- px -- ext user area program\n");
@@ -533,7 +555,7 @@ RH850_INIT:
 		printf(">> TYPE   = ");
 		for(i=4;i<11;i++) 
 		{
-			devtype[i-3]=memory[ROFFSET+i];		// use array from 1..8 
+//			devtype[i-3]=memory[ROFFSET+i];		// use array from 1..8 
 			printf("%02X ",memory[ROFFSET+i]);
 		}
 		printf("\n");
@@ -598,19 +620,23 @@ RH850_INIT:
 		errc=prg_comm(0x146,0,100,0,ROFFSET,0,0,0,0);				//Inquiry
 		if(errc!=0) goto RH850_END;
 		
-
 		errc=prg_comm(0x147,0,100,0,ROFFSET,0,0,0,0);				//ID authmode get
 		if(errc!=0) goto RH850_END;
+
+//		memory[ROFFSET+4]=0;
 //		showframe_rh850(0);
 		switch(memory[ROFFSET+4])
 		{
 			case 0x00:	printf(">> ID authentication mode\n");
 					if(check_id == 1)
 					{
-						printf(">> UNLOCK WITH ID...");
+						printf(">> UNLOCK WITH ID < ");
+						for(i=0;i<16;i++) printf("%02X ",idkey[i]);
+						printf("> ... ");
 						for(i=0;i<16;i++) memory[i]=idkey[i];
-						errc=prg_comm(0x20A,32,0,0,0,0,0,0,0);	//ID set
-						if(errc!=0) 
+						errc=prg_comm(0x20A,32,32,0,ROFFSET,0,0,0,0);	//ID set
+						//showframe_rh850(0);
+						if((errc!=0) || (memory[ROFFSET+3] != 0x30))
 						{					
 							printf("!!! CHECK DEVICE ID FAILED !!!\n");
 							goto RH850_END;
@@ -649,47 +675,13 @@ RH850_INIT:
 		for(i=4;i<21;i++) printf("%c",memory[ROFFSET+i]);
 		printf("\n");
 		
-
 		if(check_id ==1 ) goto RH850_NCHK;
 		
-/*
-		j=6;		
-		for(i=0;i<j;i++)
-		{
-			fbtype=	memory[ROFFSET+20+7*i]; 
-		
-		
-			fbsize=	(memory[ROFFSET+21+7*i] << 24) + 
-				(memory[ROFFSET+22+7*i] << 16) +
-				(memory[ROFFSET+23+7*i] << 8) + memory[ROFFSET+24+7*i];
-
-			fbnum=	(memory[ROFFSET+25+7*i] << 8) + memory[ROFFSET+26+7*i];
-		
-			printf(">> FBLOCK %04X ",fbnum);
-			switch(fbtype)
-			{
-				case 0x00:	printf("(code flash) ");
-						break;
-
-				case 0x01:	printf("(space)      ");
-						break;
-
-				case 0x02:	printf("(user boot)  ");
-						break;
-
-				case 0x03:	printf("(data flash) ");
-						break;
-
-				default:	printf("(undefined)  ");
-			}
-			printf(">> SIZE: %08lX\n",fbsize);
-		}
-*/		
-
 	}
 
-	if(param[13] == 1)
+	if((param[13] & 2)==2)
 	{
+		printf("LOCKBITS ENABLE\n");
 		errc=prg_comm(0x149,0,100,0,ROFFSET,0,0,0,0);				//lockbit enable
 		showframe_rh850(0);
 		if(errc!=0)
@@ -722,38 +714,42 @@ RH850_INIT:
 		
 	get_prot=memory[ROFFSET];
 
-
-	errc=prg_comm(0x209,0,100,0,ROFFSET,0,0,0,0);				//get ID
-	if(errc!=0)
-	{
-		errc=memory[ROFFSET+4];
-		goto RH850_END;
-	}
-//	showframe_rh850(0);
-	printf(">> ID = ");
-	for(i=4;i<19;i++) printf("%02X ",memory[ROFFSET+i]);
-	printf("\n\n");
-
 RH850_NCHK:
 
 
 	if((errc == 0) && (dev_start == 0))
 	{
-		if(opt_read == 1)
+		if((opt_read == 1) && ((param[13] & 0x0C)==0))
 		{
 			printf("\nOPTION BYTES:\n-------------\n");
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
 				printf("OPTB%ld = 0x%08lX\n",i,addr);
-			}
-		
+			}		
+		}
+
+		if((opt_read == 1) && ((param[13] & 0x0C)==4))
+		{
+			printf("\nOPTION BYTES:\n-------------\n");
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x00);
+			for(i=0;i<4;i++)
+			{
+				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
+			}		
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x01);
+			for(i=0;i<4;i++)
+			{
+				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
+				printf("OPTB%ld = 0x%08lX\n",i+4,addr);
+			}		
 		}
 	
-		if(opt0_write == 1)
+		if((opt0_write == 1) && ((param[13] & 0x0C)==0))
 		{
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nOLD OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -770,7 +766,7 @@ RH850_NCHK:
 
 			errc=prg_comm(0x14b,40,0,0,0,0,0,0,0);				//bcheck
 		
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nNEW OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -780,9 +776,41 @@ RH850_NCHK:
 		
 		}
 
-		if(opt1_write == 1)
+		if((opt0_write == 1) && ((param[13] & 0x0C)==4))
 		{
 			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			printf("\nOLD OPTION BYTES:\n-----------------\n");
+			for(i=0;i<4;i++)
+			{
+				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
+			}
+		
+			for(i=0;i<16;i++) memory[i]=memory[ROFFSET+i+4];
+			
+			memory[0]=expar & 0xFF;
+			memory[1]=(expar >> 8) & 0xFF;
+			memory[2]=(expar >> 16) & 0xFF;
+			memory[3]=(expar >> 24) & 0xFF;
+
+			waitkey();
+
+			errc=prg_comm(0x14b,40,0,0,0,0,0,0,0x80);				//bcheck
+		
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			printf("\nNEW OPTION BYTES:\n-----------------\n");
+			for(i=0;i<4;i++)
+			{
+				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
+				printf("OPTB%ld = 0x%08lX\n",i,addr);
+			}
+		
+		}
+
+
+		if(opt1_write == 1)
+		{
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nOLD OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -799,7 +827,7 @@ RH850_NCHK:
 
 			errc=prg_comm(0x14b,40,0,0,0,0,0,0,0);				//bcheck
 		
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nNEW OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -811,7 +839,7 @@ RH850_NCHK:
 
 		if(opt2_write == 1)
 		{
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nOLD OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -828,7 +856,7 @@ RH850_NCHK:
 
 			errc=prg_comm(0x14b,40,0,0,0,0,0,0,0);				//bcheck
 		
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nNEW OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -840,7 +868,7 @@ RH850_NCHK:
 
 		if(opt3_write == 1)
 		{
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nOLD OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -857,7 +885,7 @@ RH850_NCHK:
 
 			errc=prg_comm(0x14b,40,0,0,0,0,0,0,0);				//bcheck
 		
-			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0);				//bcheck
+			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x80);				//bcheck
 			printf("\nNEW OPTION BYTES:\n-----------------\n");
 			for(i=0;i<8;i++)
 			{
@@ -906,7 +934,8 @@ RH850_NCHK:
 
 		if((dflash_erase == 1) && (errc == 0))
 		{
-			if(param[7] > 0)
+			
+			if((param[7] > 0) && ((param[13] & 1)==0))
 			{
 				blocks=param[15]/32;
 				addr=param[6];
@@ -925,6 +954,16 @@ RH850_NCHK:
 				}
 				printf("\n");
 			}
+
+			if((param[7] > 0) && ((param[13] & 1)==1))
+			{
+				progress("DFLASH ERASE   ",10,0);
+				errc=prg_comm(0x15D,0,0,0,0,0,0,0,0x20);
+				progress("DFLASH ERASE   ",10,10);
+			
+			}
+
+
 		}
 
 		if((extended_erase == 1) && (errc == 0))
@@ -1657,17 +1696,28 @@ nbx:
 		{
 			len=read_block(param[8],param[9],0);	//DFLASH
 			len=(len+1023) & 0xFC00;
+			
 
 			addr=param[8];
+			len=param[9];
 			bsize=1024;
-			blocks=len / bsize;
+			blocks=len  / bsize;
 			maddr=0;
 
 			addr=param[8];
-			printf("Start = %08lx\n",addr);
+
+
+			if(len == 0)
+			{
+				printf("!! No data at %08lx\n",addr);			
+				goto RH850_END;
+			}
+
+
+			printf(">> START = %08lx\n",addr);
 				errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			addr=len;
-			printf("LEN   = %08lx  Blocks=%d\n",addr,blocks);
+			printf(">> LEN   = %08lx    Blocks=%d\n",addr,blocks);
 				errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			errc=prg_comm(0x20c,0,100,0,ROFFSET,0,0,0x3F,0);				//bootstrap
 			addr=param[8];

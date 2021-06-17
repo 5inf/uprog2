@@ -52,7 +52,7 @@ void listgroup(int index1,int index2,int index3,char *dname)
 void list_devices(void)
 {
 	listgroup(3,0,0,"Atmel AVR");
-	listgroup(60,0,0,"Atmel AVR0");
+	listgroup(60,0,0,"Atmel AVR0/AVR1");
 	listgroup(40,0,0,"Atmel ATxmega");
 	listgroup(61,0,0,"Atmel AT89xxxx");
 	listgroup(38,0,0,"Microchip PIC12");
@@ -74,19 +74,23 @@ void list_devices(void)
 	listgroup(8,0,0,"STMicro STM8");
 	listgroup(16,0,0,"STMicro SPC56xx (BAM)");
 	listgroup(44,45,0,"STMicro SPC56xx (JTAG)");
+	listgroup(63,0,0,"STMicro SPC58xx (JTAG)");
 	listgroup(33,0,0,"STMicro STM32F0xx");
 	listgroup(34,0,0,"STMicro STM32F1xx");
 	listgroup(35,0,0,"STMicro STM32F2xx");
 	listgroup(36,0,0,"STMicro STM32F3xx");
 	listgroup(37,0,0,"STMicro STM32F4xx");
+	listgroup(65,0,0,"STMicro STM32F7xx");
 	listgroup(52,0,0,"STMicro STM32L4xx");
 	listgroup(56,0,0,"NXP S9KEA");
 	listgroup(53,0,0,"NXP S32K");
 	listgroup(62,0,0,"NXP S12Z");
+	listgroup(54,0,0,"NXP MPC57xx (JTAG)");
+	listgroup(64,0,0,"Silabs EFM32/EFR32");	
 	listgroup(32,0,0,"Cypress PSoC4");
 	listgroup(21,0,0,"I2C EEPROM");
 	listgroup(22,0,0,"SPI Flash");
 	listgroup(23,0,0,"DATA Flash");
+	listgroup(66,0,0,"OneWire EEPROM");
 	listgroup(30,0,0,"XC9500(XL) CPLD");
-
 }

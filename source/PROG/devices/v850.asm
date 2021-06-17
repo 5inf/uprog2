@@ -60,7 +60,7 @@ v850_init:		ldi	XL,SIG2_OR
 			out	CTRLDDR,XL
 			call	api_vcc_on			;VCC on
 			sbi	CTRLPORT,V850_TRIGGER
-			ldi	ZL,100
+			ldi	ZL,150
 			ldi	ZH,0
 			call	api_wait_ms
 			sbi	CTRLPORT,V850_SCK
@@ -70,11 +70,11 @@ v850_init:		ldi	XL,SIG2_OR
 			call	wait_ms
 			sbi	CTRLPORT,V850_FLMD0		;FLMD0=1
 ;			cbi	CTRLPORT,V850_SI
-			ldi	ZL,15
+			ldi	ZL,5
 			ldi	ZH,0
 			call	wait_ms
 			sbi	CTRLPORT,V850_RESET		;release RESET with FLMD0=1
-			ldi	ZL,20
+			mov	ZL,r18
 			ldi	ZH,0
 			call	wait_ms
 
@@ -96,7 +96,7 @@ v850_init_1:		cbi	CTRLPORT,V850_FLMD0		;FLMD0=0 (pulse start)
 
 			rcall	v850_reset_cmd
 		
-			ldi	ZL,1
+			ldi	ZL,10
 			ldi	ZH,0
 			call	wait_ms
 
@@ -677,8 +677,6 @@ v850_request_status:	rcall	v850_send_soh		;SOH senden
 			rcall	v850_send_csum
 			rjmp	v850_send_etx		;ETX senden
 
-
-
 ;------------------------------------------------------------------------------
 ; status request (1/2 bytes)
 ;------------------------------------------------------------------------------
@@ -689,10 +687,13 @@ v850_get_status:	rcall	v850_send_zero			;STX
 			rcall	v850_send_zero			;CSUM			
 			rcall	v850_send_zero			;ETX			
 			clt					;status
-			ldi	XL,0x06				;ACK value
-			cpse	r15,XL
+			mov	XL,r15
+			cpi	XL,0x06				;ACK value
+			breq	v850_get_status_ok
+			cpi	XL,0x86				;ACK value
+			breq	v850_get_status_ok
 			set
-			ret
+v850_get_status_ok:	ret
 
 v850_get_status2:	rcall	v850_send_zero			;STX
 			rcall	v850_send_zero			;LEN

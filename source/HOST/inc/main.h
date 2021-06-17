@@ -7,6 +7,7 @@
 #include<subfunct.h>
 #include<readhex.h>
 #include<writehex.h>
+#include<debug.h>
 
 #define ROFFSET 0x2000000			//max 32MB
 #define SHM_SIZE 2064

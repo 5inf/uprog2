@@ -333,6 +333,35 @@ void show_wdata(long addr, int len, unsigned long maddr)
 	
 }
 
+void show_bdata1(unsigned short addr, int len, unsigned long maddr)
+{
+	int i;
+
+	printf("0x%04X  : ",maddr);
+	
+	for(i=0;i<len;i++)
+	{
+		printf(" %02X",memory[addr+i]);
+	}
+	printf("\n");
+	
+}
+
+
+void show_wdata1(unsigned short addr, int len, unsigned long maddr)
+{
+	int i;
+
+	printf("0x%04X  : ",maddr);
+	
+	for(i=0;i<len;i+=2)
+	{
+		printf(" %04X",memory[addr+i] + (memory[addr+i+1] << 8));
+	}
+	printf("\n");
+	
+}
+
 
 void show_ldata(long addr, int len, unsigned long maddr)
 {
@@ -342,7 +371,7 @@ void show_ldata(long addr, int len, unsigned long maddr)
 	
 	for(i=0;i<len;i+=4)
 	{
-		printf(" %08lX",memory[addr+i] + (memory[addr+i+1] << 8) + (memory[addr+i+2] << 16)+ (memory[addr+i+3] << 24));
+		printf(" %08X",(unsigned long)memory[addr+i] + (unsigned long)(memory[addr+i+1] << 8) + (unsigned long)(memory[addr+i+2] << 16)+ (unsigned long)(memory[addr+i+3] << 24));
 	}
 	printf("\n");
 	

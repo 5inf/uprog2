@@ -1,3 +1,15 @@
+# 12.6.2021 Version 1.40
+* System-Version ist jetzt 0018, Update erfolgt automatisch
+* Feature: Debug-Funktionen für HCS08 Controller
+* Feature: Checksummen-Berechnung für die RL78 Familie
+* Neue Devices: ATTiny 1xxx
+* Neue Devices: ATMEGA über JTAG
+* Erstmals Binary für Raspberry Pi
+* Beschleunigung der Datenübertragung beim Auslesen
+* Feature: Margin Check / Dataflash für S32K Familie
+* Bugfix: Program->Verify für S32K Familie las erste 16 Bytes falsch
+* Bugfix: Programmierung S32K: FSEC etc. wurde vorher nicht gelöscht
+
 # 12.1.2021 Version 1.39
 * System-Version ist jetzt 0017, Update erfolgt automatisch
 * Feature: Debug-Funktionen für ARM Cortex basierte Controller

@@ -28,7 +28,7 @@
 .def		const_1		= r3
 
 .equ		sysver_high	= 0x00	
-.equ		sysver_low	= 0x11
+.equ		sysver_low	= 0x12
 
 .equ		buffer		= 0x100		;data buffer
 .equ		stack		= 0x10ff	;system/return stack
@@ -94,10 +94,6 @@
 .include	"modules/i2c.asm"
 .include	"modules/jtag.asm"
 .include	"modules/freq_gen.asm"
-.include	"modules/la_1m.asm"
-.include	"modules/la_100k.asm"
-.include	"modules/la_10k.asm"
-;.include	"modules/swd.asm"
 
 ;device modules
 .include	"devices/s08.asm"
@@ -131,7 +127,6 @@
 .include	"devices_no_public/elmos_sbw.asm"	;xprivate
 .include	"devices/v850.asm"
 .include	"devices_no_public/tee.asm"		;xprivate
-.include	"devices_no_public/mb91.asm"		;xprivate
 .include	"devices_no_public/sp40.asm"		;xprivate
 .include	"devices/mlx363.asm"
 .include	"devices/mlx316.asm"
@@ -143,12 +138,14 @@
 .include	"devices/s12z.asm"
 .include	"devices/efm32swd.asm"
 .include	"devices/onewire.asm"
-
-;tables
-bdm_ctab:
-.include	"tables/bdmftable.inc"
+.include	"devices/esp32.asm"
+.include	"modules/generics.asm"
+.include	"devices/avrjtag.asm"
 .include	"tables/st7_code.inc"
 
+;tables
+.org 0x7B80
+.include	"tables/mlx363_crc_table.inc"
 
 ;bootloader and system stuff
 .org 0x7C00

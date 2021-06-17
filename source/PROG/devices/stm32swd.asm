@@ -147,8 +147,6 @@ swd32_init_3c:		rcall		swd32_write_dap_table
 
 			rcall		swd32_reginit		;set registers for faster output
 
-;			rcall		swd32_ptest		;I/O test
-
 			jmp		main_loop_ok
 		
 swd32_init_err:		jmp		main_loop
@@ -461,15 +459,23 @@ swd32_cmd_0:		ldi		XL,SWD32_WRITE_TAR
 ;			rcall		swd32_write_dap
 			rcall		swd32_read_drwx		;dummy readout
 
-swd32_cmd_1:		ldi		ZL,1
+			ldi		r24,0
+			ldi		r25,20
+
+swd32_cmd_1:		sbiw		r24,1
+			breq		swd32_cmd_to
+			ldi		ZL,1
 			ldi		ZH,0
 			call		api_wait_ms
 
 			rcall		swd32_read_drwx		;readout
 			cpi		r20,0x00
 			brne		swd32_cmd_1		;wait until cmd word is zero
-			
+			call		gen_wres		;write result to memory
 			jmp		main_loop_ok
+
+swd32_cmd_to:		ldi		r16,0x41
+			jmp		main_loop
 
 ;-------------------------------------------------------------------------------
 ; write stack pointer value
@@ -1203,75 +1209,3 @@ swd32_wait_ctrlstat_1:	sbiw		r24,1
 			brne		swd32_wait_ctrlstat_1		
 swd32_wait_ctrlstat_e:	ret
 
-;-------------------------------------------------------------------------------
-; port test
-;-------------------------------------------------------------------------------
-swd32_ptest:		ldi		ZL,LOW(swd32_data_ptest0*2)
-			ldi		ZH,HIGH(swd32_data_ptest0*2)
-
-			ldi		r24,7
-swd32_ptest_1:		rcall		swd32_write_dap_table
-			dec		r24
-			brne		swd32_ptest_1
-
-			rcall		swd32_wait_1s
-			rcall		swd32_write_dap_table
-
-			rcall		swd32_wait_1s
-			rcall		swd32_write_dap_table
-
-			rcall		swd32_wait_1s
-			rcall		swd32_write_dap_table
-	
-			rcall		swd32_wait_1s
-
-			ret
-
-swd32_data_ptest1:
-
-			.db SWD32_WRITE_TAR,	0x00,	0x40,0x02,0x10,0x18	;APB2ENR
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x00,0x10	;enable port c
-
-			.db SWD32_WRITE_TAR,	0x00,	0x40,0x01,0x10,0x00	;CRL
-			.db SWD32_WRITE_DRW,	0x00,	0x33,0x44,0x44,0x44	;PC6+PC7 output
-			
-			.db SWD32_WRITE_TAR,	0x00,	0x40,0x01,0x10,0x0C	;ODR
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x00,0xC0	;PC6+PC7 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x00,0x80	;PC6+PC7 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x00,0x40	;PC6+PC7 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x00,0xC0	;PC6+PC7 output
-
-
-			.db SWD32_WRITE_TAR,	0x00,	0x20,0x00,0x10,0x00	;mem
-
-swd32_data_ptest0:
-			.db SWD32_WRITE_TAR,	0x00,	0x40,0x02,0x10,0x14	;AHBENR
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x08,0x00,0x14	;enable port c, SRAM,FLIT
-
-			.db SWD32_WRITE_TAR,	0x00,	0x48,0x00,0x08,0x00	;MODER
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x05,0x00,0x00	;PC8+PC9 output
-			
-			.db SWD32_WRITE_TAR,	0x00,	0x48,0x00,0x08,0x14	;ODR
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x03,0x00	;PC8+PC9 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x01,0x00	;PC8+PC9 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x02,0x00	;PC8+PC9 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x03,0x00	;PC8+PC9 output
-
-
-			.db SWD32_WRITE_TAR,	0x00,	0x20,0x00,0x10,0x00	;mem
-
-swd32_data_ptest4:
-			.db SWD32_WRITE_TAR,	0x00,	0x40,0x02,0x38,0x30	;AHB1ENR
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x00,0x04	;enable port c
-
-			.db SWD32_WRITE_TAR,	0x00,	0x40,0x02,0x08,0x00	;MODER
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x05,0x00,0x00	;PC8+PC9 output
-			
-			.db SWD32_WRITE_TAR,	0x00,	0x40,0x02,0x08,0x14	;ODR
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x03,0x00	;PC8+PC9 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x01,0x00	;PC8+PC9 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x02,0x00	;PC8+PC9 output
-			.db SWD32_WRITE_DRW,	0x00,	0x00,0x00,0x03,0x00	;PC8+PC9 output
-
-
-			.db SWD32_WRITE_TAR,	0x00,	0x20,0x00,0x10,0x00	;mem

@@ -148,12 +148,17 @@ int daemon_task(void)
 		interface_type=1;
 	}
 
-	if((interface_type == 2) && ((usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6661)) != 0))
+	if(interface_type == 2) 
 	{
+		usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6661);
+		if(usb_stat != 0) usb_stat = ftdi_usb_open(&ftdic,0x2763,0xFFFF);
+		if(usb_stat != 0)
+		{
 #if DEBUG_OUTPUT == 1
-		printf("NO FTDI DEVICE (%s)\n",ftdi_get_error_string(&ftdic));
+			printf("NO FTDI DEVICE (%s)\n",ftdi_get_error_string(&ftdic));
 #endif
-		interface_type=1;
+			interface_type=1;
+		}
 	}
 
 	if((interface_type == 2) && ((usb_stat = ftdi_set_baudrate(&ftdic,1250000)) != 0))
@@ -188,7 +193,7 @@ int daemon_task(void)
 		interface_type=0;
 	}
 
-	if((interface_type == 2) && ((usb_stat = ftdi_set_latency_timer(&ftdic,28)) != 0))
+	if((interface_type == 2) && ((usb_stat = ftdi_set_latency_timer(&ftdic,2)) != 0))
 	{
 #if DEBUG_OUTPUT == 1
 		printf("ERROR SET LATENCY TIMER (%s)\n",ftdi_get_error_string(&ftdic));
@@ -196,6 +201,7 @@ int daemon_task(void)
 		interface_type=0;
 	}
 
+/*
 
 	if((interface_type == 2) && ((usb_stat = ftdi_read_data_set_chunksize(&ftdic,2176)) != 0))
 	{
@@ -213,7 +219,7 @@ int daemon_task(void)
 #endif
 		interface_type=0;
 	}
-
+*/
 	if(interface_type == 1) 
 	{
 		interface_type=0;

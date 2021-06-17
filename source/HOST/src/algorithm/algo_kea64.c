@@ -98,13 +98,6 @@ int prog_kea64swd(void)
 	int unsecure=0;
 	int debug_ram=0;
 	int debug_flash=0;
-	size_t dbg_len = 80;
-	char *dbg_line;
-	char *dbg_ptr;
-	char c;
-	unsigned long dbg_addr,dbg_val;
-
-	dbg_line=malloc(100);
 		
 	errc=0;
 
@@ -538,7 +531,8 @@ KEA64SWD_ORUN:
 		
 	}
 
-#include "dbg_cortex.c"
+	if((debug_ram==1) && (errc==0)) debug_armcortex(0);
+	if((debug_flash==1) && (errc==0)) debug_armcortex(1);
 
 	errc|=prg_comm(0x9A,0,0,0,0,0x00,0x00,0x00,0x00);			//exit debug
 

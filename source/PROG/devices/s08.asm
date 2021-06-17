@@ -212,33 +212,6 @@ s08_write_1:		call	bdm8_bwrite		;write next data
 
 
 ;-------------------------------------------------------------------------------
-; execute code
-;
-; PAR1 = ADDR low
-; PAR2 = ADDR high
-; PAR3 =
-; PAR4 =
-;-------------------------------------------------------------------------------
-s08_exec:		call	bdm_prepare
-
-			ldi	XL,0x90			;background
-			call	bdm_send_byte
-			call	bdm_wait160
-
-			ldi	XL,0x4b			;write PC
-			call	bdm_send_byte
-			movw	XL,r16			;addr
-			call	bdm_send_word
-			call	bdm_wait160
-
-			ldi	XL,0x08			;GO
-			call	bdm_send_byte
-			call	bdm_wait160
-
-			clr	r16
-			jmp	main_loop
-
-;-------------------------------------------------------------------------------
 ; read memory
 ;
 ; PAR1 = ADDR low
@@ -347,85 +320,84 @@ s08_fexec_2:		movw	ZL,r16			;return address
 ;-------------------------------------------------------------------------------
 ; debug subroutines
 ;-------------------------------------------------------------------------------
-s08_active:		call	bdm_prepare
-			ldi	XL,0x90			;background
-			call	bdm_send_byte
-			call	bdm_wait160
+s08_dbgnextbm:		call	api_buf_bread
+s08_dbgnextb:		call	bdm_send_byte
+s08_dbgnext:		call	bdm_wait160
 			jmp	main_loop_ok
 
-s08_go:			call	bdm_prepare
-			ldi	XL,0x08			;go
-			call	bdm_send_byte
-			call	bdm_wait160
-			jmp	main_loop_ok
+s08_dbgnextwm:		call	api_buf_lread
+s08_dbgnextw:		call	bdm_send_word
+			rjmp	s08_dbgnext
 
-s08_write_regs:		call	api_resetptr
-			call	bdm_prepare
-			ldi	XL,0x48			;write A
-			call	bdm_send_byte
-			call	api_buf_bread
-			call	bdm_send_byte
-			call	bdm_wait160
-
-			ldi	XL,0x49			;write CCR
-			call	bdm_send_byte
-			call	api_buf_bread
-			call	bdm_send_byte
-			call	bdm_wait160
-
-
-			ldi	XL,0x4b			;write PC
-			call	bdm_send_byte
-			call	api_buf_mread
-			call	bdm_send_word
-			call	bdm_wait160
-
-			ldi	XL,0x4c			;write HX
-			call	bdm_send_byte
-			call	api_buf_mread
-			call	bdm_send_word
-			call	bdm_wait160
-
-			ldi	XL,0x4f			;write SP
-			call	bdm_send_byte
-			call	api_buf_mread
-			call	bdm_send_word
-			call	bdm_wait160
-			jmp	main_loop_ok
-
-
-s08_read_regs:		call	bdm_prepare
-			call	api_resetptr
-	
-			ldi	XL,0x68			;read A
-			call	bdm_send_byte
+s08_dbgstoreb:		call	bdm_send_byte
 			call	bdm_wait160
 			call	bdm_recv_byte
-			call	api_buf_bwrite
+			jmp	api_buf_bwrite
 
-			ldi	XL,0x69			;read CCR
-			call	bdm_send_byte
-			call	bdm_wait160
-			call	bdm_recv_byte
-			call	api_buf_bwrite
-			
-			ldi	XL,0x6b			;read PC
-			call	bdm_send_byte
+s08_dbgstorew:		call	bdm_send_byte
 			call	bdm_wait160
 			call	bdm_recv_word
-			call	api_buf_mwrite
+			jmp	api_buf_mwrite
 
-			ldi	XL,0x6c			;read HX
-			call	bdm_send_byte
-			call	bdm_wait160
-			call	bdm_recv_word
-			call	api_buf_mwrite
-			
-			ldi	XL,0x6f			;read SP
-			call	bdm_send_byte
-			call	bdm_wait160
-			call	bdm_recv_word
-			call	api_buf_mwrite
+s08_prepare:		call	api_resetptr
+			jmp	bdm_prepare
 
+;-------------------------------------------------------------------------------
+; single byte cmd
+;
+; PAR4 = CMD
+;-------------------------------------------------------------------------------
+s08_cmd:		rcall	s08_prepare
+			mov	XL,r19			;get cmd
+			rjmp	s08_dbgnextb
+
+;-------------------------------------------------------------------------------
+; write register byte
+;
+; PAR1 = value
+; PAR4 = write CMD
+;-------------------------------------------------------------------------------
+s08_wbyte:		rcall	s08_prepare
+			mov	XL,r19
+			call	bdm_send_byte
+			mov	XL,r16
+			rjmp	s08_dbgnextb		
+
+;-------------------------------------------------------------------------------
+; write register word
+; PAR1/2 = value
+; PAR4   = write CMD
+;-------------------------------------------------------------------------------
+s08_wword:		rcall	s08_prepare
+			mov	XL,r19
+			call	bdm_send_byte
+			movw	XL,r16
+			rjmp	s08_dbgnextw		
+						
+;-------------------------------------------------------------------------------
+; read BDC status register
+;-------------------------------------------------------------------------------
+s08_read_stat:		rcall	s08_prepare
+			ldi	XL,0xe4			;read BDC status
+			rcall	s08_dbgstoreb
 			jmp	main_loop_ok			
-	
+			
+;-------------------------------------------------------------------------------
+; read all registers
+;-------------------------------------------------------------------------------
+s08_read_regs:		rcall	s08_prepare
+			ldi	XL,0x68			;read A
+			rcall	s08_dbgstoreb
+			ldi	XL,0x69			;read CCR
+			rcall	s08_dbgstoreb
+			ldi	XL,0x6c			;read HX
+			rcall	s08_dbgstorew
+			ldi	XL,0x6b			;read PC
+			rcall	s08_dbgstorew		
+			ldi	XL,0x6f			;read SP
+			rcall	s08_dbgstorew
+			ldi	XL,0xe2			;read BP
+			rcall	s08_dbgstorew
+			ldi	XL,0xe4			;read BDC status
+			rcall	s08_dbgstoreb
+			jmp	main_loop_ok			
