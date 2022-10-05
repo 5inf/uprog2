@@ -114,8 +114,9 @@ int prog_sici(void)
 	{
 		printf("-- 5v   -- using 5V VDD\n");	
 		printf("-- read -- read angle/status\n");
-		printf("-- re   -- read eeprom\n");
-		printf("-- d2 -- switch to device 2\n");
+		printf("-- pe   -- program config eeprom\n");
+		printf("-- re   -- read config eeprom\n");
+		printf("-- d2   -- switch to device 2\n");
 		return 0;
 	}
 
@@ -139,12 +140,8 @@ int prog_sici(void)
 	
 	}
 
-
-
 	ee_prog=check_cmd_prog("pe","eeprom");
-	ee_verify=check_cmd_verify("ve","eeprom");
 	ee_readout=check_cmd_read("re","eeprom",&ee_prog,&ee_verify);
-
 
 	if(find_cmd("read"))
 	{

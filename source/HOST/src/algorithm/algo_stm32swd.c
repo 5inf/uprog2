@@ -503,7 +503,6 @@ STM32SWD_ORUN:
 			//execute prog
 			errc=prg_comm(0x59,0,0,0,0,0x72,0,0,0);
 
-
 			for(i=0;i<60;i++)
 			{
 				progress("PROG OPTIONBYTES ",60,i);

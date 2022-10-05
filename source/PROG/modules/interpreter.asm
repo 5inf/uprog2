@@ -68,10 +68,10 @@ prg_exec_jtab1:	jmp	prg_exec_e1		;code 00 unknown
 		jmp	prg_exec_e2		;reserved
 		jmp	prg_exec_e2		;reserved
 		jmp	s08_trim		;code 2b BDM sync pulse measure
-		jmp	sercomm1		;code 2c sercomm 9K6
-		jmp	sercomm2		;code 2d sercomm 38K4
-		jmp	sercomm3		;code 2e sercomm 115K
-		jmp	sercomm4		;code 2f sercomm 500k
+		jmp	sercomm9600		;code 2c sercomm 9K6
+		jmp	sercomm38k4		;code 2d sercomm 38K4
+		jmp	sercomm115k		;code 2e sercomm 115K
+		jmp	sercomm500k		;code 2f sercomm 500k
 
 		jmp	s12xd_fdiv		;code 30 s12xd set fclkdiv
 		jmp	s12x_exec		;code 31 s12 exec in RAM
@@ -315,12 +315,12 @@ prg_exec_jtab2:
 		jmp	prg_exec_e1		;code 11e unknown
 		jmp	r8c_lock		;code 11f r8c read/write lock
 
-		jmp	spiflash_write41	;code 120 write spi flash (256 bytes page) in quad mode
-		jmp	spiflash_write42	;code 121 write spi flash (512 bytes page) in quad mode
-		jmp	spiflash_read4		;code 122 read spi flash in quad mode
+		jmp	spiflash_read4		;code 120 SPI-Flash read (4 bytes address)
+		jmp	spiflash_write4		;code 121 SPI-Flash write (4 bytes address)
+		jmp	spiflash_write24	;code 122 SPI-Flash write (4 bytes address, 512 bytes page size)
 		jmp	spiflash_getstatus	;code 123 get spi flash status (+0x60)
 		jmp	spiflash_erase_nw	;code 124 erase and no wait
-		jmp	spiflash_setquad	;code 125 set spi flash into quad mode
+		jmp	spiflash_read4s		;code 125 SPI-Flash read (4 bytes address), streamed
 		jmp	pic1_dprog3		;code 126 pic16 prog data flash
 		jmp	pic1_dread3		;code 127 pic16 read data flash
 		jmp	swd32_prepare		;code 128 STM32 write SP/PC
@@ -328,8 +328,8 @@ prg_exec_jtab2:
 		jmp	swd32_readregs		;code 12a STM32 read registers
 		jmp	swd32_sgo		;code 12b STM32 run
 		jmp	prg_exec_e1		;code 12c unknown
-		jmp	spiflash_resquad	;code 12d reset quad mode on spi flash
-		jmp	prg_exec_e1		;code 12e unknown
+		jmp	prg_exec_e1		;code 12d unknown
+		jmp	spiflash_reads		;code 12e SPI-Flash read (3 bytes address), streamed
 		jmp	freq_gen_stop		;code 12f frequency generator stop
 
 		jmp	pdi_init		;code 130 pdi init
@@ -461,8 +461,8 @@ prg_exec_jtab2:
 		jmp	prg_exec_e1		;code 1a7 unknown
 		jmp	prg_exec_e1		;code 1a8 unknown
 		jmp	prg_exec_e1		;code 1a9 unknown
-		jmp	prg_exec_e1		;code 1aa unknown
-		jmp	prg_exec_e1		;code 1ab unknown
+		jmp	veml3328_start		;code 1aa VEML3328 start conversion
+		jmp	veml3328_read		;code 1ab VEML3328 read data
 		jmp	avr_fprog2		;code 1ac AVR fprog (old)
 		jmp	avr_eprog2		;code 1ad AVR eprog (old)
 		jmp	avr_merase2		;code 1ae AVR merase (old)
@@ -503,7 +503,7 @@ prg_exec_jtab2:
 		jmp	prg_exec_e1		;code 1cf SICI chip reset
 
 		jmp	s32k_init		;code 1d0 S32K init sequence
-		jmp	s32k_readid		;code 1d1 S32K read device ID
+		jmp	swd32_rlong		;code 1d1 SWD read long
 		jmp	s32k_erase		;code 1d2 S32K erase via MDM
 		jmp	s32k_erase2		;code 1d3 S32K erase via DEBUG
 		jmp	s9kea_erase		;code 1d4 S9KEA erase
@@ -628,7 +628,7 @@ prg_exec_jtab3:	jmp	s08_cmd			;code 200 HCS08 single byte command
 
 		jmp	avrjtag_write_ee	;code 250 AVR JTAG write EEPROM page
 		jmp	avrjtag_nop32		;code 251 AVR JTAG 32bit NOP instruction
-		jmp	prg_exec_e1		;code 252 unknown
+		jmp	samd_erase		;code 252 erase SAMD
 		jmp	prg_exec_e1		;code 253 unknown
 		jmp	prg_exec_e1		;code 254 unknown
 		jmp	prg_exec_e1		;code 255 unknown

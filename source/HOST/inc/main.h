@@ -64,3 +64,5 @@ typedef struct typelist
 } devicedat;
 
 int force_exit;
+int use_vanilla_pid;
+

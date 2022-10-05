@@ -1,0 +1,349 @@
+
+boot.elf:     file format elf32-littlearm
+boot.elf
+architecture: arm, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x20000000
+
+Program Header:
+    LOAD off    0x00010000 vaddr 0x20000000 paddr 0x20000000 align 2**16
+         filesz 0x00000150 memsz 0x00000250 flags rwx
+private flags = 5000200: [Version5 EABI] [soft-float ABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000150  20000000  20000000  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .heap         00000100  20000150  20000150  00010150  2**0
+                  ALLOC
+  2 .ARM.attributes 00000021  00000000  00000000  00010150  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+20000000 l    d  .text	00000000 .text
+20000150 l    d  .heap	00000000 .heap
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+00000000 l    df *ABS*	00000000 build/src/boot.o
+40064000 l       *ABS*	00000000 ICS_BASE
+00000000 l       *ABS*	00000000 ICS_C1
+00000001 l       *ABS*	00000000 ICS_C2
+00000002 l       *ABS*	00000000 ICS_C3
+00000003 l       *ABS*	00000000 ICS_C4
+00000003 l       *ABS*	00000000 ICS_S
+40052000 l       *ABS*	00000000 WDOG_BASE
+00000000 l       *ABS*	00000000 WDOG_CS1
+00000001 l       *ABS*	00000000 WDOG_CS2
+00000002 l       *ABS*	00000000 WDOG_CNTH
+00000003 l       *ABS*	00000000 WDOG_CNTL
+00000004 l       *ABS*	00000000 WDOG_TOVALH
+00000005 l       *ABS*	00000000 WDOG_TOVALL
+00000006 l       *ABS*	00000000 WDOG_WINH
+00000007 l       *ABS*	00000000 WDOG_WINL
+400ff000 l       *ABS*	00000000 GPIOA_BASE
+400ff000 l       *ABS*	00000000 GPIOB_BASE
+00000000 l       *ABS*	00000000 PDOR
+00000004 l       *ABS*	00000000 PSOR
+00000008 l       *ABS*	00000000 PCOR
+0000000c l       *ABS*	00000000 PTOR
+00000010 l       *ABS*	00000000 PDIR
+00000014 l       *ABS*	00000000 PDDR
+00000018 l       *ABS*	00000000 PIDR
+40049000 l       *ABS*	00000000 PORT_IOFLT
+40049004 l       *ABS*	00000000 PORT_PUEL
+40049008 l       *ABS*	00000000 PORT_PUEH
+4004900c l       *ABS*	00000000 PORT_HDRVE
+4004d000 l       *ABS*	00000000 PORTE_BASE
+00000000 l       *ABS*	00000000 PCR0
+00000004 l       *ABS*	00000000 PCR1
+00000008 l       *ABS*	00000000 PCR2
+0000000c l       *ABS*	00000000 PCR3
+00000010 l       *ABS*	00000000 PCR4
+00000014 l       *ABS*	00000000 PCR5
+00000018 l       *ABS*	00000000 PCR6
+0000001c l       *ABS*	00000000 PCR7
+00000020 l       *ABS*	00000000 PCR8
+00000024 l       *ABS*	00000000 PCR9
+00000028 l       *ABS*	00000000 PCR10
+0000002c l       *ABS*	00000000 PCR11
+00000030 l       *ABS*	00000000 PCR12
+00000034 l       *ABS*	00000000 PCR13
+00000038 l       *ABS*	00000000 PCR14
+0000003c l       *ABS*	00000000 PCR15
+00000040 l       *ABS*	00000000 PCR16
+00000044 l       *ABS*	00000000 PCR17
+00000048 l       *ABS*	00000000 PCR18
+0000004c l       *ABS*	00000000 PCR19
+00000050 l       *ABS*	00000000 PCR20
+00000054 l       *ABS*	00000000 PCR21
+00000058 l       *ABS*	00000000 PCR22
+0000005c l       *ABS*	00000000 PCR23
+00000060 l       *ABS*	00000000 PCR24
+00000064 l       *ABS*	00000000 PCR25
+00000068 l       *ABS*	00000000 PCR26
+0000006c l       *ABS*	00000000 PCR27
+00000070 l       *ABS*	00000000 PCR28
+00000074 l       *ABS*	00000000 PCR29
+00000078 l       *ABS*	00000000 PCR30
+0000007c l       *ABS*	00000000 PCR31
+00000080 l       *ABS*	00000000 GPCLR
+00000084 l       *ABS*	00000000 GPCHR
+00000088 l       *ABS*	00000000 GICLR
+0000008c l       *ABS*	00000000 GICHR
+000000a0 l       *ABS*	00000000 ISFR
+000000c0 l       *ABS*	00000000 DFER
+000000c4 l       *ABS*	00000000 DFCR
+000000c8 l       *ABS*	00000000 DFWR
+40020000 l       *ABS*	00000000 FLASH_BASE
+00000000 l       *ABS*	00000000 FCLKDIV
+00000001 l       *ABS*	00000000 FSEC
+00000002 l       *ABS*	00000000 FCCOBIX
+00000004 l       *ABS*	00000000 FCNFG
+00000005 l       *ABS*	00000000 FERCNFG
+00000006 l       *ABS*	00000000 FSTAT
+00000007 l       *ABS*	00000000 FERSTAT
+00000008 l       *ABS*	00000000 FPROT
+00000009 l       *ABS*	00000000 EEPROT
+0000000a l       *ABS*	00000000 FCCOBHI
+0000000b l       *ABS*	00000000 FCCOBLO
+0000000c l       *ABS*	00000000 FOPT
+20000000 l       .text	00000000 reset_vector
+20000008 l       .text	00000000 main_start
+2000002a l       .text	00000000 main_loop
+20000030 l       .text	00000000 main_loop_wait
+2000004e l       .text	00000000 prog_flash
+2000005c l       .text	00000000 prog_eeprom
+2000010e l       .text	00000000 read_eeprom
+20000052 l       .text	00000000 prog_flash_1
+2000006a l       .text	00000000 prog_row
+20000060 l       .text	00000000 prog_eeprom_1
+200000c6 l       .text	00000000 prog_ebyte
+200000ba l       .text	00000000 prog_row_loop
+200000f0 l       .text	00000000 prog_ebyte_loop
+200000fc l       .text	00000000 read_flash
+20000100 l       .text	00000000 read_flash_1
+20000114 l       .text	00000000 read_eeprom_1
+00000000         *UND*	00000000 reset_addr
+00000100 g       *ABS*	00000000 heap_size
+00000000 g       *ABS*	00000000 _sidata
+20000150 g       .text	00000000 __exidx_end
+20000150 g       .text	00000000 _etext
+20000150 g       .text	00000000 _sbss
+20000150 g       .text	00000000 __bss_start__
+20000150 g       .text	00000000 _sdata
+20000250 g       .heap	00000000 _heap_end
+20000150 g       .text	00000000 __exidx_start
+20000150 g       .text	00000000 _ebss
+20000150 g       .heap	00000000 _heap_start
+20000150 g       .text	00000000 __bss_end__
+00000400 g       *ABS*	00000000 stack_size
+20002c00 g       *ABS*	00000000 _stack_end
+20003000 g       *ABS*	00000000 _stack_start
+20000150 g       .text	00000000 _edata
+
+
+
+Disassembly of section .text:
+
+20000000 <reset_vector>:
+20000000:	1ffffffc 	svcne	0x00fffffc
+20000004:	20000009 	andcs	r0, r0, r9
+
+20000008 <main_start>:
+20000008:	b662      	cpsie	i
+2000000a:	4d46      	ldr	r5, [pc, #280]	; (20000124 <read_eeprom_1+0x10>)
+2000000c:	4b46      	ldr	r3, [pc, #280]	; (20000128 <read_eeprom_1+0x14>)
+2000000e:	806b      	strh	r3, [r5, #2]
+20000010:	4b46      	ldr	r3, [pc, #280]	; (2000012c <read_eeprom_1+0x18>)
+20000012:	806b      	strh	r3, [r5, #2]
+20000014:	4b46      	ldr	r3, [pc, #280]	; (20000130 <read_eeprom_1+0x1c>)
+20000016:	80ab      	strh	r3, [r5, #4]
+20000018:	2300      	movs	r3, #0
+2000001a:	706b      	strb	r3, [r5, #1]
+2000001c:	702b      	strb	r3, [r5, #0]
+2000001e:	4d45      	ldr	r5, [pc, #276]	; (20000134 <read_eeprom_1+0x20>)
+20000020:	2280      	movs	r2, #128	; 0x80
+20000022:	70aa      	strb	r2, [r5, #2]
+20000024:	4d44      	ldr	r5, [pc, #272]	; (20000138 <read_eeprom_1+0x24>)
+20000026:	220f      	movs	r2, #15
+20000028:	702a      	strb	r2, [r5, #0]
+
+2000002a <main_loop>:
+2000002a:	4944      	ldr	r1, [pc, #272]	; (2000013c <read_eeprom_1+0x28>)
+2000002c:	2200      	movs	r2, #0
+2000002e:	600a      	str	r2, [r1, #0]
+
+20000030 <main_loop_wait>:
+20000030:	6808      	ldr	r0, [r1, #0]
+20000032:	4290      	cmp	r0, r2
+20000034:	d0fc      	beq.n	20000030 <main_loop_wait>
+20000036:	1c03      	adds	r3, r0, #0
+20000038:	4a41      	ldr	r2, [pc, #260]	; (20000140 <read_eeprom_1+0x2c>)
+2000003a:	4013      	ands	r3, r2
+2000003c:	22ff      	movs	r2, #255	; 0xff
+2000003e:	4010      	ands	r0, r2
+20000040:	2852      	cmp	r0, #82	; 0x52
+20000042:	d004      	beq.n	2000004e <prog_flash>
+20000044:	2862      	cmp	r0, #98	; 0x62
+20000046:	d009      	beq.n	2000005c <prog_eeprom>
+20000048:	2861      	cmp	r0, #97	; 0x61
+2000004a:	d060      	beq.n	2000010e <read_eeprom>
+2000004c:	e7ed      	b.n	2000002a <main_loop>
+
+2000004e <prog_flash>:
+2000004e:	4c3d      	ldr	r4, [pc, #244]	; (20000144 <read_eeprom_1+0x30>)
+20000050:	2780      	movs	r7, #128	; 0x80
+
+20000052 <prog_flash_1>:
+20000052:	f000 f80a 	bl	2000006a <prog_row>
+20000056:	3f01      	subs	r7, #1
+20000058:	d1fb      	bne.n	20000052 <prog_flash_1>
+2000005a:	e7e6      	b.n	2000002a <main_loop>
+
+2000005c <prog_eeprom>:
+2000005c:	4c39      	ldr	r4, [pc, #228]	; (20000144 <read_eeprom_1+0x30>)
+2000005e:	4f3a      	ldr	r7, [pc, #232]	; (20000148 <read_eeprom_1+0x34>)
+
+20000060 <prog_eeprom_1>:
+20000060:	f000 f831 	bl	200000c6 <prog_ebyte>
+20000064:	3f01      	subs	r7, #1
+20000066:	d1fb      	bne.n	20000060 <prog_eeprom_1>
+20000068:	e7df      	b.n	2000002a <main_loop>
+
+2000006a <prog_row>:
+2000006a:	4d33      	ldr	r5, [pc, #204]	; (20000138 <read_eeprom_1+0x24>)
+2000006c:	2270      	movs	r2, #112	; 0x70
+2000006e:	71aa      	strb	r2, [r5, #6]
+20000070:	2200      	movs	r2, #0
+20000072:	70aa      	strb	r2, [r5, #2]
+20000074:	2206      	movs	r2, #6
+20000076:	816a      	strh	r2, [r5, #10]
+20000078:	2201      	movs	r2, #1
+2000007a:	70aa      	strb	r2, [r5, #2]
+2000007c:	1c1a      	adds	r2, r3, #0
+2000007e:	72ea      	strb	r2, [r5, #11]
+20000080:	0a12      	lsrs	r2, r2, #8
+20000082:	72aa      	strb	r2, [r5, #10]
+20000084:	2202      	movs	r2, #2
+20000086:	70aa      	strb	r2, [r5, #2]
+20000088:	7822      	ldrb	r2, [r4, #0]
+2000008a:	72ea      	strb	r2, [r5, #11]
+2000008c:	7862      	ldrb	r2, [r4, #1]
+2000008e:	72aa      	strb	r2, [r5, #10]
+20000090:	2203      	movs	r2, #3
+20000092:	70aa      	strb	r2, [r5, #2]
+20000094:	78a2      	ldrb	r2, [r4, #2]
+20000096:	72ea      	strb	r2, [r5, #11]
+20000098:	78e2      	ldrb	r2, [r4, #3]
+2000009a:	72aa      	strb	r2, [r5, #10]
+2000009c:	2204      	movs	r2, #4
+2000009e:	70aa      	strb	r2, [r5, #2]
+200000a0:	7922      	ldrb	r2, [r4, #4]
+200000a2:	72ea      	strb	r2, [r5, #11]
+200000a4:	7962      	ldrb	r2, [r4, #5]
+200000a6:	72aa      	strb	r2, [r5, #10]
+200000a8:	2205      	movs	r2, #5
+200000aa:	70aa      	strb	r2, [r5, #2]
+200000ac:	79a2      	ldrb	r2, [r4, #6]
+200000ae:	72ea      	strb	r2, [r5, #11]
+200000b0:	79e2      	ldrb	r2, [r4, #7]
+200000b2:	72aa      	strb	r2, [r5, #10]
+200000b4:	2280      	movs	r2, #128	; 0x80
+200000b6:	71aa      	strb	r2, [r5, #6]
+200000b8:	2180      	movs	r1, #128	; 0x80
+
+200000ba <prog_row_loop>:
+200000ba:	79aa      	ldrb	r2, [r5, #6]
+200000bc:	400a      	ands	r2, r1
+200000be:	d0fc      	beq.n	200000ba <prog_row_loop>
+200000c0:	3308      	adds	r3, #8
+200000c2:	3408      	adds	r4, #8
+200000c4:	4770      	bx	lr
+
+200000c6 <prog_ebyte>:
+200000c6:	4d1c      	ldr	r5, [pc, #112]	; (20000138 <read_eeprom_1+0x24>)
+200000c8:	2270      	movs	r2, #112	; 0x70
+200000ca:	71aa      	strb	r2, [r5, #6]
+200000cc:	2200      	movs	r2, #0
+200000ce:	70aa      	strb	r2, [r5, #2]
+200000d0:	2211      	movs	r2, #17
+200000d2:	816a      	strh	r2, [r5, #10]
+200000d4:	2201      	movs	r2, #1
+200000d6:	70aa      	strb	r2, [r5, #2]
+200000d8:	1c1a      	adds	r2, r3, #0
+200000da:	72ea      	strb	r2, [r5, #11]
+200000dc:	0a12      	lsrs	r2, r2, #8
+200000de:	72aa      	strb	r2, [r5, #10]
+200000e0:	2202      	movs	r2, #2
+200000e2:	70aa      	strb	r2, [r5, #2]
+200000e4:	7822      	ldrb	r2, [r4, #0]
+200000e6:	72ea      	strb	r2, [r5, #11]
+200000e8:	72aa      	strb	r2, [r5, #10]
+200000ea:	2280      	movs	r2, #128	; 0x80
+200000ec:	71aa      	strb	r2, [r5, #6]
+200000ee:	2180      	movs	r1, #128	; 0x80
+
+200000f0 <prog_ebyte_loop>:
+200000f0:	79aa      	ldrb	r2, [r5, #6]
+200000f2:	400a      	ands	r2, r1
+200000f4:	d0fc      	beq.n	200000f0 <prog_ebyte_loop>
+200000f6:	3301      	adds	r3, #1
+200000f8:	3401      	adds	r4, #1
+200000fa:	4770      	bx	lr
+
+200000fc <read_flash>:
+200000fc:	4c11      	ldr	r4, [pc, #68]	; (20000144 <read_eeprom_1+0x30>)
+200000fe:	4f12      	ldr	r7, [pc, #72]	; (20000148 <read_eeprom_1+0x34>)
+
+20000100 <read_flash_1>:
+20000100:	681a      	ldr	r2, [r3, #0]
+20000102:	6022      	str	r2, [r4, #0]
+20000104:	3304      	adds	r3, #4
+20000106:	3404      	adds	r4, #4
+20000108:	3f01      	subs	r7, #1
+2000010a:	d1f9      	bne.n	20000100 <read_flash_1>
+2000010c:	e78d      	b.n	2000002a <main_loop>
+
+2000010e <read_eeprom>:
+2000010e:	4c0d      	ldr	r4, [pc, #52]	; (20000144 <read_eeprom_1+0x30>)
+20000110:	4b0e      	ldr	r3, [pc, #56]	; (2000014c <read_eeprom_1+0x38>)
+20000112:	4f0d      	ldr	r7, [pc, #52]	; (20000148 <read_eeprom_1+0x34>)
+
+20000114 <read_eeprom_1>:
+20000114:	781a      	ldrb	r2, [r3, #0]
+20000116:	7022      	strb	r2, [r4, #0]
+20000118:	3301      	adds	r3, #1
+2000011a:	3401      	adds	r4, #1
+2000011c:	3f01      	subs	r7, #1
+2000011e:	d1f9      	bne.n	20000114 <read_eeprom_1>
+20000120:	e783      	b.n	2000002a <main_loop>
+20000122:	20000000 	andcs	r0, r0, r0
+20000126:	20c54005 	sbccs	r4, r5, r5
+2000012a:	28d90000 	ldmcs	r9, {}^	; <UNPREDICTABLE>
+2000012e:	10000000 	andne	r0, r0, r0
+20000132:	40000000 	andmi	r0, r0, r0
+20000136:	00004006 	andeq	r4, r0, r6
+2000013a:	00004002 	andeq	r4, r0, r2
+2000013e:	ff002000 			; <UNDEFINED> instruction: 0xff002000
+20000142:	0200ffff 	andeq	pc, r0, #1020	; 0x3fc
+20000146:	01002000 	mrseq	r2, (UNDEF: 0)
+2000014a:	00000000 	andeq	r0, r0, r0
+2000014e:	Address 0x2000014e is out of bounds.
+
+
+Disassembly of section .heap:
+
+20000150 <_heap_start>:
+	...
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00002041 	andeq	r2, r0, r1, asr #32
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000016 	andeq	r0, r0, r6, lsl r0
+  10:	726f4305 	rsbvc	r4, pc, #335544320	; 0x14000000
+  14:	2d786574 	cfldr64cs	mvdx6, [r8, #-464]!	; 0xfffffe30
+  18:	0600304d 	streq	r3, [r0], -sp, asr #32
+  1c:	094d070c 	stmdbeq	sp, {r2, r3, r8, r9, sl}^
+  20:	Address 0x00000020 is out of bounds.
+

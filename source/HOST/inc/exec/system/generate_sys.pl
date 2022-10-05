@@ -41,7 +41,7 @@ sub gencode
 	{
 		chomp;
 		$line=$_;
-		if(substr($line,8,2) eq "00")	#only data records
+		if(substr($line,7,2) eq "00")	#only data records
 		{
 			$addr=substr($line,3,4);
 			$addr=sprintf("%u",hex($addr));

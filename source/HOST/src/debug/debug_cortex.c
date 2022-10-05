@@ -63,10 +63,9 @@ void show_cortex_registers(void)
 
 void debug_armcortex(int mode)
 {
-	int errc,blocks,tblock,bsize,i,j,eblock=0;
+	int errc,blocks,i,j;
 	unsigned long len,addr,maddr;
 
-	int debug_flash=0;
 	size_t dbg_len=80;
 	char *dbg_line;
 	char *dbg_ptr;

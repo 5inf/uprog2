@@ -219,7 +219,7 @@ KEA64SWD_ORUN:
 
 		if((mass_erase == 1) && (errc == 0))
 		{
-			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0x55);	//init
+			errc=prg_comm(0x1D0,0,16,0,0,0,0,0xDE,0x01);	//init
 			printf("JID: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
 			if(errc > 0) goto ERR_EXIT;
 			printf("ERASE FLASH\n");
@@ -227,12 +227,13 @@ KEA64SWD_ORUN:
 			printf("MASS ERASE_TIME: %d ms\n",(20-memory[0])*20);
 			if(errc > 0) goto ERR_EXIT;
 			printf("RE-INIT\n");
-			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0);		//re-init
+			errc=prg_comm(0x1D0,0,16,0,0,0,0,0xDE,0x00);		//re-init
 		}
 		else
 		{
-			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0);					//init
+			errc=prg_comm(0x1D0,0,16,0,0,0,0,0xDE,0);					//init
 			printf("JID: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
+//			printf("ERR= %02X\n",errc);
 			if(errc > 0) goto ERR_EXIT;
 		}
 
@@ -489,18 +490,19 @@ KEA64SWD_ORUN:
 
 	if((run_ram == 1) && (errc == 0))
 	{
-		len = read_block(param[4],param[5],0);
+		len = read_block(param[6],param[7],0);
 		printf("BYTES= %04lX\n",len);
 		if(len < 8)
 		{	
-			len = read_block(0,param[5],0);	//read from addr 0
+			len = read_block(0,param[7],0);	//read from addr 0
 			printf("LOW BYTES= %04lX\n",len);
 		}
 
 		printf("TRANSFER & START CODE\n");
-		addr=param[4];
+		addr=param[6];
 		maddr=0;
-		blocks=(param[5]+2047) >> 11;
+		blocks=(param[7]+2047) >> 11;
+		printf("ADDR = %08lx  LEN= %d Blocks\n",addr,blocks);
 
 		progress("TRANSFER ",blocks,0);
 
@@ -509,7 +511,8 @@ KEA64SWD_ORUN:
 			errc=prg_comm(0xb2,max_blocksize,0,maddr,0,		//write 1.K
 				(addr >> 8) & 0xff,
 				(addr >> 16) & 0xff,
-				0x20,max_blocksize >> 8);
+				(addr >> 24) & 0xff,
+				max_blocksize >> 8);
 		
 			addr+=max_blocksize;
 			maddr+=max_blocksize;
@@ -520,7 +523,7 @@ KEA64SWD_ORUN:
 		addr=param[6];
 
 		printf("\nSTART CODE AT 0x%02x%02x%02x%02x\n",memory[7],memory[6],memory[5],memory[4]);
-		
+
 		errc=prg_comm(0x128,8,12,0,0,0,0,0,0);	//set pc + sp	
 		errc=prg_comm(0x12b,0,100,0,0,0,0,0,0);		//go
 		

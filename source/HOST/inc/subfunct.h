@@ -30,9 +30,9 @@ int get_currentkey(void);
 int find_cmd(char *cptr);
 
 void show_data(long,int);
-void show_bdata(long,int,unsigned long);
-void show_wdata(long,int,unsigned long);
-void show_ldata(long,int,unsigned long);
+void show_bdata(unsigned long,int,unsigned long);
+void show_wdata(unsigned long,int,unsigned long);
+void show_ldata(unsigned long,int,unsigned long);
 void show_bdata1(unsigned short,int,unsigned long);
 void show_wdata1(unsigned short,int,unsigned long);
 void show_data4_b(long,int);

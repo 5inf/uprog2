@@ -70,7 +70,7 @@ void print_s08_error(int errc)
 
 int prog_s08(void)
 {
-	int errc,blocks,bsize,i,j,fbsize;
+	int errc,blocks,bsize,j,fbsize;
 	unsigned int ramsize,ramstart,addr;
 	int prdiv8,bfreq,fcdiv;
 	float freq,bdmfreq;

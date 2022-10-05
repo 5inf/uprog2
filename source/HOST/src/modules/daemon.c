@@ -52,7 +52,7 @@
 
 //#define DEBUG_OUTPUT 1
 
-int daemon_task(void)
+int daemon_task(int vpid)
 {
 	struct ftdi_context ftdic;
 	struct sockaddr_rc btaddr = { 0 };
@@ -150,7 +150,14 @@ int daemon_task(void)
 
 	if(interface_type == 2) 
 	{
-		usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6661);
+		if(vpid == 1)
+		{
+			usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6001);
+		}
+		else
+		{
+			usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6661);		
+		}
 		if(usb_stat != 0) usb_stat = ftdi_usb_open(&ftdic,0x2763,0xFFFF);
 		if(usb_stat != 0)
 		{

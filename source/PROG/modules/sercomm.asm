@@ -2,7 +2,7 @@
 ;#										#
 ;# UPROG2 universal programmer for linux					#
 ;#										#
-;# copyright (c) 2012-2016 Joerg Wolfram (joerg@jcwolfram.de)			#
+;# copyright (c) 2012-2021 Joerg Wolfram (joerg@jcwolfram.de)			#
 ;#										#
 ;#										#
 ;# This program is free software; you can redistribute it and/or		#
@@ -25,145 +25,134 @@
 
 ;-------------------------------------------------------------
 ; serial communication 9K6
+; PAR 1/2 TXLEN (0= skip)
+; PAR 3/3 RXLEN (0= skip)
 ;-------------------------------------------------------------
-sercomm1:	movw	r24,YL			;send length
-		andi	r25,0x03		;limit to 1K
-		call	api_resetptr
-		adiw	r24,1
-		;send
-sercomm1_1:	sbiw	r24,1
-		breq	sercomm1_2
-		ldi	ZL,1
-		ldi	ZH,0
-		call	api_wait_ms
-		call	api_buf_bread		;get char
-		rcall	send3_9600
-		rjmp	sercomm1_1
-		;receive
-sercomm1_2:	call	api_resetptr
-		in	r24,GPIOR1
-		in	r25,GPIOR2
-		andi	r25,0x03		;limit to 1K
-		adiw	r24,1
+sercomm9600:		call	api_resetptr
+			movw	r24,r16			;send length
+			adiw	r24,1
 
-sercomm1_3:	sbiw	r24,1
-		breq	sercomm1_4
-		rcall	recv4_9600
-		brtc	sercomm1_e
-		call	api_buf_bwrite
-		rjmp	sercomm1_3
+			;send
+sercomm9600_1:		sbiw	r24,1
+			breq	sercomm9600_2
+			call	api_buf_bread		;get char
+			rcall	send3_9600
+			rjmp	sercomm9600_1
 
-sercomm1_4:	jmp	main_loop_ok
+sercomm9600_2:		call	api_resetptr
+			movw	r24,r18			;recv length
+			adiw	r24,1
 
-sercomm1_e:	ldi	r16,0x91		;timeout
-		jmp	main_loop
+			;receive
+sercomm9600_3:		sbiw	r24,1
+			breq	sercomm9600_4
+			rcall	recv4_9600
+			brtc	sercomm9600_e
+			call	api_buf_bwrite
+			rjmp	sercomm9600_3
+
+sercomm9600_4:		jmp	main_loop_ok
+
+sercomm9600_e:		ldi	r16,0x41		;timeout
+			jmp	main_loop
 
 
 ;-------------------------------------------------------------
 ; serial communication 38K4
+; PAR 1/2 TXLEN (0= skip)
+; PAR 3/3 RXLEN (0= skip)
 ;-------------------------------------------------------------
-sercomm2:	movw	r24,YL			;send length
-		andi	r25,0x03		;limit to 1K
-		call	api_resetptr
-		adiw	r24,1
-		;send
-sercomm2_1:	sbiw	r24,1
-		breq	sercomm2_2
-		ldi	ZL,1
-		ldi	ZH,0
-		call	api_wait_ms
-		call	api_buf_bread		;get char
-		rcall	send3_38400
-		rjmp	sercomm2_1
-		;receive
-sercomm2_2:	call	api_resetptr
-		in	r24,GPIOR1
-		in	r25,GPIOR2
-		andi	r25,0x03		;limit to 1K
-		adiw	r24,1
+sercomm38k4:		call	api_resetptr
+			movw	r24,r16			;send length
+			adiw	r24,1
 
-sercomm2_3:	sbiw	r24,1
-		breq	sercomm2_4
-		rcall	recv4_38400
-		brtc	sercomm2_e
-		call	api_buf_bwrite
-		rjmp	sercomm2_3
+			;send
+sercomm38k4_1:		sbiw	r24,1
+			breq	sercomm38k4_2
+			call	api_buf_bread		;get char
+			rcall	send3_38400
+			rjmp	sercomm38k4_1
 
-sercomm2_4:	jmp	main_loop_ok
+sercomm38k4_2:		call	api_resetptr
+			movw	r24,r18			;recv length
+			adiw	r24,1
 
-sercomm2_e:	ldi	r16,0x91		;timeout
-		jmp	main_loop
+			;receive
+sercomm38k4_3:		sbiw	r24,1
+			breq	sercomm38k4_4
+			rcall	recv4_38400
+			brtc	sercomm38k4_e
+			call	api_buf_bwrite
+			rjmp	sercomm38k4_3
+
+sercomm38k4_4:		jmp	main_loop_ok
+
+sercomm38k4_e:		ldi	r16,0x41		;timeout
+			jmp	main_loop
 
 ;-------------------------------------------------------------
 ; serial communication 115K
+; PAR 1/2 TXLEN (0= skip)
+; PAR 3/3 RXLEN (0= skip)
 ;-------------------------------------------------------------
-sercomm3:	movw	r24,YL			;send length
-		andi	r25,0x07		;limit to 2K
-		call	api_resetptr
-		adiw	r24,1
-		;send
-sercomm3_1:	sbiw	r24,1
-		breq	sercomm3_2
-		ldi	ZL,1
-		ldi	ZH,0
-		call	api_wait_ms
-		call	api_buf_bread		;get char
-		rcall	send3_115k
-		rjmp	sercomm3_1
-		;receive
-sercomm3_2:	call	api_resetptr
-		in	r24,GPIOR1
-		in	r25,GPIOR2
-		andi	r25,0x07		;limit to 2K
-		adiw	r24,1
+sercomm115k:		call	api_resetptr
+			movw	r24,r16			;send length
+			adiw	r24,1
 
-sercomm3_3:	sbiw	r24,1
-		breq	sercomm3_4
-		rcall	recv4_115k
-		brtc	sercomm3_e
-		call	api_buf_bwrite
-		rjmp	sercomm3_3
+			;send
+sercomm115k_1:		sbiw	r24,1
+			breq	sercomm115k_2
+			call	api_buf_bread		;get char
+			rcall	send3_115k
+			rjmp	sercomm115k_1
 
-sercomm3_4:	jmp	main_loop_ok
+sercomm115k_2:		call	api_resetptr
+			movw	r24,r18			;recv length
+			adiw	r24,1
 
-sercomm3_e:	ldi	r16,0x91		;timeout
-		jmp	main_loop
+			;receive
+sercomm115k_3:		sbiw	r24,1
+			breq	sercomm115k_4
+			rcall	recv4_115k
+			brtc	sercomm115k_e
+			call	api_buf_bwrite
+			rjmp	sercomm115k_3
+
+sercomm115k_4:		jmp	main_loop_ok
+
+sercomm115k_e:		ldi	r16,0x41		;timeout
+			jmp	main_loop
 
 ;-------------------------------------------------------------
 ; serial communication 500k
+; PAR 1/2 TXLEN (0= skip)
+; PAR 3/3 RXLEN (0= skip)
 ;-------------------------------------------------------------
-sercomm4:	movw	r24,YL			;send length
-		andi	r25,0x03		;limit to 1K
-		call	api_resetptr
-		adiw	r24,1
-		;send
-sercomm4_1:	sbiw	r24,1
-		breq	sercomm4_2
-		ldi	ZL,1
-		ldi	ZH,0
-		call	api_wait_ms
-		call	api_buf_bread		;get char
-		rcall	send3_500k
-		rjmp	sercomm4_1
-		;receive
-sercomm4_2:	call	api_resetptr
-		in	r24,GPIOR1
-		in	r25,GPIOR2
-		andi	r25,0x03		;limit to 1K
-		adiw	r24,1
+sercomm500k:		call	api_resetptr
+			movw	r24,r16			;send length
+			adiw	r24,1
 
-sercomm4_3:	sbiw	r24,1
-		breq	sercomm4_4
-		rcall	recv4_500k
-		ldi	ZL,3			;9
-sercomm4_5:	dec	ZL
-		brne	sercomm4_5
-		brtc	sercomm4_e
-		call	api_buf_bwrite
-		rjmp	sercomm4_3
+			;send
+sercomm500k_1:		sbiw	r24,1
+			breq	sercomm500k_2
+			call	api_buf_bread		;get char
+			rcall	send3_500k
+			rjmp	sercomm500k_1
 
-sercomm4_4:	jmp	main_loop_ok
+sercomm500k_2:		call	api_resetptr
+			movw	r24,r18			;recv length
+			adiw	r24,1
 
-sercomm4_e:	ldi	r16,0x91		;timeout
-		jmp	main_loop
+			;receive
+sercomm500k_3:		sbiw	r24,1
+			breq	sercomm500k_4
+			rcall	recv4_500k
+			brtc	sercomm500k_e
+			call	api_buf_bwrite
+			rjmp	sercomm500k_3
+
+sercomm500k_4:		jmp	main_loop_ok
+
+sercomm500k_e:		ldi	r16,0x41		;timeout
+			jmp	main_loop
 

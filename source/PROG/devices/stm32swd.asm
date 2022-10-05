@@ -24,6 +24,7 @@
 .equ			SWD32_RST		= SIG1
 .equ			SWD32_CLOCK		= SIG2
 .equ			SWD32_DATA		= SIG3
+.equ			SWD32_TRIGGER		= SIG5
 
 .equ			SWD32_ZERO_R		= 0				;none
 .equ			SWD32_ONE_R		= SIG3_OR			;data
@@ -180,6 +181,9 @@ swd32_reset_1:		out		CTRLPORT,r14		;one
 			out		CTRLPIN,r15		;clock inactive
 			brne		swd32_reset_1
 
+			cpi		r18,0xde		;skip switch to SWD mode if not needed 
+			breq		swd32_reset_nsw
+
 			;switch to SWD mode
 			ldi		XH,16
 			ldi		ZH,0xE7			;switch code (LSB first)
@@ -194,6 +198,7 @@ swd32_reset_2:		mov		XL,r14			;one
 			dec		XH
 			brne		swd32_reset_2
 
+swd32_reset_nsw:
 			;goto run-test-idle
 			cbi		CTRLPORT,SWD32_DATA
 			ldi		XH,16
@@ -319,7 +324,10 @@ swd32_nread_1:		movw		r20,r16
 ;-------------------------------------------------------------------------------
 ; write long
 ;-------------------------------------------------------------------------------
-swd32_wlong:		rcall		swd32_wvdata
+swd32_wlong:		sbi		CTRLPORT,SWD32_TRIGGER	
+			cbi		CTRLPORT,SWD32_TRIGGER	
+			rcall		swd32_wvdata
+			sts		0x100,XL
 			jmp		main_loop_ok
 
 swd32_wword:		ldi		ZL,LOW(swd32_wword_data*2)
@@ -328,6 +336,7 @@ swd32_wword:		ldi		ZL,LOW(swd32_wword_data*2)
 			rcall		swd32_write_dap_table
 			rcall		swd32_wvdata
 			rcall		swd32_write_dap_table
+			sts		0x100,XL
 			jmp		main_loop_ok
 
 swd32_wbyte:		ldi		ZL,LOW(swd32_wbyte_data*2)
@@ -336,6 +345,7 @@ swd32_wbyte:		ldi		ZL,LOW(swd32_wbyte_data*2)
 			rcall		swd32_write_dap_table
 			rcall		swd32_wvdata
 			rcall		swd32_write_dap_table
+			sts		0x100,XL
 			jmp		main_loop_ok
 
 
@@ -348,7 +358,7 @@ swd32_wvdata:		ldi		YL,0
 			ld		r22,Y+
 			ld		r23,Y+			
 			rcall		swd32_write_dap
-			
+
 			ldi		XL,SWD32_WRITE_DRW
 			ld		r20,Y+
 			ld		r21,Y+
@@ -1035,13 +1045,22 @@ swd32_write_dap_table:	lpm		XL,Z+		;CMD
 ; XL=ack out
 ; r20-r23 data in
 ;-------------------------------------------------------------------------------
-swd32_write_dap:	mov		r9,XL
-			rcall		swd32_head		;send header
-
+swd32_write_dap:	clr		r5
+;			mov		r9,XL
+swd32_write_dap_0:	rcall		swd32_head		;send header
+	
 			;TrN switch to output
 			out		CTRLPORT,r14		;ONE (is pull-up)
 			sbi		CTRLDDR,SWD32_DATA
 			out		CTRLPIN,r15		;CLOCK
+
+;			cpi		XL,0x02			;WAIT
+;			brne		swd32_wd_0
+	
+;			mov		XL,r9
+;			dec		r5
+;			brne		swd32_write_dap_0	; again
+
 
 swd32_wd_0:		clr		r4			;parity
 			ldi		XH,32			;bits to do
@@ -1062,6 +1081,9 @@ swd32_wd_1:		mov		r12,r14			;one
 			sbrs		r4,0
 			mov		r12,r13			;zero
 			out		CTRLPORT,r12
+			nop
+			nop
+			nop
 			out		CTRLPIN,r15	
 			ret
 
@@ -1140,6 +1162,28 @@ swd32_rd_1:		out		CTRLPORT,r14		;ONE (is pull-up)
 			out		CTRLPIN,r15		;CLOCK
 			ret
 
+
+;-------------------------------------------------------------------------------
+; SWD generic read
+;-------------------------------------------------------------------------------
+swd32_rlong:		ldi		YL,0
+			ldi		YH,1
+			movw		r20,r16
+			movw		r22,r18			
+			
+			ldi		XL,S32K_WRITE_TAR
+			rcall		swd32_write_dap
+
+			rcall		swd32_read_drwx		;dummy value
+			st		Y+,r20
+			st		Y+,r21
+			st		Y+,r22
+			st		Y+,r23
+			st		Y+,XL			;store axk status
+			
+			jmp		main_loop_ok
+
+
 ;-------------------------------------------------------------------------------
 ; some wait routines
 ;-------------------------------------------------------------------------------
@@ -1151,16 +1195,6 @@ swd32_wait_1ms:		push	ZH
 			pop	ZL
 			pop	ZH
 			ret
-
-swd32_wait_1s:		push	ZH
-			push	ZL
-			ldi	ZL,0
-			ldi	ZH,2
-			call	api_wait_ms
-			pop	ZL
-			pop	ZH
-			ret
-
 
 swd32_w0:		ldi	ZL,33
 swd32_w0_1:		dec	ZL

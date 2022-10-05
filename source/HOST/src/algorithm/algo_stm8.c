@@ -38,6 +38,9 @@ void print_stm8_error(int errc)
 		case 0x22:	set_error("(SYNC pulse too long)",errc);
 				break;
 
+		case 0x23:	set_error("(unsupported SWIM frequency)",errc);
+				break;
+
 		default:	set_error("(unexpected error)",errc);
 	}
 	print_error();
@@ -46,8 +49,8 @@ void print_stm8_error(int errc)
 
 int prog_stm8(void)
 {
-	int errc,blocks,bsize,i,j,subblock,sbb;
-	unsigned long ramsize,ramstart,addr,flash_addr,flash_size,faddr;
+	int errc,blocks,bsize,i,j,subblock,sbb,ifreq;
+	unsigned long ramsize,ramstart,addr,flash_addr,flash_size,faddr,maddr;
 	float freq;
 	int unsecure = 0;
 	int main_prog=0;
@@ -70,17 +73,17 @@ int prog_stm8(void)
 		
 		printf("-- un -- unsecure device\n");
 
-		printf("-- em -- main flash erase\n");
+//		printf("-- em -- main flash erase\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
 		printf("-- rm -- main flash readout\n");
 
-		printf("-- ee -- eeprom erase\n");
+//		printf("-- ee -- eeprom erase\n");
 		printf("-- pe -- eeprom program\n");
 		printf("-- ve -- eeprom verify\n");
 		printf("-- re -- eeprom readout\n");
 
-		printf("-- eo -- option bytes erase\n");
+//		printf("-- eo -- option bytes erase\n");
 		printf("-- po -- option bytes program\n");
 		printf("-- vo -- option bytes verify\n");
 		printf("-- ro -- option bytes readout\n");
@@ -109,6 +112,10 @@ int prog_stm8(void)
 		unsecure=1;
 		printf("## Action: remove ROP\n");
 	}
+
+	errc=prg_comm(0xfe,0,0,0,0,3,3,0,0);	//enable PU
+
+
 
 	if(find_cmd("rr"))
 	{
@@ -156,9 +163,16 @@ int prog_stm8(void)
 		errc=prg_comm(0x50,0,1,0,0x5000,0,0,0,0);					//SWIM init
 		if(errc == 0)
 		{
-			freq=512/memory[0x5000];
-			printf("SWIM FREQ = %2.1fMHz\n\n",freq);
-			errc=prg_comm(0x52,0,0,0,0,0,0,0,0);					//SWIM config
+			freq=512.0/memory[0x5000];
+			ifreq=(int)(freq+0.5);
+			printf("SWIM FREQ = %2.1f (%d)MHz\n\n",freq,ifreq);
+			
+			switch(ifreq)
+			{
+				case 8:		errc=prg_comm(0x52,0,0,0,0,13,1,6,0);break;	
+				default:	errc=0x23;
+			}
+			
 		}
 	}
 
@@ -341,7 +355,7 @@ int prog_stm8(void)
 	//program main flash
 	if((main_prog == 1) && (errc == 0))
 	{
-		addr=0x3000;
+		addr=0x20000;
 		read_block(param[0],param[1],param[0]);
 		//write PUKR
 		memory[addr++]=0x01;			//1 byte
@@ -355,7 +369,7 @@ int prog_stm8(void)
 		memory[addr++]=0x01;			//low
 		memory[addr++]=0x00;			//high
 		
-		//write DUKR
+		//write PUKR
 		memory[addr++]=0x01;			//1 byte
 		memory[addr++]=0x00;			//AE
 		memory[addr++]=param[13] >> 8;		//AH
@@ -370,10 +384,14 @@ int prog_stm8(void)
 		//end of sequence
 		memory[addr++]=0xff;			//end
 
-		errc=prg_comm(0x53,addr-0x3000,0,0x3000,0,0,0,0,0);	//SWIM sequence
+//waitkey();
+
+		errc=prg_comm(0x53,addr-0x20000,0,0x20000,0,0,0,0,0);	//SWIM sequence
+
+//waitkey();
 
 		faddr = param[0];
-		bsize = max_blocksize;
+		bsize = 1024;
 		if(bsize > param[1]) bsize=param[1];
 		blocks = param[1] / bsize;
 		progress("PROG FLASH  ",blocks,0);
@@ -382,13 +400,13 @@ int prog_stm8(void)
 			if(errc == 0)
 			{
 //				printf("BLK : %06X LEN %04X\n",faddr,bsize);
-				addr=0x3000;
+				addr=0x20000;
 				sbb=1024/param[6];
 				for(subblock=0;subblock<sbb;subblock++)
 				{
 					if(param[17] > 0x100) //does we have flash_ncr2?
 					{
-						memory[addr++]=0x02;			//1 byte
+						memory[addr++]=0x02;			//2 bytes
 						memory[addr++]=0x00;			//AE
 						memory[addr++]=param[12] >> 8;		//AH
 						memory[addr++]=param[12] & 0xff;	//AL
@@ -427,7 +445,7 @@ int prog_stm8(void)
 				//end of sequence
 				memory[addr++]=0xff;			//end
 
-				errc=prg_comm(0x53,addr-0x3000,0,0x3000,0,0,0,0,0);	//SWIM sequence
+				errc=prg_comm(0x53,addr-0x20000,0,0x20000,0,0,0,0,0);	//SWIM sequence
 
 				progress("PROG FLASH  ",blocks,j+1);
 			//	printf("data: %02X %02X %02X %02X\n",memory[0],memory[1],memory[2],memory[3]);
@@ -444,15 +462,17 @@ int prog_stm8(void)
 		flash_size=param[1];
 		if(bsize > param[1]) bsize=param[1];
 		blocks = flash_size / bsize;
-
+		maddr=0;
+		
 		progress("READ FLASH  ",blocks,0);
 		for(j=0;j<blocks;j++)
 		{
 //			printf("BLK : %06X LEN %04X\n",flash_addr,bsize);
-			errc=prg_comm(0x56,0,bsize,0,flash_addr+ROFFSET,
+			errc=prg_comm(0x56,0,bsize,0,maddr+ROFFSET,
 			(flash_addr & 0xff),(flash_addr >> 8) & 0xff,(flash_addr >> 16) & 0xff,0);
 			progress("READ FLASH  ",blocks,j+1);
 			flash_addr+=bsize;
+			maddr+=bsize;
 		}
 		printf("\n");
 	}
@@ -463,9 +483,10 @@ int prog_stm8(void)
 		printf("VERIFY FLASH\n");
 		flash_addr=param[0];
 		flash_size=param[1];
+		maddr=0;
 		for(j=0;j<flash_size;j++)
 		{
-			if(memory[flash_addr+j] != memory[flash_addr+j+ROFFSET])
+			if(memory[flash_addr+j] != memory[maddr+j+ROFFSET])
 			{
 				printf("ERR -> ADDR= %04lX  DATA= %02X  READ= %02X\n",
 				flash_addr+j,memory[flash_addr+j],memory[flash_addr+j+ROFFSET]);
@@ -592,6 +613,7 @@ int prog_stm8(void)
 	prg_comm(0x51,0,0,0,0,0,0,0,0);				//SWIM exit
 
 	prg_comm(0x2ef,0,0,0,0,0,0,0,0);	//dev 1
+	errc=prg_comm(0xfe,0,0,0,0,0,0,0,0);	//disable PU
 
 	print_stm8_error(errc);
 

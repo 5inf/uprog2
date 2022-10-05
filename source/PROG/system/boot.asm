@@ -25,7 +25,7 @@
 ;################################################################################
 
 .equ		max_transfer	= 0x08		;2K max. transfer size (HIGH byte)
-.equ		bl_version 	= 16		;bootloader version 1.5
+.equ		bl_version 	= 17		;bootloader version 1.5
 
 .macro	hget
 lpp:		lds	r0,UCSR0A

@@ -1,3 +1,13 @@
+# 21.11.2021 Version 1.41
+* System-Version ist jetzt 0019, Update erfolgt automatisch
+* Bugfix: Update-Daten waren teilweise unvollständig
+* Feature: Option für nicht umprogrammierte FTDI-Chips
+* Neue Devices: STM8L mit 64K Flash
+* Neue Devices: VEML3328 Farbsensor
+* Change beim KEA64: Code im RAM beginnt jetzt im L-SRAM
+* Bugfix: JTAG/SWD-Umschaltung bei KEA64 entfernt
+* Optimierung: SPI-Flashes werden jetzt schneller ausgelesen
+
 # 12.6.2021 Version 1.40
 * System-Version ist jetzt 0018, Update erfolgt automatisch
 * Feature: Debug-Funktionen für HCS08 Controller

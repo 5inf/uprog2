@@ -304,7 +304,7 @@ void show_data(long addr, int len)
 	}
 }
 
-void show_bdata(long addr, int len, unsigned long maddr)
+void show_bdata(unsigned long addr, int len, unsigned long maddr)
 {
 	int i;
 
@@ -319,7 +319,7 @@ void show_bdata(long addr, int len, unsigned long maddr)
 }
 
 
-void show_wdata(long addr, int len, unsigned long maddr)
+void show_wdata(unsigned long addr, int len, unsigned long maddr)
 {
 	int i;
 
@@ -337,7 +337,7 @@ void show_bdata1(unsigned short addr, int len, unsigned long maddr)
 {
 	int i;
 
-	printf("0x%04X  : ",maddr);
+	printf("0x%04X  : ",(unsigned short)maddr);
 	
 	for(i=0;i<len;i++)
 	{
@@ -352,7 +352,7 @@ void show_wdata1(unsigned short addr, int len, unsigned long maddr)
 {
 	int i;
 
-	printf("0x%04X  : ",maddr);
+	printf("0x%04X  : ",(unsigned short)maddr);
 	
 	for(i=0;i<len;i+=2)
 	{
@@ -363,7 +363,7 @@ void show_wdata1(unsigned short addr, int len, unsigned long maddr)
 }
 
 
-void show_ldata(long addr, int len, unsigned long maddr)
+void show_ldata(unsigned long addr, int len, unsigned long maddr)
 {
 	int i;
 

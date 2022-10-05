@@ -76,131 +76,95 @@ spiflash_read_1:	call	spi_zerobyte
 			jmp	main_loop_ok
 
 ;------------------------------------------------------------------------------
-; set quad mode
-; par4 = algorithm
+; read memory
+; PAR1	=	ADDRL
+; PAR2	=	ADDRM
+; PAR3	=	ADDRH
+; PAR4	=	ADDRX
 ;------------------------------------------------------------------------------
-spiflash_setquad:	rcall	spiflash_wready
-			cpi	r19,0x00		;mode 0x00 (use status register 2)
-			brne	spiflash_setquad2
-	
-spiflash_setquad1:	rcall	read_config2
-			andi	XL,0x02
-			breq	spiflash_setquad1_1
-			jmp	main_loop_ok		;quad bit is already set
-
-spiflash_setquad1_1:	rcall	spiflash_wren		;write enable
-			SPIFL_ACT
-			ldi	XL,0x01			;WRR cmd
-			call	spi_byte
-			ldi	XL,0x00			;status reg
-			call	spi_byte
-			ldi	XL,0x02			;config reg
-			call	spi_byte
-			SPIFL_INH
+spiflash_read4:		movw	YL,const_0
+			SPIFL_ACT		;CSN
 			
-			rcall	spiflash_wait25
-
-			rcall	read_config2
-		
-			andi	XL,0x02
-			breq	spiflash_setquad_err
+			ldi	XL,0x13		;READ
+			call	spi_byte
+			
+			mov	XL,r19		;AX
+			call	spi_byte		
+			mov	XL,r18		;AH
+			call	spi_byte
+			mov	XL,r17		;AM
+			call	spi_byte
+			mov	XL,r16		;AL
+			call	spi_byte
+						
+			ldi	r24,0
+			ldi	r25,8		;size
+			
+spiflash_read4_1:	call	spi_zerobyte
+			st	Y+,XL
+			sbiw	r24,1
+			brne	spiflash_read4_1
+			
+			SPIFL_INH
 			jmp	main_loop_ok
 
-spiflash_setquad_err:	ldi	r16,0x59		;cannot set quad mode
-			jmp	main_loop
-
-
-spiflash_setquad2:	cpi	r19,0x01		;mode 0x01 (use status register bit 6)
-			brne	spiflash_setquad_err
-
-			rcall	read_config
-			andi	XL,0x40
-			breq	spiflash_setquad2_1
-			jmp	main_loop_ok		;quad bit is already set
-
-spiflash_setquad2_1:	rcall	spiflash_wren		;write enable
-			SPIFL_ACT
-			ldi	XL,0x01			;WRSR cmd
-			call	spi_byte
-			ldi	XL,0x40			;status reg
-			call	spi_byte
-			SPIFL_INH
-
-			rcall	spiflash_wait25
-			
-			rcall	read_config
-			rcall	read_config
-		
-			andi	XL,0x40
-			breq	spiflash_setquad_err
-			jmp	main_loop_ok
 
 ;------------------------------------------------------------------------------
-; reset quad mode
-; par4 = algorithm
+; read 2K memory, streamed version
+; PAR1	=	ADDRL
+; PAR2	=	ADDRM
+; PAR3	=	ADDRH
+; PAR4	=	ADDRX
 ;------------------------------------------------------------------------------
-spiflash_resquad:	rcall	spiflash_wready
-			cpi	r19,0x00		;mode 0x00 (use status register 2)
-			brne	spiflash_resquad2
-	
-spiflash_resquad1:	rcall	read_config2
-			andi	XL,0x02
-			brne	spiflash_resquad1_1
-			jmp	main_loop_ok		;quad bit is already set
-
-spiflash_resquad1_1:	rcall	spiflash_wren		;write enable
-			rcall	spiflash_wready
-			SPIFL_ACT
-			ldi	XL,0x01			;WRR cmd
-			call	spi_byte
-			ldi	XL,0x00			;status reg
-			call	spi_byte
-			ldi	XL,0x00			;config reg
-			call	spi_byte
-			SPIFL_INH
-
-			rcall	spiflash_wait25
-			rcall	spiflash_wready
+spiflash_reads:		SPIFL_ACT		;CSN
 			
-			rcall	read_config2
-		
-			andi	XL,0x02
-			brne	spiflash_resquad_err
-			jmp	main_loop_ok
-
-spiflash_resquad_err:	ldi	r16,0x59		;cannot set quad mode
-			jmp	main_loop
-
-
-spiflash_resquad2:	cpi	r19,0x01		;mode 0x01 (use status register bit 6)
-			brne	spiflash_resquad_err
-
-			rcall	read_config
-			andi	XL,0x40
-			brne	spiflash_resquad2_1
-			jmp	main_loop_ok		;quad bit is already set
-
-spiflash_resquad2_1:	rcall	spiflash_wren		;write enable
-			SPIFL_ACT
-			ldi	XL,0x01			;WRSR cmd
+			ldi	XL,0x03		;READ
+			call	spi_byte						
+			mov	XL,r18		;AH
 			call	spi_byte
-			ldi	XL,0x00			;status reg
+			mov	XL,r17		;AM
 			call	spi_byte
+			mov	XL,r16		;AL
+			call	spi_byte
+						
+			ldi	r24,0
+			ldi	r25,8		;size
+			
+spiflash_reads_1:	call	spi_zerobyte
+			call	host_put
+			
+			sbiw	r24,1
+			brne	spiflash_reads_1
+			
 			SPIFL_INH
-
-			rcall	spiflash_wait25
-
-			rcall	read_config
-		
-			andi	XL,0x40
-			brne	spiflash_resquad_err
-			jmp	main_loop_ok
+			jmp	main_loop_ok_noret
 
 
-spiflash_wait25:	ldi	ZL,25
-			ldi	ZH,0
-			jmp	api_wait_ms
-
+spiflash_read4s:	SPIFL_ACT		;CSN
+			
+			ldi	XL,0x13		;READ
+			call	spi_byte
+			
+			mov	XL,r19		;AX
+			call	spi_byte		
+			mov	XL,r18		;AH
+			call	spi_byte
+			mov	XL,r17		;AM
+			call	spi_byte
+			mov	XL,r16		;AL
+			call	spi_byte
+						
+			ldi	r24,0
+			ldi	r25,8		;size
+			
+spiflash_read4s_1:	call	spi_zerobyte
+			call	host_put
+			
+			sbiw	r24,1
+			brne	spiflash_read4s_1
+			
+			SPIFL_INH
+			jmp	main_loop_ok_noret
 
 
 ;------------------------------------------------------------------------------
@@ -217,65 +181,6 @@ spiflash_read_conf:	rcall	spiflash_wready
 			rcall	read_config3
 			sts	0x102,XL
 			jmp	main_loop_ok		;quad bit is already set
-
-;------------------------------------------------------------------------------
-; read memory
-; PAR1	=	ADDRL
-; PAR2	=	ADDRM
-; PAR3	=	ADDRH
-; PAR4	=	256bytes-blocks
-;------------------------------------------------------------------------------
-spiflash_read4:		movw	YL,const_0
-		
-			ldi	r24,0x00	;cycles
-			mov	r25,r19
-
-			SPIFL_ACT
-			
-			ldi	XL,0x6b		;READ QUAD
-			call	spi_byte
-			
-			mov	XL,r18		;AH
-			call	spi_byte
-			mov	XL,r17		;AM
-			call	spi_byte
-			mov	XL,r16		;AL
-			call	spi_byte
-		
-			ldi	XL,0		;dummy
-			call	spi_byte
-		
-			ldi	XL,0x03		;all IO input
-			out	CTRLDDR,XL
-			in	XL,CTRLPIN
-			ori	XL,0x3C
-			out	CTRLPORT,XL
-						
-			ldi	r22,SPI_SCK_PULSE
-			
-spiflash_read4_1:	out	CTRLPIN,r22	;SCK HI
-			in	r23,CTRLPIN	;get data
-			lsl	r23
-			out	CTRLPIN,r22	;SCK LO
-			lsl	r23
-			andi	r23,0xf0
-			out	CTRLPIN,r22	;SCK HI
-			in	XL,CTRLPIN	;get data	
-			lsr	XL
-			lsr	XL
-			out	CTRLPIN,r22	;SCK LO
-			andi	XL,0x0f
-			or	XL,r23
-			st	Y+,XL
-			sbiw	r24,1
-			brne	spiflash_read4_1
-			
-			call	spi0_reinit
-			
-;			ldi	ZL,4
-;			ldi	ZH,0
-;			call	api_wait_ms
-			jmp	main_loop_ok
 
 ;------------------------------------------------------------------------------
 ; write 
@@ -320,6 +225,49 @@ spiflash_write_2:	ld	XL,Y+
 ; PAR1	=	ADDRL
 ; PAR2	=	ADDRM
 ; PAR3	=	ADDRH
+; PAR4	=	ADDRX
+;------------------------------------------------------------------------------
+spiflash_write4:	movw	YL,const_0
+			ldi	r25,8		;pages
+			
+spiflash_write4_1:	rcall	spiflash_wren	;write enable
+					
+			SPIFL_ACT
+
+			ldi	XL,0x02		;WRITE
+			call	spi_byte
+			
+			mov	XL,r19		;AX
+			call	spi_byte
+			mov	XL,r18		;AH
+			call	spi_byte
+			mov	XL,r17		;AM
+			call	spi_byte
+			call	spi_zerobyte	;AL
+
+			ldi	r24,0		;256 bytes
+			
+spiflash_write4_2:	ld	XL,Y+
+			call	spi_byte
+			dec	r24
+			brne	spiflash_write4_2
+
+			SPIFL_INH
+			
+			rcall	spiflash_wready3	
+			add	r17,const_1
+			adc	r18,const_0
+			adc	r19,const_0
+			dec	r25
+			brne	spiflash_write4_1
+			
+			jmp	main_loop_ok
+
+;------------------------------------------------------------------------------
+; write 
+; PAR1	=	ADDRL
+; PAR2	=	ADDRM
+; PAR3	=	ADDRH
 ; PAR4	=	512bytes-blocks
 ;------------------------------------------------------------------------------
 spiflash_write2:	movw	YL,const_0
@@ -356,122 +304,51 @@ spiflash_write2_2:	ld	XL,Y+
 			brne	spiflash_write2_1
 			jmp	main_loop_ok
 
-;------------------------------------------------------------------------------
-; write 
-; PAR1	=	ADDRL
-; PAR2	=	ADDRM
-; PAR3	=	ADDRH
-; PAR4	=	256bytes-blocks
-;------------------------------------------------------------------------------
-spiflash_write41:	movw	YL,const_0
-
-spiflash_write41_1:	rcall	spiflash_wren	;write enable
-					
-			SPIFL_ACT
-
-			ldi	XL,0x32		;WRITE
-			call	spi_byte
-			
-			mov	XL,r18		;AH
-			call	spi_byte
-			mov	XL,r17		;AM
-			call	spi_byte
-			call	spi_zerobyte	;AL
-
-			ldi	XL,0x3F		;all IO output
-			out	CTRLDDR,XL
-			ldi	r22,SPI_SCK_PULSE
-
-			ldi	r24,0x00	;256 bytes
-			ldi	r25,1
-			
-spiflash_write41_2:	ld	XL,Y+
-			mov	r23,XL
-			lsr	XL
-			lsr	XL
-			andi	XL,0x3c
-			out	CTRLPORT,XL	;data + SCK LOW
-			lsl	r23	
-			out	CTRLPIN,r22	;SCK HI
-			lsl	r23			
-			andi	r23,0x3c
-			out	CTRLPORT,r23	;data + SCK LOW
-			sbiw	r24,1
-			out	CTRLPIN,r22	;SCK HI
-			
-			brne	spiflash_write41_2
-			
-			out	CTRLPIN,r22	;pulse off
-
-			call	spi_inactive
-			call	spi0_reinit
-			
-			rcall	spiflash_wready3	
-			add	r17,const_1
-			adc	r18,const_0
-			
-			dec	r19
-			brne	spiflash_write41_1
-			jmp	main_loop_ok
 
 ;------------------------------------------------------------------------------
 ; write 
 ; PAR1	=	ADDRL
 ; PAR2	=	ADDRM
 ; PAR3	=	ADDRH
-; PAR4	=	512bytes-blocks
+; PAR4	=	ADDRX
 ;------------------------------------------------------------------------------
-spiflash_write42:	movw	YL,const_0
+spiflash_write24:	movw	YL,const_0
+			ldi	r25,4		;pages
 
-spiflash_write42_1:	rcall	spiflash_wren	;write enable
+spiflash_write24_1:	rcall	spiflash_wren	;write enable
 					
 			SPIFL_ACT
 
-			ldi	XL,0x32		;WRITE QUAD
+			ldi	XL,0x12		;WRITE
 			call	spi_byte
 			
+			mov	XL,r19		;AX
+			call	spi_byte
 			mov	XL,r18		;AH
 			call	spi_byte
 			mov	XL,r17		;AM
 			call	spi_byte
 			call	spi_zerobyte	;AL
 
-			ldi	XL,0x3F		;all IO output
-			out	CTRLDDR,XL
-			ldi	r22,SPI_SCK_PULSE
-
-
-			ldi	r24,0x00	;256 words
-			ldi	r25,2
+			ldi	r24,0		;256 words
 			
-spiflash_write42_2:	ld	XL,Y+
-			mov	r23,XL
-			lsr	XL
-			lsr	XL
-			andi	XL,0x3c
-			out	CTRLPORT,XL
-			lsl	r23
-			out	CTRLPIN,r22	;pulse
-			lsl	r23			
-			andi	r23,0x3c
-			out	CTRLPORT,r23
-			sbiw	r24,1
-			out	CTRLPIN,r22	;pulse
-			
-			brne	spiflash_write42_2
-			
-			out	CTRLPIN,r22	;pulse off
+spiflash_write24_2:	ld	XL,Y+
+			call	spi_byte
+			ld	XL,Y+
+			call	spi_byte
+			dec	r24
+			brne	spiflash_write24_2
 
-			call	spi_inactive
-			call	spi0_reinit
+			SPIFL_INH
 			
 			rcall	spiflash_wready3	
 			ldi	XL,2
 			add	r17,XL
 			adc	r18,const_0
+			adc	r19,const_0
 			
-			dec	r19
-			brne	spiflash_write42_1
+			dec	r25
+			brne	spiflash_write24_1
 			jmp	main_loop_ok
 
 			
@@ -504,8 +381,12 @@ spiflash_erase_nw:	rcall	spiflash_wren		;write enable
 ;------------------------------------------------------------------------------
 ; set bank
 ; PAR4 = bank
+; PAR3 = 1=only write 
 ;------------------------------------------------------------------------------
-spiflash_set_bank:	SPIFL_ACT
+spiflash_set_bank:	sbrc	r18,0
+			rjmp	spiflash_set_bank1
+			clr	r5
+			SPIFL_ACT
 			ldi	XL,0x17			;set bank
 			call	spi_byte
 			mov	XL,r19			;bank no
@@ -513,6 +394,12 @@ spiflash_set_bank:	SPIFL_ACT
 			call	spi_byte
 			SPIFL_INH
 			jmp	main_loop_ok
+
+spiflash_set_bank1:	mov	r4,r19
+			mov	r5,const_1
+			jmp	main_loop_ok			
+
+
 
 ;------------------------------------------------------------------------------
 ; get status

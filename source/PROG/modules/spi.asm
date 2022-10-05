@@ -70,26 +70,208 @@ spi_byte_1:		sbrc	XL,7
 			brne	spi_byte_1
 			ret
 
+
+;------------------------------------------------------------------------------
+; exchange byte XL -> XL
+; ca. 2MHz
+; uses r22,r0,r1
+;------------------------------------------------------------------------------
+spi_zerobytef:		clr	XL
 spi_byte_fast:		ldi	r22,SPI_SCK_PULSE
-			ldi	r21,0xFF
-spi_bytef_1:		sbrc	XL,7
-			sbi	CTRLPORT,SPI_MOSI
-			sbrs	XL,7
-			cbi	CTRLPORT,SPI_MOSI
-			
-			
-			
+			in	r0,CTRLPORT
+
+			bst	XL,7
+			bld	r0,2
+			out	CTRLPORT,r0		;set MOSI
 			out	CTRLPIN,r22		;clock pulse
-			lsl	XL
-			sbic	CTRLPIN,SPI_MISO
-			inc	XL		
-			out	CTRLPIN,r22
-			dec	r21
-			brne	spi_bytef_1
+			nop
+			in	r1,CTRLPIN		;get MISO
+			bst	r1,3
+			bld	XL,7				
+			out	CTRLPIN,r22		;clock pulse
+
+			bst	XL,6
+			bld	r0,2
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,6				
+			out	CTRLPIN,r22		;clock pulse
+			
+			bst	XL,5
+			bld	r0,2
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,5				
+			out	CTRLPIN,r22		;clock pulse
+			
+			bst	XL,4
+			bld	r0,2
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,4				
+			out	CTRLPIN,r22		;clock pulse
+			
+			bst	XL,3
+			bld	r0,2
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,3				
+			out	CTRLPIN,r22		;clock pulse
+			
+			bst	XL,2
+			bld	r0,2
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,2				
+			out	CTRLPIN,r22		;clock pulse
+			
+			bst	XL,1
+			bld	r0,2
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,1				
+			out	CTRLPIN,r22		;clock pulse
+			
+			bst	XL,0
+			bld	r0,2
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,0				
+			out	CTRLPIN,r22		;clock pulse
+	
+			ret
+
+
+spi_send_fast:		ldi	r22,SPI_SCK_PULSE
+			in	r0,CTRLPORT
+
+			bst	XL,7
+			bld	r0,2
+			out	CTRLPORT,r0		;set MOSI
+			out	CTRLPIN,r22		;clock pulse
+			bst	XL,6
+			bld	r0,2
+			out	CTRLPIN,r22		;clock pulse
+
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			bst	XL,5
+			bld	r0,2
+			out	CTRLPIN,r22		;clock pulse
+			
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			bst	XL,4
+			bld	r0,2
+			out	CTRLPIN,r22		;clock pulse
+			
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			bst	XL,3
+			bld	r0,2
+			out	CTRLPIN,r22		;clock pulse
+			
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			bst	XL,2
+			bld	r0,2
+			out	CTRLPIN,r22		;clock pulse
+			
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			bst	XL,1
+			bld	r0,2
+			out	CTRLPIN,r22		;clock pulse
+			
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			bst	XL,0
+			bld	r0,2
+			out	CTRLPIN,r22		;clock pulse
+			
+			out	CTRLPORT,r0
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			nop
+			out	CTRLPIN,r22		;clock pulse
 			ret
 
 
 
+spi_recv_fast:		ldi	r22,SPI_SCK_PULSE
+			cbi	CTRLPORT,SPI_MOSI	;set MOSI to zero
+
+			out	CTRLPIN,r22		;clock pulse
+			nop
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			out	CTRLPIN,r22		;clock pulse
+			bld	XL,7				
+
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			out	CTRLPIN,r22		;clock pulse
+			bld	XL,6				
+
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			out	CTRLPIN,r22		;clock pulse
+			bld	XL,5				
+
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			out	CTRLPIN,r22		;clock pulse
+			bld	XL,4				
+
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			out	CTRLPIN,r22		;clock pulse
+			bld	XL,3				
+
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			out	CTRLPIN,r22		;clock pulse
+			bld	XL,2				
+
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			out	CTRLPIN,r22		;clock pulse
+			bld	XL,1
+
+			out	CTRLPIN,r22		;clock pulse
+			in	r1,CTRLPIN
+			bst	r1,3
+			bld	XL,0				
+			
+			ret
 
 ;------------------------------------------------------------------------------
 ; exchange byte XL -> XL

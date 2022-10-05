@@ -46,33 +46,6 @@ void print_spiflash_error(int errc)
 	print_error();
 }
 
-int show_quadmode(void)
-{
-	prg_comm(0x1e8,0,4,0,0,0,0,0,0);		//get info
-
-	if(param[15] == 0)
-	{
-		printf(" QUAD MODE IS NOT AVAILABLE\n");
-		return -1;
-	}
-	else
-	{
-		printf(" config/status: %02X  %02X %02X\n",memory[0],memory[1],memory[2]);
-
-	 	if(	((param[17]==0) && (memory[1] & 0x02)) ||
-			((param[17]==1) && (memory[0] & 0x40)))
-		{		
-			printf(" QUAD MODE IS ENABLED\n");
-			return 1;
-		}
-		else
-		{		
-			printf(" QUAD MODE IS DISABLED\n");
-			return 0;
-		}
-	}			
-}
-
 int prog_spiflash(void)
 {
 	int errc,blocks,i,loops,maxloops,rstat;
@@ -84,10 +57,7 @@ int prog_spiflash(void)
 	int main_readout=0;
 	int unprotect=0;
 	int protect=0;
-	int quadmode=0;
 	int ignore_size=0;
-	int res_quad=0;
-	int set_quad=0;
 	int is_quad=0;
 	errc=0;
 
@@ -101,9 +71,6 @@ int prog_spiflash(void)
 		printf("-- vm -- memory verify\n");
 		printf("-- rm -- memory read\n");
 		printf("-- rc -- config bytes read\n");
-		printf("-- qm -- use quad mode\n");
-		printf("-- qr -- reset quad mode (non-volatile)\n");
-		printf("-- qs -- set quad mode (non-volatile)\n");
 		printf("-- is -- ignore size\n");
  		printf("-- d2 -- switch to device 2\n");
 
@@ -132,45 +99,6 @@ int prog_spiflash(void)
 	{
 		unprotect=1;
 		printf("## Action: disable all write protection\n");
-	}
-
-	if(find_cmd("qr"))
-	{
-		if(param[15]==0)
-		{
-			printf("## quad mode is not supported\n");		
-		}
-		else
-		{
-			res_quad=1;
-			printf("## clear quad mode non-volatile\n");
-		}
-	}
-
-	if(find_cmd("qs"))
-	{
-		if(param[15]==0)
-		{
-			printf("## quad mode is not supported\n");		
-		}
-		else
-		{
-			set_quad=1;
-			printf("## set quad mode non-volatile\n");
-		}
-	}
-
-	if(find_cmd("qm"))
-	{
-		if(param[15]==0)
-		{
-			printf("## quad mode is not supported\n");		
-		}
-		else
-		{
-			quadmode=1;
-			printf("## use quad mode\n");
-		}
 	}
 
 	if(find_cmd("pr"))
@@ -250,9 +178,7 @@ int prog_spiflash(void)
 		errc=0x43;
 		goto SPIF_FEXIT;
 	}
-	
-	is_quad=show_quadmode();
-	
+		
 	if((unprotect == 1) && (errc == 0))
 	{
 		printf("DISABLE WRITE PROTECTION\n");
@@ -286,31 +212,50 @@ int prog_spiflash(void)
 		printf("\n");
 	}	
 
-	//store current quad mode status and enable quad mode
-	if((quadmode == 1) || (set_quad == 1))
+
+	if((main_prog == 1) && (errc == 0) && (param[3] == 0))
 	{
-		if(is_quad == 0)
+		len=param[1]*256;
+		if(len > 0x1000000) len=0x1000000;
+		
+		read_block(param[0],len,0);
+		bsize=max_blocksize;
+		addr=param[0];
+		blocks=len/bsize;
+		maddr=0;
+
+		progress("PROG ",blocks,0);
+		for(i=0;i<blocks;i++)
 		{
-			printf("ENABLE QUAD MODE\n");
-//			waitkey();
-			errc=prg_comm(0x125,0,0,0,0,0,0,0,param[17]);
-			if(errc != 0) goto SPIF_FEXIT;
-			if(show_quadmode() != 1)
+			if(must_prog(maddr,bsize) && (errc==0))
 			{
-				errc=0x59;
-				goto SPIF_FEXIT;
+				if(param[11]==256)
+				{
+					errc=prg_comm(0x103,bsize,0,maddr,0,
+						(addr & 0xff),
+						(addr >> 8) & 0xff,
+						(addr >> 16) & 0xff,
+						bsize >> 8);		//write
+				}
+				if(param[11]==512)
+				{
+					errc=prg_comm(0x10F,bsize,0,maddr,0,
+						(addr & 0xff),
+						(addr >> 8) & 0xff,
+						(addr >> 16) & 0xff,
+						bsize >> 9);		//write
+				}
 			}
+			addr+=bsize;			
+			maddr+=bsize;
+			progress("PROG ",blocks,i+1);
 		}
 	}
 
-
-	if((main_prog == 1) && (errc == 0))
+	if((main_prog == 1) && (errc == 0) && (param[3] > 0))
 	{
 		for(bank=0;bank<=param[3];bank++)
 		{
-//			printf("SELECT BANK %d\n",bank);
-			prg_comm(0x107,0,0,0,0,0,0,0,bank);		//select bank
-
 			len=param[1]*256;
 			if(len > 0x1000000) len=0x1000000;
 		
@@ -324,45 +269,25 @@ int prog_spiflash(void)
 			progress("PROG ",blocks,0);
 			for(i=0;i<blocks;i++)
 			{
-				if(must_prog(maddr,bsize) && (errc==0) && (quadmode == 0))
+				if(must_prog(maddr,bsize) && (errc==0))
 				{
 					if(param[11]==256)
-					{
-						errc=prg_comm(0x103,bsize,0,maddr,0,
-							(addr & 0xff),
-							(addr >> 8) & 0xff,
-							(addr >> 16) & 0xff,
-							bsize >> 8);		//write
-					}
-					if(param[11]==512)
-					{
-						errc=prg_comm(0x10F,bsize,0,maddr,0,
-							(addr & 0xff),
-							(addr >> 8) & 0xff,
-							(addr >> 16) & 0xff,
-							bsize >> 9);		//write
-					}
-				}
-				if(must_prog(maddr,bsize) && (errc==0) && (quadmode == 1))
-				{
-					if(param[11]==256)
-					{
-						errc=prg_comm(0x120,bsize,0,maddr,0,
-							(addr & 0xff),
-							(addr >> 8) & 0xff,
-							(addr >> 16) & 0xff,
-							bsize >> 8);		//write
-					}
-					if(param[11]==512)
 					{
 						errc=prg_comm(0x121,bsize,0,maddr,0,
 							(addr & 0xff),
 							(addr >> 8) & 0xff,
 							(addr >> 16) & 0xff,
-							bsize >> 9);		//write
+							bank);
+					}
+					if(param[11]==512)
+					{
+						errc=prg_comm(0x122,bsize,0,maddr,0,
+							(addr & 0xff),
+							(addr >> 8) & 0xff,
+							(addr >> 16) & 0xff,
+							bank);
 					}
 				}
-
 				addr+=bsize;			
 				maddr+=bsize;
 				progress("PROG ",blocks,i+1);
@@ -371,12 +296,67 @@ int prog_spiflash(void)
 		}
 	}
 
-	if(((main_readout == 1) || (main_verify == 1)) && (errc == 0))
+
+
+	if(((main_readout == 1) || (main_verify == 1)) && (errc == 0) && (param[3]==0))
+	{
+		bsize=max_blocksize;
+//		param[0]=0x800000;
+		addr=param[0]+(bank << 24);
+		len=param[1]*256;
+		if(len > 0x1000000) len=0x1000000;
+		blocks=len/bsize;
+		maddr=0;
+
+		progress("READ ",blocks,0);
+		for(i=0;i<blocks;i++)
+		{
+//			printf("BLOCK=%d   ADDR=%08lX ",i,addr);
+			if(errc == 0)
+			{
+				errc=prg_comm(0x12e,0,bsize,0,maddr+ROFFSET,
+				(addr & 0xff),
+				(addr >> 8) & 0xff,
+				(addr >> 16) & 0xff,
+				bsize >> 8);		//blocks
+			}
+			memory[maddr]=0xbe;
+			addr+=bsize;
+			maddr+=bsize;
+//			printf("DONE\n",i,addr);
+			progress("READ ",blocks,i+1);
+		}
+		printf("\n");
+//		printf("DONE (%02X)\n",errc);
+	
+		//verify main
+		if((main_verify == 1) && (errc == 0))
+		{
+			read_block(param[0],len,0);
+			maddr=param[0];		
+			for(addr=maddr;addr<(maddr+len);addr++)
+
+			if(memory[addr] != memory[addr+ROFFSET])
+			{
+				printf("ERR -> ADDR= %08lX  FILE= %02X  READ= %02X\n",
+					addr,memory[addr],memory[addr+ROFFSET]);
+				errc=1;
+			}
+		}
+
+		if((main_readout == 1) && (errc == 0))
+		{
+//			printf("SAVE=%08lx   SIZE=%08lX\n",param[0],len);
+			writeblock_data(0,len,param[0]);
+		}
+	}
+
+
+	if(((main_readout == 1) || (main_verify == 1)) && (errc == 0) && (param[3]>0))
 	{
 		for(bank=0;bank<=param[3];bank++)
 		{
 			printf("READ DATA FROM BANK %d\n",bank);
-			prg_comm(0x107,0,0,0,0,0,0,0,bank);		//select bank
 
 			bsize=max_blocksize;
 //			param[0]=0x800000;
@@ -390,23 +370,15 @@ int prog_spiflash(void)
 			for(i=0;i<blocks;i++)
 			{
 //				printf("BLOCK=%d   ADDR=%08lX ",i,addr);
-				if((errc == 0) && (quadmode == 0))
+				if(errc == 0)
 				{
-					errc=prg_comm(0x102,0,bsize,0,maddr+ROFFSET,
+					errc=prg_comm(0x125,0,bsize,0,maddr+ROFFSET,
 					(addr & 0xff),
 					(addr >> 8) & 0xff,
 					(addr >> 16) & 0xff,
-					bsize >> 8);		//blocks
+					bank);
 				}
-				if((errc == 0) && (quadmode == 1))
-				{
-					errc=prg_comm(0x122,0,bsize,0,maddr+ROFFSET,
-					(addr & 0xff),
-					(addr >> 8) & 0xff,
-					(addr >> 16) & 0xff,
-					bsize >> 8);		//blocks
-				}
-				memory[maddr]=0xbe;
+//				memory[maddr]=0xbe;
 				addr+=bsize;
 				maddr+=bsize;
 //				printf("DONE\n",i,addr);
@@ -444,25 +416,6 @@ int prog_spiflash(void)
 	}
 
 	if(errc==0x9f) goto SPIF_FEXIT;
-
-
-
-	if(((quadmode == 1) && (is_quad == 0)) || (res_quad == 1))
-	{
-		if(is_quad == 1)
-		{
-			printf("DISABLE QUAD MODE\n");
-//			waitkey();
-			errc=prg_comm(0x12D,0,0,0,0,0,0,0,param[17]);
-			if(errc != 0) goto SPIF_FEXIT;
-			is_quad=show_quadmode();
-			if(is_quad != 0)
-			{
-				errc=0x59;
-				goto SPIF_FEXIT;
-			}
-		}
-	}
 	
 	if((protect == 1) && (errc == 0))
 	{

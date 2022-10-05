@@ -28,7 +28,7 @@
 .def		const_1		= r3
 
 .equ		sysver_high	= 0x00	
-.equ		sysver_low	= 0x12
+.equ		sysver_low	= 0x13
 
 .equ		buffer		= 0x100		;data buffer
 .equ		stack		= 0x10ff	;system/return stack
@@ -77,6 +77,8 @@
 
 .org 0x0000
 .include	"modules/interrupts.asm"
+.org 0x0080
+.include	"tables/parity_table.inc"
 .org 0x01e0
 .include	"modules/version.asm"
 .org 0x0200
@@ -85,12 +87,11 @@
 ;communication modules
 .include	"modules/spi.asm"
 .include	"modules/bdm.asm"
-.include	"modules/serial1.asm"
 .include	"modules/serial2.asm"
 .include	"modules/sercomm.asm"
 .include	"modules/serial3.asm"
 .include	"modules/serial4.asm"
-.include	"modules/serial_e.asm"
+;.include	"modules/serial_e.asm"
 .include	"modules/i2c.asm"
 .include	"modules/jtag.asm"
 .include	"modules/freq_gen.asm"

@@ -56,7 +56,7 @@ void print_avrjtag_error(int errc,unsigned long addr)
 
 int prog_avrjtag(void)
 {
-	int errc,blocks,tblock,bsize,i,j,eblock=0;
+	int errc,blocks,tblock,bsize,j,eblock=0;
 	unsigned long addr,maddr,signature;
 	int chip_erase=0;
 	int main_prog=0;
@@ -75,15 +75,6 @@ int prog_avrjtag(void)
 	int cal_set=0;
 	int tout;
 
-	int debug_flash=0;
-	size_t dbg_len=80;
-	char *dbg_line;
-	char *dbg_ptr;
-	char c;
-	unsigned short dbg_addr,dbg_val;
-	
-	dbg_line=malloc(100);
-	
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
@@ -105,7 +96,6 @@ int prog_avrjtag(void)
 		printf("-- ef -- set ext fuse\n");
 		printf("-- lb -- set lock bits\n");
 		printf("-- wc -- write calibration value to flash\n");
-//		printf("-- df -- debug code in FLASH\n");
 		printf("-- st -- start device\n");
 		printf("-- ii -- ignore wrong ID\n");
 		printf("-- d2 -- switch to device 2\n");
@@ -130,13 +120,6 @@ int prog_avrjtag(void)
 		printf("## Ignore device ID\n");
 	}
 
-/*	if(find_cmd("df"))
-	{
-		debug_flash=1;
-		printf("## Action: debug code in FLASH\n");
-		goto AVRJTAG_ORUN;
-	}
-*/
 	if(find_cmd("ex"))
 	{
 		param[3]+=384;
@@ -233,7 +216,7 @@ int prog_avrjtag(void)
 	printf("\n");
 
 
-AVRJTAG_ORUN:
+//AVRJTAG_ORUN:
 
 	errc=0;
 
@@ -270,8 +253,6 @@ AVRJTAG_ORUN:
 				printf("!!! IGNORE SIGNATURE BY COMMAND OVERRIDE !!!\n");	
 			}
 		}
-
-		if(debug_flash==1) goto AVRJTAG_NRD;
 
 
 		errc=prg_comm(0x249,0,0,0,0,0,0,0,0);	//PRGEN
@@ -600,17 +581,6 @@ AVRJTAG_NRD:
 		writeblock_close();
 	}
 
-/*
-	if(param[12] > 0)
-	{
-		if((debug_flash==1) && (errc==0) && (param[12]==1)) debug_avrjtag_t1();
-	}
-	else
-	{
-		printf("!! Debugging is not supported for %s !!\n",name);
-	
-	}
-*/
 	if(dev_start == 1)
 	{
 		if(errc == 0) errc=prg_comm(0x0e,0,0,0,0,0,0,0,0);			//init

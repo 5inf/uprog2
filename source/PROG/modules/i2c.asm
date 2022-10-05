@@ -225,7 +225,97 @@ lps25h_start:		rcall	i2c_start		;start condition
 			call	api_wait_ms
 
 			jmp	main_loop_ok
+
+;-------------------------------------------------------------------------------
+; start veml3328
+; PA3/4 command
+;-------------------------------------------------------------------------------
+veml3328_read:		call	api_resetptr
+			ldi	r16,0x41
+			ldi	XH,0x00			;status
+			rcall	veml3328_get
+			ldi	XH,0x0C			;id
+			rcall	veml3328_get
+			ldi	XH,0x04			;C
+			rcall	veml3328_get
+			ldi	XH,0x05			;R
+			rcall	veml3328_get
+			ldi	XH,0x06			;G
+			rcall	veml3328_get
+			ldi	XH,0x07			;B
+			rcall	veml3328_get
+			ldi	XH,0x08			;I
+			rcall	veml3328_get
+			jmp	main_loop_ok
 		
+veml3328_start:		ldi	r16,0x41		;no start
+			rcall	i2c_start		;start condition
+			cpi	r23,0x08		;check for result
+			brne	veml3328_err		;error
+			ldi	r16,0x42		;no ack
+			ldi	XL,0x20			;addresswrite
+			rcall	i2c_wbyte		;write byte
+			cpi	r23,0x18		;check for result
+			brne	veml3328_err		;error
+			ldi	XL,0x00			;CMD
+			rcall	i2c_wbyte		;write byte
+			cpi	r23,0x28		;check for result
+			brne	veml3328_err		;error
+			mov	XL,r18			;data low
+			rcall	i2c_wbyte		;write byte
+			cpi	r23,0x28		;check for result
+			brne	veml3328_err		;error
+			mov	XL,r19			;data high
+			rcall	i2c_wbyte		;write byte
+			cpi	r23,0x28		;check for result
+			brne	veml3328_err		;error
+			rcall	i2c_stop
+
+			ldi	ZL,55
+			ldi	ZH,0
+			sbrc	r18,5
+			ldi	ZL,220
+			sbrs	r18,4
+			rjmp	veml3328_start1
+			lsl	ZL
+			rol	ZH
+veml3328_start1:	call	api_wait_ms
+
+			jmp	main_loop_ok
+			
+
+		
+veml3328_get:		ldi	r16,0x41
+			rcall	i2c_start		;start condition
+			cpi	r23,0x08		;check for result
+			brne	veml3328_err0		;error
+			ldi	r16,0x42		;no ack
+			ldi	XL,0x20			;addresswrite
+			rcall	i2c_wbyte		;write byte
+			cpi	r23,0x18		;check for result
+			brne	veml3328_err0		;error
+			mov	XL,XH			;command
+			rcall	i2c_wbyte		;write byte
+			cpi	r23,0x28		;check for result
+			brne	veml3328_err		;error
+			rcall	i2c_start		;repeated start condition
+			ldi	XL,0x21			;addresswrite
+			rcall	i2c_wbyte		;write byte
+			rcall	i2c_rbyte		;read byte with ACK
+			call	api_buf_bwrite		
+			rcall	i2c_rbyten		;read byte with ACK
+			call	api_buf_bwrite		
+			rcall	i2c_stop
+			ldi	ZL,1
+			ldi	ZH,0
+			call	api_wait_ms
+			ret
+
+veml3328_err0:		pop	r0
+			pop	r0
+veml3328_err:		rcall	i2c_stop
+			jmp	main_loop		;stop condition and end
+
 
 
 ;-------------------------------------------------------------------------------

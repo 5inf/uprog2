@@ -36,7 +36,7 @@
 #include <algorithm.h>
 #include <wires.h>
 
-extern int daemon_task(void);
+extern int daemon_task(int);
 
 int main(int argc, char *argv[])
 {
@@ -46,6 +46,7 @@ int main(int argc, char *argv[])
 	
 	range_err=0;
 	
+	use_vanilla_pid=0;
 	force_exit=0;
 	is_error=0;
 	jj=0;
@@ -71,7 +72,7 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.40                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.41                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  (c) 2012-2021 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");
@@ -108,6 +109,7 @@ int main(int argc, char *argv[])
 		return(0);	
 	}
 
+		
 	if((strncmp(argv[1],"KILL",4) != 0) && (force_exit == 0))
 	{
 
@@ -115,11 +117,30 @@ int main(int argc, char *argv[])
 		{
 			printf("\nuprog2 daemon is not active, starting daemon and searching for programmer...\n\n");		
 
+			if(argc > 2)
+			{
+				//search for cmd string
+				if (strncmp(argv[2],"-",1) == 0)
+				{
+					strncpy(cmd,argv[2],80);
+				}
+			}
+
+			if(find_cmd("vp"))
+			{
+				if(pids == 1)
+				{
+					use_vanilla_pid=1;
+					printf("\n## TRY TO USE VANILLA USB PID \n");
+		
+				}
+			}
+	
 			mypid=fork();
 		
 			if(mypid == 0)
 			{
-				return(daemon_task());
+				return(daemon_task(use_vanilla_pid));
 			}
 			else
 			{	//wait until daemon is active
@@ -472,6 +493,8 @@ int main(int argc, char *argv[])
 			case 65:	errcode=prog_stm32swd();	break;	//f7
 			case 66:	errcode=prog_onewire();		break;	//onewire EEPROM
 			case 67:	errcode=prog_avrjtag();		break;	//AVR over JTAG
+//			case 68:	errcode=prog_samdswd();		break;	//ATSAMD over SWD
+
 			case 89:	errcode=prog_dgen();		break;
 			case 97:	errcode=prog_fgen();		break;
 

@@ -611,7 +611,7 @@ ONLY_DD:
 			mcsum -= checksum[tblock];
 			addr+=1024;
 		}
-		printf("\nMAIN FLASH CHECKSUM = 0x%04X\n\n",mcsum & 0xFFFF);		
+		printf("\nMAIN FLASH CHECKSUM = 0x%04X\n\n",(unsigned short)mcsum & 0xFFFF);		
 	}
 
 	//checksum data
@@ -649,7 +649,7 @@ ONLY_DD:
 			mcsum -= checksum[tblock];
 			addr+=1024;
 		}
-		printf("\nDATA FLASH CHECKSUM = 0x%04X\n\n",mcsum & 0xFFFF);		
+		printf("\nDATA FLASH CHECKSUM = 0x%04X\n\n",(unsigned short)mcsum & 0xFFFF);		
 	}
 
 

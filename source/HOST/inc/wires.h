@@ -207,8 +207,8 @@ const char * const cables[]=
 	// 68 
 	"no connections",
 
-	// 69 
-	"no connections"
+	// 69 VEML3328
+	"(1=VSS  2=VDD  3=SCL  4=SDA)",
 
 	// 70 
 	"no connections",

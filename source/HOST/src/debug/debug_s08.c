@@ -50,9 +50,9 @@ void show_s08_registers(void)
 
 void debug_s08(int mode)
 {
-	int errc,blocks,tblock,bsize,i,j,eblock=0;
+	int errc,i,j;
 	unsigned short ramsize,ramstart,addr,len;
-	float freq,bdmfreq;
+	float bdmfreq;
 	int bfreq;
 
 	size_t dbg_len=80;

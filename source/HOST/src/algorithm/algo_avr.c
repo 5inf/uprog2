@@ -40,6 +40,9 @@ void print_avr_error(int errc,unsigned long addr)
 		case 0x41:	set_error("(no echo)",errc);
 				break;
 
+		case 0x45:	set_error("(verify error)",errc);
+				break;
+
 		default:	set_error("(unexpected error)",errc);
 	}
 	print_error();
@@ -400,7 +403,7 @@ int prog_avr(void)
 			{
 				printf("ERR -> ADDR= %06lX  DATA= %02X  READ= %02X\n",
 				addr+j,memory[j],memory[j+ROFFSET]);
-				errc=1;
+				errc=0x45;
 			}
 		}
 	}
@@ -484,7 +487,7 @@ int prog_avr(void)
 			{
 				printf("ERR -> ADDR= %04lX  DATA= %02X  READ= %02X\n",
 				addr+j,memory[j],memory[j+ROFFSET]);
-				errc=1;
+				errc=0x45;
 			}
 		}
 	}
