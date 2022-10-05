@@ -6,7 +6,7 @@ myNAME = rl78-dump-dflash
 
 ################################################################################
 
-DEVICE=r5f10agg
+DEVICE=r5f10a6a
 PROGDEV=RL78DMP
 
 TOOLPREFIX=/usr/local/toolchain/rl78-elf/bin/rl78-elf

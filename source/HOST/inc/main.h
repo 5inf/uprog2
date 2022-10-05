@@ -10,10 +10,15 @@
 #include<debug.h>
 
 #define ROFFSET 0x2000000			//max 32MB
-#define SHM_SIZE 2064
+#define SHM_SIZE 32768+16
+
 #define DEBUG_OUTPUT 0
 
+#define ARM_READ_ID 0xA5
+#define ARM_READ_CSTAT 0xB1
+
 unsigned char *memory;		//global memory map
+unsigned char *memory_used;	//global memory map (used memory)
 unsigned char *shm;
 unsigned long shmkey;
 char sfile[300];		//data file
@@ -30,6 +35,7 @@ long max_post_data;
 long post_data_start;
 int hold_vdd;
 int range_err;
+unsigned char com_buf[33000];
 
 unsigned long loaddr,hiaddr;
 unsigned long s1,e1,s2,e2,s3,e3,s4,e4,devid;
@@ -65,4 +71,4 @@ typedef struct typelist
 
 int force_exit;
 int use_vanilla_pid;
-
+int programmer_type;

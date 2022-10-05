@@ -46,12 +46,12 @@ sub gencode
 		if(substr($line,0,2) eq "S3")
 		{
 			$line=substr($line,0,length($line)-2)."FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
-			$addr=substr($line,4,8);
-			$addr=sprintf("%u",hex($addr));
+			$xaddr=substr($line,6,6);
+			$addr=sprintf("%u",hex($xaddr));
 		#	$addr-=0x20001000;
 			$llen=substr($line,2,2);
 			$llen=sprintf("%u",hex($llen))-5;
-		#	print $addr."\t".$llen."\n";
+			print $xaddr."\t".$llen."\n";
 			for($i=0;$i<$llen;$i++)
 			{
 				$romdata[$addr+$i]=substr($line,12+2*$i,2);

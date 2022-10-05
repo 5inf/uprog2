@@ -1,8 +1,7 @@
-#include <r5f10bgg.h>
+#include <r5f10a6a.h>
 #include <unilib.h>
 
 #define DATA_PIN PORT_4,0		//PIN 5
-
 
 extern unsigned char get_fbyte0(unsigned int);
 extern unsigned char get_fbyte1(unsigned int);
@@ -39,7 +38,6 @@ int main()
 	portpin_set_output(DATA_PIN);
 	portpin_set_high(DATA_PIN);
 	clock_config(CLOCK_I_16);
-
 
 	ptr=0;		//start of Flash
 

@@ -231,8 +231,9 @@ int prog_avr(void)
 		errc=writeblock_open();
 	}
 
-	printf("INIT\n");
+	printf("INIT... ");
 	errc=prg_comm(0x01,0,0,0,0,0,0,0,0x50);	//slow
+	printf(" DONE\n");
 
 	if (errc == 0) 
 	{

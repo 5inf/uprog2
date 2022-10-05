@@ -288,7 +288,7 @@ int prog_avrjtag(void)
 
 	}
 
-AVRJTAG_NRD:
+//AVRJTAG_NRD:
 
 	if ((errc == 0) && (chip_erase == 1))
 	{

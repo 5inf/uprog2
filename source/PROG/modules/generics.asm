@@ -30,3 +30,15 @@ gen_wres:		sts	0x0100,r20
 			sts	0x0102,r22
 			sts	0x0103,r23
 			ret
+
+gen_w32:		st	Y+,r20
+			st	Y+,r21
+			st	Y+,r22
+			st	Y+,r23
+			ret
+
+gen_r32:		ld	r20,Y+
+			ld	r21,Y+
+			ld	r22,Y+
+			ld	r23,Y+
+			ret

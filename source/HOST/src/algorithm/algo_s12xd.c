@@ -286,7 +286,7 @@ int prog_s12xd(void)
 	{
 		printf("ERASE EEPROM\n");
 		errc=prg_comm(0x38,0,0,0,0,0,0,0,0);			//main erase
-		if((errc == 0xc0) || (errc == 0xc4))
+		if((errc == 0x80) || (errc == 0xc0) || (errc == 0xc4))
 		{
 			errc = 0;
 		}
@@ -297,7 +297,7 @@ int prog_s12xd(void)
 	{
 		printf("ERASE FLASH\n");
 		errc=prg_comm(0x33,0,0,0,0,0,0,0,0);			//main erase
-		if((errc == 0xc0) || (errc == 0xc4))
+		if((errc == 0x80) || (errc == 0xc0) || (errc == 0xc4))
 		{
 			errc = 0;
 		}
@@ -308,7 +308,7 @@ int prog_s12xd(void)
 	{
 		printf("UNSECURE DEVICE\n");
 		errc=prg_comm(0x34,0,0,0,0,0,0,fcdiv,bfreq-1);		//main erase + unsecure
-		if((errc == 0xc0) || (errc == 0xc4))
+		if((errc == 0x80) || (errc == 0xc0) || (errc == 0xc4))
 		{
 			errc = 0;
 		}

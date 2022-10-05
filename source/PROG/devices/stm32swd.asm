@@ -40,8 +40,8 @@
 .equ			SWD32_READ_CTRL		= 0xb1
 .equ			SWD32_WRITE_CTRL	= 0x95
 
-.equ			SWD32_READ_STAT		= 0xb5
-.equ			SWD32_WRITE_SELECT	= 0x8d
+.equ			SWD32_READ_STAT		= 0xa9		;b5
+.equ			SWD32_WRITE_SELECT	= 0x8d		;8d
 
 .equ			SWD32_READ_RDBUFF	= 0xbd		;read buffer
 
@@ -54,8 +54,8 @@
 .equ			SWD32_READ_TAR		= 0xf5
 .equ			SWD32_WRITE_TAR		= 0xd1
 
-.equ			SWD32_READ_BASE		= 0xed
-.equ			SWD32_READ_IDR		= 0xc9
+.equ			SWD32_READ_IDR		= 0xed
+.equ			SWD32_WRITE_BASE	= 0xc9
 
 .equ			SWD32_READ_DRW		= 0xf9
 .equ			SWD32_WRITE_DRW		= 0xdd
@@ -184,19 +184,7 @@ swd32_reset_1:		out		CTRLPORT,r14		;one
 			cpi		r18,0xde		;skip switch to SWD mode if not needed 
 			breq		swd32_reset_nsw
 
-			;switch to SWD mode
-			ldi		XH,16
-			ldi		ZH,0xE7			;switch code (LSB first)
-			ldi		ZL,0x9E
-swd32_reset_2:		mov		XL,r14			;one
-			sbrs		ZL,0
-			mov		XL,r13			;zero
-			out		CTRLPORT,XL
-			lsr		ZH
-			ror		ZL
-			out		CTRLPIN,r15		;clock inactive
-			dec		XH
-			brne		swd32_reset_2
+			rcall		swd32_switch_swd
 
 swd32_reset_nsw:
 			;goto run-test-idle
@@ -207,6 +195,22 @@ swd32_reset_4:		out		CTRLPORT,r13		;zero
 			out		CTRLPIN,r15		;clock inactive
 			brne		swd32_reset_4
 			ret
+
+			;switch to SWD mode
+swd32_switch_swd:	ldi		XH,16
+			ldi		ZH,0xE7			;switch code (LSB first)
+			ldi		ZL,0x9E
+swd32_switch_swd_2:	mov		XL,r14			;one
+			sbrs		ZL,0
+			mov		XL,r13			;zero
+			out		CTRLPORT,XL
+			lsr		ZH
+			ror		ZL
+			out		CTRLPIN,r15		;clock inactive
+			dec		XH
+			brne		swd32_switch_swd_2
+			ret
+
 
 ;-------------------------------------------------------------------------------
 ; write
@@ -374,8 +378,6 @@ swd32_wbyte_data:	.db SWD32_WRITE_CSW,	0x00,	0x23,0x00,0x00,0x00	;8 bit access
 			.db SWD32_WRITE_CSW,	0x00,	0x23,0x00,0x00,0x02	;32 bit access
 
 
-
-
 ;-------------------------------------------------------------------------------
 ; go
 ; P1-P4 = Address
@@ -445,6 +447,12 @@ swd32_data_exit:	.db SWD32_WRITE_TAR,	0x00,	0xE0,0x00,0xED,0xF0	;DHCSR
 ;-------------------------------------------------------------------------------
 ; flash command etc
 ;-------------------------------------------------------------------------------
+swd32_cmd2:		ldi		r20,0x00		;cmd word is at 0x18000c00
+			ldi		r21,0x0c
+			ldi		r22,0x00
+			ldi		r23,0x18
+			rjmp		swd32_cmd_0
+
 swd32_cmd1:		ldi		r20,0x00		;cmd word is at 0x20000000
 			ldi		r21,0x00
 			ldi		r22,0x00
@@ -470,7 +478,7 @@ swd32_cmd_0:		ldi		XL,SWD32_WRITE_TAR
 			rcall		swd32_read_drwx		;dummy readout
 
 			ldi		r24,0
-			ldi		r25,20
+			ldi		r25,8			;shorten??? (was 20)
 
 swd32_cmd_1:		sbiw		r24,1
 			breq		swd32_cmd_to
@@ -582,6 +590,7 @@ swd32_data_wreg:	.db SWD32_WRITE_TAR,	0x00,	0xE0,0x00,0xED,0xF4	;DCRSR
 
 ;-------------------------------------------------------------------------------
 ; read registers for debug
+; r19 bit 4 = do not read data at PC
 ;-------------------------------------------------------------------------------
 swd32_readregs:		ldi		YL,0
 			ldi		YH,1
@@ -605,6 +614,8 @@ swd32_readregs_1:	ldi		ZL,LOW(swd32_data_rregs*2)
 			brne		swd32_readregs_1
 
 			sbiw		YL,4
+			sbrc		r19,4
+			jmp		main_loop_ok
 
 			;now read data at PC
 			ld		r20,Y+
@@ -778,6 +789,123 @@ swd32_dbgcheck:		ldi		XL,SWD32_WRITE_TAR
 			rcall		swd32_write_dap
 			
 			rcall		swd32_readback
+			jmp		main_loop_ok
+
+;-------------------------------------------------------------------------------
+; SWD execute commands 
+; par4 = num of chunks
+;-------------------------------------------------------------------------------
+swd32_swdexec: 		ldi		YL,0			;reset buffer pointer
+			ldi		YH,1
+			mov		r24,r19
+
+swd32_swdexec_1:	ld		XL,Y+			;command
+			ld		r23,Y+
+			ld		r22,Y+
+			ld		r21,Y+
+			ld		r20,Y+
+			rcall		swd32_write_dap
+			sbrc		r18,1
+			rcall		swd32_wait_1ms		
+			dec		r24
+			brne		swd32_swdexec_1
+			
+			sbrc		r18,1
+			rjmp		swd32_swdexec_2
+
+			ldi		ZL,10			;wait 1ms
+			ldi		ZH,0
+			call		api_wait_ms
+			rcall		swd32_read_drwx		;dummy read SR
+
+swd32_swdexec_2:	jmp		main_loop_ok
+
+;-------------------------------------------------------------------------------
+; SWD execute commands 
+; par1+2 = timeout
+; par3 = activate delay (bit 0)
+; par4 = num of chunks
+;-------------------------------------------------------------------------------
+swd32_swdexec2: 	ldi		YL,0			;reset buffer pointer
+			ldi		YH,1
+			mov		r24,r19
+			movw		r10,r16
+
+swd32_swdexec2_1:	ld		XL,Y+			;command
+			sbrs		XL,7
+			rjmp		swd32_swdexec2_wh
+			ld		r23,Y+
+			ld		r22,Y+
+			ld		r21,Y+
+			ld		r20,Y+
+			
+swd32_swdexec2_c:	rcall		swd32_write_dap
+			sbrc		r18,1
+			rcall		swd32_wait_1ms		
+swd32_swdexec2_nxt:	dec		r24
+			brne		swd32_swdexec2_1
+			jmp		main_loop_ok
+			
+swd32_swdexec2_wh:	push		r24
+			movw		r24,r10			;get timeout
+			cpi		XL,0x55			;wait for high
+			brne		swd32_swdexec2_wl
+		
+swd32_swdexec2_wh1:	rcall		swd32_read_drwx		;dummy read SR
+			ld		XL,Y			;byte 3
+			and		XL,r23
+			brne		swd32_swdexec2_wh3
+			ldd		XL,Y+1			;byte 2
+			and		XL,r22
+			brne		swd32_swdexec2_wh3
+			ldd		XL,Y+2			;byte 1
+			and		XL,r21
+			brne		swd32_swdexec2_wh3
+			ldd		XL,Y+3			;byte 0
+			and		XL,r20
+			brne		swd32_swdexec2_wh3
+			
+			rcall		swd32_wait_1ms		;wait 1ms	
+			sbiw		r24,1			;timeout?
+			brne		swd32_swdexec2_wh1
+			
+swd32_swdexec2_wh2:	pop		r24
+			ldi		r16,0x42		;timeout
+			jmp		main_loop
+			
+swd32_swdexec2_wh3:	adiw		YL,4
+			pop		r24
+			rjmp		swd32_swdexec2_nxt				
+
+swd32_swdexec2_wl:	cpi		XL,0x44			;wait for low
+			brne		swd32_swdexec2_ro
+
+swd32_swdexec2_wl1:	rcall		swd32_read_drwx		;dummy read SR
+			ld		XL,Y			;byte 3
+			com		XL
+			and		XL,r23
+			brne		swd32_swdexec2_wh3
+			ldd		XL,Y+1			;byte 2
+			com		XL
+			and		XL,r22
+			brne		swd32_swdexec2_wh3
+			ldd		XL,Y+2			;byte 1
+			com		XL
+			and		XL,r21
+			brne		swd32_swdexec2_wh3
+			ldd		XL,Y+3			;byte 0
+			com		XL
+			and		XL,r20
+			brne		swd32_swdexec2_wh3
+			
+			rcall		swd32_wait_1ms		
+			sbiw		r24,1
+			brne		swd32_swdexec2_wl1		
+
+			rjmp		swd32_swdexec2_wh2
+
+swd32_swdexec2_ro:	rcall		swd32_wait_1ms		
+			rcall		swd32_read_drwx		;read current address
 			jmp		main_loop_ok
 
 
@@ -1045,8 +1173,10 @@ swd32_write_dap_table:	lpm		XL,Z+		;CMD
 ; XL=ack out
 ; r20-r23 data in
 ;-------------------------------------------------------------------------------
-swd32_write_dap:	clr		r5
-;			mov		r9,XL
+swd32_write_dap:	push		r5
+			push		r9
+			clr		r5
+			mov		r9,XL
 swd32_write_dap_0:	rcall		swd32_head		;send header
 	
 			;TrN switch to output
@@ -1054,12 +1184,12 @@ swd32_write_dap_0:	rcall		swd32_head		;send header
 			sbi		CTRLDDR,SWD32_DATA
 			out		CTRLPIN,r15		;CLOCK
 
-;			cpi		XL,0x02			;WAIT
-;			brne		swd32_wd_0
+			cpi		XL,0x02			;WAIT
+			brne		swd32_wd_0
 	
-;			mov		XL,r9
-;			dec		r5
-;			brne		swd32_write_dap_0	; again
+			mov		XL,r9
+			dec		r5
+			brne		swd32_write_dap_0	; again
 
 
 swd32_wd_0:		clr		r4			;parity
@@ -1084,6 +1214,9 @@ swd32_wd_1:		mov		r12,r14			;one
 			nop
 			nop
 			nop
+			nop
+			pop		r5
+			pop		r9
 			out		CTRLPIN,r15	
 			ret
 
@@ -1164,6 +1297,28 @@ swd32_rd_1:		out		CTRLPORT,r14		;ONE (is pull-up)
 
 
 ;-------------------------------------------------------------------------------
+; SWD read AP IDR
+;-------------------------------------------------------------------------------
+swd32_read_apid:	ldi		YL,0
+			ldi		YH,1
+			ldi		XL,SWD32_READ_DRW
+			rcall		swd32_read_dap
+			ldi		XL,0x77
+			rjmp		swd32_store32
+
+;-------------------------------------------------------------------------------
+; SWD read TAR
+;-------------------------------------------------------------------------------
+swd32_rread_tar:	ldi		YL,0
+			ldi		YH,1
+			ldi		XL,SWD32_READ_TAR
+			rcall		swd32_read_dap
+			ldi		XL,SWD32_READ_TAR
+			rcall		swd32_read_dap
+			ldi		XL,0x77
+			rjmp		swd32_store32
+
+;-------------------------------------------------------------------------------
 ; SWD generic read
 ;-------------------------------------------------------------------------------
 swd32_rlong:		ldi		YL,0
@@ -1175,7 +1330,7 @@ swd32_rlong:		ldi		YL,0
 			rcall		swd32_write_dap
 
 			rcall		swd32_read_drwx		;dummy value
-			st		Y+,r20
+swd32_store32:		st		Y+,r20
 			st		Y+,r21
 			st		Y+,r22
 			st		Y+,r23
@@ -1210,21 +1365,25 @@ swd32_wait_5ms:		ldi	ZL,5
 ;-------------------------------------------------------------------------------
 ; define registers for faster output
 ;-------------------------------------------------------------------------------
-swd32_reginit:		ldi	XL,SWD32_ZERO
-			mov	r13,XL
-			ldi	XL,SWD32_ONE
-			mov	r14,XL
-			ldi	XL,SWD32_CLK
-			mov	r15,XL
+swd32_reginit:		ldi		XL,SWD32_ZERO
+			mov		r13,XL
+			ldi		XL,SWD32_ONE
+			mov		r14,XL
+			ldi		XL,SWD32_CLK
+			mov		r15,XL
 			ret
 
-swd32_reginit_reset:	ldi	XL,SWD32_ZERO_R
-			mov	r13,XL
-			ldi	XL,SWD32_ONE_R
-			mov	r14,XL
-			ldi	XL,SWD32_CLK
-			mov	r15,XL
+swd32_reginit_reset:	ldi		XL,SWD32_ZERO_R
+			mov		r13,XL
+			ldi		XL,SWD32_ONE_R
+			mov		r14,XL
+			ldi		XL,SWD32_CLK
+			mov		r15,XL
 			ret
+
+swd32_get_idcode:	ldi		XL,SWD32_READ_CTRL	;read CTRLSTAT
+			rcall		swd32_read_dap
+			
 
 
 swd32_read_ctrlstat:	ldi		XL,SWD32_READ_CTRL	;read CTRLSTAT
@@ -1243,3 +1402,8 @@ swd32_wait_ctrlstat_1:	sbiw		r24,1
 			brne		swd32_wait_ctrlstat_1		
 swd32_wait_ctrlstat_e:	ret
 
+
+swd32_get_register:	mov		XL,r19
+			rcall		swd32_read_dap
+			call		gen_wres
+			jmp		main_loop_ok

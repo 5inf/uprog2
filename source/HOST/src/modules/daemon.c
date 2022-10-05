@@ -42,19 +42,12 @@
 #include<bluetooth/hci_lib.h>
 #include<bluetooth/rfcomm.h>
 
-//#ifdef COMP_32
-//#include<ftdi.h>
-//#else
-#include<libftdi1/ftdi.h>
-//#endif
-
 #include <main.h>
 
 //#define DEBUG_OUTPUT 1
 
 int daemon_task(int vpid)
 {
-	struct ftdi_context ftdic;
 	struct sockaddr_rc btaddr = { 0 };
 	struct pollfd pfd;
 
@@ -133,101 +126,7 @@ int daemon_task(int vpid)
 	shm[0] = 0x00;						//searching for interface
 	shm[1] = 0x00;						//no command
 	
-	//try to open communication with FTDI device
-	interface_type=2;	//preset to FTDI
-
-#if DEBUG_OUTPUT == 1
-	printf("+++ CHECK USB INTEFACE\n");
-#endif
-
-	if(ftdi_init(&ftdic) < 0)
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR INIT FTDI INTEFACE\n");
-#endif
-		interface_type=1;
-	}
-
-	if(interface_type == 2) 
-	{
-		if(vpid == 1)
-		{
-			usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6001);
-		}
-		else
-		{
-			usb_stat = ftdi_usb_open(&ftdic,0x0403,0x6661);		
-		}
-		if(usb_stat != 0) usb_stat = ftdi_usb_open(&ftdic,0x2763,0xFFFF);
-		if(usb_stat != 0)
-		{
-#if DEBUG_OUTPUT == 1
-			printf("NO FTDI DEVICE (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-			interface_type=1;
-		}
-	}
-
-	if((interface_type == 2) && ((usb_stat = ftdi_set_baudrate(&ftdic,1250000)) != 0))
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR SET BAUDRATE (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-		interface_type=0;
-	}
-
-	if((interface_type == 2) && ((usb_stat = ftdi_set_line_property(&ftdic,8,STOP_BIT_2,NONE)) != 0))
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR SET LINE (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-		interface_type=0;
-	}
-
-	if((interface_type == 2) && ((usb_stat = ftdi_setflowctrl(&ftdic,SIO_RTS_CTS_HS)) != 0))
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR SET FLOW CONTROL (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-		interface_type=0;
-	}
-
-	if((interface_type == 2) && ((usb_stat = ftdi_setrts(&ftdic,SIO_SET_MODEM_CTRL_REQUEST)) != 0))
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR SET FLOW CONTROL (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-		interface_type=0;
-	}
-
-	if((interface_type == 2) && ((usb_stat = ftdi_set_latency_timer(&ftdic,2)) != 0))
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR SET LATENCY TIMER (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-		interface_type=0;
-	}
-
-/*
-
-	if((interface_type == 2) && ((usb_stat = ftdi_read_data_set_chunksize(&ftdic,2176)) != 0))
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR SET RX CHUNKSIZE (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-		interface_type=0;
-	}
-
-
-	if((interface_type == 2) && ((usb_stat = ftdi_write_data_set_chunksize(&ftdic,2176)) != 0))
-	{
-#if DEBUG_OUTPUT == 1
-		printf("ERROR SET TX CHUNKSIZE (%s)\n",ftdi_get_error_string(&ftdic));
-#endif
-		interface_type=0;
-	}
-*/
-	if(interface_type == 1) 
+	if(interface_type == 0) 
 	{
 		interface_type=0;
 		dev_id = hci_get_route(NULL);
@@ -271,6 +170,18 @@ int daemon_task(int vpid)
 #endif
 					interface_type=1;
 				}
+
+				if(strcmp(name,"PARAPROG") == 0)
+				{
+					strcpy(bt_address,addr);
+#if DEBUG_OUTPUT == 1
+					printf("BT PARALLEL PROGRAMMER FOUND (%s)\n",bt_address);
+#endif
+					interface_type=3;
+				}
+
+
+
 			}
 
  			free( ii );
@@ -279,7 +190,7 @@ int daemon_task(int vpid)
 	}
 
 	//now connect rfcomm	
-	if(interface_type == 1) 
+	if((interface_type == 1) || (interface_type == 3))  
 	{
 		sock=socket(AF_BLUETOOTH,SOCK_STREAM,BTPROTO_RFCOMM);
 		btaddr.rc_family =  AF_BLUETOOTH;
@@ -307,17 +218,10 @@ int daemon_task(int vpid)
 		goto daemon_end;				//exit
 	}
 
-	if(interface_type == 2)					//FTDI
+	if((interface_type == 1) || (interface_type == 3)) 	//BT
 	{	
 		shm[0]=0x10;					//interface found
-		shm[2]=2;
-		while(shm[0] == 0x11) usleep(1000);		//wait for client
-	}
-
-	if(interface_type == 1)					//BT
-	{	
-		shm[0]=0x10;					//interface found
-		shm[2]=1;
+		shm[2]=interface_type;
 		while(shm[0] == 0x10) usleep(1000);		//wait for client
 	}
 
@@ -340,7 +244,7 @@ DAEMON_W1:
 			{
 				shm[14]=0x00;	//no char
 
-				if(interface_type == 1)
+				if((interface_type == 1) || (interface_type == 3))  
 				{
 #if DEBUG_OUTPUT == 1
 					printf("check...\n");				
@@ -348,14 +252,6 @@ DAEMON_W1:
 					i=read(sock,&shm[14],1);
 				}
 
-				if(interface_type == 2)
-				{
-#if DEBUG_OUTPUT == 1
-					printf("check...\n");				
-#endif					
-					i=ftdi_read_data(&ftdic,&shm[14],1);					
-				}
-			
 			//	shm[14]=1;
 				shm[1]=0xad;	//OK
 				goto DAEMON_W1;
@@ -368,51 +264,32 @@ DAEMON_W1:
 				ping_enabled=0;
 			}
 
-
-			if(interface_type == 2)			//clear FTDI buffer
-			{
-				i=ftdi_usb_purge_tx_buffer(&ftdic);
-				i=ftdi_usb_purge_rx_buffer(&ftdic);
-			}
 			slen=11+txlen;		//10 head + data + 0xcc
 			offset=0;
 			i=0;
 
-			if(interface_type == 2)
+			do
 			{
 #if DEBUG_OUTPUT == 1
 				printf("write...\n");				
 #endif
-				i=ftdi_write_data(&ftdic,&shm[offset+4],slen);
+				i=write(sock,&shm[offset+4],slen);
 #if DEBUG_OUTPUT == 1
 				printf("written: %d\n",i);
 #endif
-			}
-			else
-			{
-				do
+				if(i > 0)
 				{
-#if DEBUG_OUTPUT == 1
-					printf("write...\n");				
-#endif
-					i=write(sock,&shm[offset+4],slen);
-#if DEBUG_OUTPUT == 1
-					printf("written: %d\n",i);
-#endif
-					if(i > 0)
-					{
-						slen-=i;
-						offset+=i;
-					}
-					usleep(200);
-				}while(slen > 0);
-			}
+					slen-=i;
+					offset+=i;
+				}
+				usleep(200);
+			}while(slen > 0);
 	
 			//now read back result
 			offset=0;
 			tstamp1=time(NULL);
 			read_timeout=0;
-			if(interface_type == 1)
+			if((interface_type == 1) || (interface_type == 3))  
 			{
 #if DEBUG_OUTPUT == 1
 				printf("read...\n");				
@@ -429,24 +306,6 @@ DAEMON_W1:
 					offset+=i;
 					if(offset < rxlen) usleep(500);
 					if((time(NULL) -tstamp1) > 30) read_timeout=1;
-				}
-			}
-
-			if(interface_type == 2)
-			{
-#if DEBUG_OUTPUT == 1
-				printf("read...\n");				
-#endif
-				while((offset <= rxlen) && (read_timeout == 0))
-				{
-					i=ftdi_read_data(&ftdic,&shm[offset+14],rxlen+1);
-					offset+=i;
-					if(offset < rxlen) usleep(100);
-					if((time(NULL) -tstamp1) > 30)
-						read_timeout=1;
-						
-//					printf(">>> Time = %08lX\n",time(NULL));
-
 				}
 			}
 
@@ -479,14 +338,7 @@ DAEMON_W1:
 		timeout++;
 		if(timeout > 2000)
 		{
-			if((interface_type == 2) && ((usb_stat = ftdi_set_baudrate(&ftdic,1250000)) != 0))
-			{
-#if DEBUG_OUTPUT == 1
-				printf("\nCONNECTION TO PROGRAMMER LOST\n");
-#endif
-				goto daemon_end;
-			}
-			if((interface_type == 1) && (ping_enabled == 1))
+			if(((interface_type == 1) || (interface_type == 3)) && (ping_enabled == 1))
 			{
 				pfd.fd=sock;
 				pfd.events=POLLIN;	
@@ -514,17 +366,13 @@ DAEMON_W1:
 	
 daemon_end:
 
-	if((interface_type == 1) && (sock > -1))
+	if(((interface_type == 1) || (interface_type == 3)) && (sock > -1))
 	{
 		close(sock);
 	}
 
-	if(interface_type == 2)
-	{
-		ftdi_usb_close(&ftdic);
-		ftdi_deinit(&ftdic);
-	}
 
+	sleep(1);
 	shmdt(shm);			//detach shared memory	
 	shmctl(shmid,IPC_RMID,0);
 #if DEBUG_OUTPUT == 1

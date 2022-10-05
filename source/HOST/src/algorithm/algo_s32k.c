@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2021 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -90,6 +90,7 @@ int prog_s32kswd(void)
 	int fcnfgm=0;
 	int dfsize=0;
 	int eesize=0;
+	int gstatus=0;
 
 	errc=0;
 
@@ -97,6 +98,7 @@ int prog_s32kswd(void)
 	{
 		printf("-- 5V -- set VDD to 5V\n");
 		printf("-- ea -- erase all (mass erase)\n");
+		printf("-- gs -- get MDM status register\n");
 		printf("-- un -- unsecure code (set FSEC to 0xFE)\n");
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
@@ -159,6 +161,12 @@ int prog_s32kswd(void)
 	{
 		unsecure=1;
 		printf("## unsecure code\n");
+	}
+
+	if(find_cmd("gs"))
+	{
+		gstatus=1;
+		printf("## get MDM status register\n");
 	}
 
 	if(((strstr(cmd,"PD3200")) && ((strstr(cmd,"PD3200") - cmd) == 1)) && (param[10] < 130))
@@ -325,6 +333,21 @@ S32KSWD_ORUN:
 			errc=prg_comm(0x91,0,0,0,0,0,0,0,0);		//exit
 			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0);		//re-init
 		}
+		else if(gstatus==1)
+		{
+			errc=prg_comm(0x1D0,0,16,0,0,0,0,0,0x55);	//init
+			if(errc > 0) goto ERR_EXIT;
+			printf("JID: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
+			errc=prg_comm(0x1be,0,16,0,0,0,0,0,0);		//get MDM status
+			if(errc > 0) goto ERR_EXIT;
+			printf("MDM: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);
+			if(memory[0] & 2) printf("  FLASH ready\n"); else printf("  FLASH not ready\n");
+			if(memory[0] & 4) printf("  FLASH secured\n"); else printf("  FLASH not secured\n");
+			if(memory[0] & 8) printf("  SYSTEM not in reset\n"); else printf("  SYSTEM in reset\n");
+			if(memory[0] & 32) printf("  MASS ERASE enabled\n"); else printf("  MASS ERASE disabled\n");
+			if(memory[0] & 64) printf("  BACKDOOR KEY enabled\n"); else printf("  BACKDOOR KEY disabled\n");
+			goto ERR_EXIT;
+		}
 		else
 		{
 			printf("READ ID\n");
@@ -338,8 +361,9 @@ S32KSWD_ORUN:
 		}
 	
 		if(errc != 0) goto ERR_EXIT;
-		
+				
 		errc=prg_comm(0x1D1,0,4,0,0,0x24,0x80,0x04,0x40);				//READ DEVID
+			printf("DEV: %02X%02X%02X%02X\n",memory[3],memory[2],memory[1],memory[0]);		
 		j=(memory[3] >> 4)*100+(memory[3] & 0x0F)*10+(memory[2] >> 4);
 
 		if((j == 1665))
@@ -348,7 +372,6 @@ S32KSWD_ORUN:
 			errc=0x50;	
 			goto ERR_EXIT;
 		}
-
 		else if((j != param[10]) && (ignore_id==0))
 		{
 			printf("DEVICE CODE = %d, SHOULD BE %d\n",j,(int)param[10]);
@@ -960,7 +983,7 @@ S32KSWD_ORUN:
 	
 	if(dev_start == 1)
 	{
-		i=prg_comm(0x0e,0,0,0,0,0,0,0,0);			//init
+		i=prg_comm(0x0e,0,0,0,0,1,1,0,0);				//init
 		waitkey();
 		i=prg_comm(0x0f,0,0,0,0,0,0,0,0);					//exit
 	}
@@ -975,4 +998,3 @@ ERR_EXIT:
 
 	return errc;
 }
-

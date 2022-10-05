@@ -20,8 +20,10 @@ int set_vpp();
 void progress(char *mystring, int v_max, int v_act);
 
 int must_prog(long mad,int blen);
+int must_prog_used(long mad,int blen);
 int must_prog_pic16(long mad,int blen);
 
+int kbhit(void);
 void waitkey(void);
 void waitkey_dbg2(void);
 int abortkey(void);
@@ -55,3 +57,4 @@ int check_00(long,int);
 
 void debug_avrjtag_t1(void);
 
+void paraprog_view(int);

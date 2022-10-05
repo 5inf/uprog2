@@ -7,7 +7,7 @@
 	
 reset_vector:
 
-		.word 0x20008000	// start SP
+		.word 0x200003C0	// start SP
 		.word 0x20000009	// start PC
 
 main_start:

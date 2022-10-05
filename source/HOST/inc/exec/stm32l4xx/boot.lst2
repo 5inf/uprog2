@@ -65,7 +65,7 @@ SYMBOL TABLE:
 Disassembly of section .text:
 
 00000000 <reset_vector>:
-   0:	20008000 	andcs	r8, r0, r0
+   0:	200003c0 	andcs	r0, r0, r0, asr #7
    4:	20000009 	andcs	r0, r0, r9
 
 00000008 <main_loop>:

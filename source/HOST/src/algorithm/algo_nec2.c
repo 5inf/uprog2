@@ -23,6 +23,8 @@
 //###############################################################################
 
 #include <main.h>
+#include "exec/78k0r_dump/N78k0r-dump-dflash.h"
+#include "exec/78k0r_fdump/N78k0r-dump-flash.h"
 
 void print_nec2_error(int errc,unsigned long addr)
 {
@@ -60,15 +62,17 @@ void print_nec2_error(int errc,unsigned long addr)
 
 int prog_nec2(void)
 {
-	int errc,blocks,tblock,bsize,eblock=0;
+	int j,errc,blocks,tblock,bsize,eblock=0;
 	unsigned long addr,maddr;
 	int chip_erase=0;
 	int main_blank=0;
 	int main_prog=0;
 	int main_verify=0;
-	int dflash_prog=0;
-	int dflash_verify=0;
 	int dev_start=0;
+	int main_dump=0;
+	int dflash_dump=0;
+
+
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
@@ -78,9 +82,8 @@ int prog_nec2(void)
 
 		printf("-- pm -- main flash program\n");
 		printf("-- vm -- main flash verify\n");
-
-		printf("-- pd -- data flash program\n");
-		printf("-- vd -- data flash verify\n");
+		printf("-- dm -- main flash dump (will erase first 2K of main)\n");
+		printf("-- dd -- data flash dump (will erase first 2K of main)\n");
 
 		printf("-- st -- start device\n");
 		printf("-- d2 -- switch to device 2\n");
@@ -112,11 +115,25 @@ int prog_nec2(void)
 		printf("## Action: blank check\n");
 	}
 
-	main_prog=check_cmd_prog("pm","code flash");
-	dflash_prog=check_cmd_prog("pd","data flash");
+	if(find_cmd("dm"))
+	{
+		main_dump=1;
+		printf("## Action: main flash dump\n");
+		goto ONLY_DD;	
+	}
 
+	if(find_cmd("dd"))
+	{
+		dflash_dump=1;
+		printf("## Action: data flash dump\n");
+		goto ONLY_DD;	
+	}
+
+
+	main_prog=check_cmd_prog("pm","code flash");
 	main_verify=check_cmd_verify("vm","code flash");
-	dflash_verify=check_cmd_verify("vd","data flash");
+
+ONLY_DD:
 
 	if(find_cmd("st"))
 	{
@@ -137,12 +154,19 @@ int prog_nec2(void)
 		errc=prg_comm(0x60,0,0,0,0,0,0,0,0);	//init
 	}
 	
-
-	//erase
+	//mass erase
 	if ((errc == 0) && (chip_erase == 1))	//unlock
 	{
 		printf("CHIP ERASE\n");
 		errc=prg_comm(0x61,0,00,0,0,0,0,0,0);	//program
+	}
+
+	//block erase
+	if ((errc == 0) && ((main_dump == 1) || (dflash_dump == 1)))	//unlock
+	{
+		printf("DUMP AREA ERASE\n");
+		errc=prg_comm(0x62,0,00,0,0,0,0,0,0);	//first 1k block
+		errc=prg_comm(0x62,0,00,0,0,4,0,0,0);	//second 1k block
 	}
 
 	//blank check
@@ -209,55 +233,74 @@ int prog_nec2(void)
 		printf("\n");
 	}
 
-	//program dflash
-	if ((errc == 0) && (dflash_prog == 1))
+	//program dumper
+	if ((errc == 0) && (dflash_dump == 1))
 	{
-		read_block(param[2],param[3],0);
-		bsize = max_blocksize;
-		addr=param[2];
-		blocks=param[3]/bsize;
+		bsize = 2048;
+		if(bsize > param[1]) bsize=param[1];
+		addr=param[0];
+		blocks=1;
 		maddr=0;
 
-		progress("DATA PROG   ",blocks,0);
+		for(j=0;j<2048;j++)
+		{
+			memory[j] = N78k0r_dump[j];
+		}
+
+		progress("DUMP PROG   ",blocks,0);
 		for(tblock=0;tblock<blocks;tblock++)
 		{
-			progress("DATA PROG   ",blocks,tblock+1);
-			if(errc == 0)
+			if((must_prog(maddr,bsize)) && (errc == 0))
 			{
-				errc=prg_comm(0x63,bsize,0,maddr,0,
+				//printf("ADDR = %08lX\n",addr);
+				errc=prg_comm(0x63,bsize,7,maddr,0,
 					(addr >> 8) & 0xff,(addr >> 16) & 0xff,0,0);	//program
-				eblock=tblock;
-				addr+=bsize;
-				maddr+=bsize;
+				if(errc!=0) 
+				{
+					printf("RESP = %02X %02X %02X %02X %02X\n",memory[2],memory[3],memory[4],memory[5],memory[6]);		
+				}
 			}
+			maddr+=bsize;
+			addr+=bsize;
+			progress("DUMP PROG   ",blocks,tblock+1);
 		}
 		printf("\n");
 	}
 
-	//verify dflash
-	if ((errc == 0) && (dflash_verify == 1))
+	//program dumper
+	if ((errc == 0) && (main_dump == 1))
 	{
-		read_block(param[2],param[3],0);
-		bsize = max_blocksize;
-		addr=param[2];
-		blocks=param[3]/bsize;
+		bsize = 2048;
+		if(bsize > param[1]) bsize=param[1];
+		addr=param[0];
+		blocks=1;
 		maddr=0;
 
-		progress("DATA VERIFY ",blocks,0);
+		for(j=0;j<2048;j++)
+		{
+			memory[j] = N78k0r_fdump[j];
+		}
+
+		progress("DUMP PROG   ",blocks,0);
 		for(tblock=0;tblock<blocks;tblock++)
 		{
-			progress("DATA VERIFY ",blocks,tblock+1);
-			if(errc == 0)
+			if((must_prog(maddr,bsize)) && (errc == 0))
 			{
-				errc=prg_comm(0x64,bsize,0,maddr,0,
-					(addr >> 8) & 0xff,(addr >> 16) & 0xff,0,0);	//verify
-				eblock=tblock;
-				addr+=bsize;
-				maddr+=bsize;
+				//printf("ADDR = %08lX\n",addr);
+				errc=prg_comm(0x63,bsize,7,maddr,0,
+					(addr >> 8) & 0xff,(addr >> 16) & 0xff,0,0);	//program
+				if(errc!=0) 
+				{
+					printf("RESP = %02X %02X %02X %02X %02X\n",memory[2],memory[3],memory[4],memory[5],memory[6]);		
+				}
 			}
+			maddr+=bsize;
+			addr+=bsize;
+			progress("DUMP PROG   ",blocks,tblock+1);
 		}
 		printf("\n");
 	}
+
 
 	if(dev_start == 1)
 	{
@@ -267,12 +310,60 @@ int prog_nec2(void)
 
 	prg_comm(0x65,0,0,0,0,8,0,0,0);	//exit
 
+	if ((errc == 0) && (dflash_dump == 1))
+	{
+		bsize=2048;
+		sleep(1);
+		errc=writeblock_open();
+		if(errc == 0) errc=prg_comm(0x0e,0,0,0,0,0,0,0,0);			//init
+		maddr=0;
+		blocks=param[3]/bsize;
+
+		sleep(1);
+		
+		progress("READ DUMP   ",blocks,0);
+		for(j=0;j<blocks;j++)
+		{
+			errc=prg_comm(0x193,0,bsize,0,ROFFSET+maddr,0,0,0,0);
+			maddr+=bsize;
+			progress("READ DUMP   ",blocks,j+1);
+		}
+		writeblock_data(0,param[3],param[2]);
+		writeblock_close();
+		prg_comm(0x65,0,0,0,0,8,0,0,0);	//exit
+	}
+
+
+	if ((errc == 0) && (main_dump == 1))
+	{
+		bsize=2048;
+		sleep(1);
+		errc=writeblock_open();
+		if(errc == 0) errc=prg_comm(0x0e,0,0,0,0,0,0,0,0);			//init
+		maddr=0;
+		blocks=param[1]/bsize;
+
+		sleep(1);
+		
+		progress("READ DUMP   ",blocks,0);
+		for(j=0;j<blocks;j++)
+		{
+			errc=prg_comm(0x193,0,bsize,0,ROFFSET+maddr,0,0,0,0);
+			maddr+=bsize;
+			progress("READ DUMP   ",blocks,j+1);
+		}
+		writeblock_data(0,param[1],param[0]);
+		writeblock_close();
+		prg_comm(0x65,0,0,0,0,8,0,0,0);	//exit
+	}
+
+
+
 	prg_comm(0x2ef,0,0,0,0,0,0,0,0);	//dev 1
 	print_nec2_error(errc,eblock*1024);
 
 	return errc;
 }
-
 
 
 

@@ -98,7 +98,8 @@ void debug_armcortex(int mode)
 			errc=prg_comm(0xb2,max_blocksize,0,maddr,0,		//write 1.K
 				(addr >> 8) & 0xff,
 				(addr >> 16) & 0xff,
-				0x20,max_blocksize >> 8);
+				(addr >> 24) & 0xff,
+				max_blocksize >> 8);
 		
 			addr+=max_blocksize;
 			maddr+=max_blocksize;
@@ -111,7 +112,6 @@ void debug_armcortex(int mode)
 		printf("\nSTART CODE AT 0x%02x%02x%02x%02x\n",memory[7],memory[6],memory[5],memory[4] & 0xFE);
 		
 		errc=prg_comm(0x128,8,12,0,0,0,0,0,0);	//set pc + sp	
-
 		errc=prg_comm(0x12a,0,100,0,0,0,0,0,0);	
 		show_cortex_registers();		
 

@@ -138,8 +138,8 @@ const char * const cables[]=
 	// 45 (PPC JTAG2)
 	"(1=VSS  2=VDD  3=TMS  4=TCK  5=TDI  6=TDO  7=JCOMP  [8=RESET])",
 	
-	// FRS
-	"no connections",
+	// TLE986x
+	"(1=VSS  2=VDD  3=RST  4=SWDCK  5=SWDIO)",
 	
 	// 47 
 	"(1=VSS  2=VDD  3=SEL  4=SCK  5=MOSI  6=MISO)",
@@ -210,14 +210,14 @@ const char * const cables[]=
 	// 69 VEML3328
 	"(1=VSS  2=VDD  3=SCL  4=SDA)",
 
-	// 70 
-	"no connections",
+	// 70 PIC16
+	"(1=VSS  2=VDD  3=PGD  4=PGC  9=MCLR)",
 	
-	// 71 
-	"no connections",
+	// 71 MB91
+	"(1=VSS  2=VDD  3=RST  4=TXD  5=RXD)",
 	
-	// 72 
-	"no connections",
+	// 72 RA6 
+	"(1=VSS  2=VDD  3=RST  4=SWDCK  5=SWDIO)",
 	
 	// 73 
 	"no connections",
@@ -238,5 +238,306 @@ const char * const cables[]=
 	"no connections",
 
 	// 79 
+	"no connections",
+
+	// 80 
+	"no connections",
+	
+	// 81 
+	"no connections",
+
+	// 82 
+	"no connections",
+	
+	// 83 
+	"no connections",
+	
+	// 84 
+	"no connections",
+	
+	// 85 
+	"no connections",
+	
+	// 86 
+	"no connections",
+	
+	// 87 
+	"no connections",
+	
+	// 88 
+	"no connections",
+
+	// 89 
+	"no connections",
+
+	// 90 
+	"no connections",
+	
+	// 91 
+	"no connections",
+
+	// 92 
+	"no connections",
+	
+	// 93 
+	"no connections",
+	
+	// 94 
+	"no connections",
+	
+	// 95 
+	"no connections",
+	
+	// 96 
+	"no connections",
+	
+	// 97 
+	"no connections",
+	
+	// 98 
+	"no connections",
+
+	// 99 
+	"no connections",
+
+	// 100 
+	"no connections",
+	
+	// 101 
+	"no connections",
+
+	// 102 
+	"no connections",
+	
+	// 103 
+	"no connections",
+	
+	// 104 
+	"no connections",
+	
+	// 105 
+	"no connections",
+	
+	// 106 
+	"no connections",
+	
+	// 107 
+	"no connections",
+	
+	// 108 
+	"no connections",
+
+	// 109 
+	"no connections",
+
+	// 110 
+	"no connections",
+	
+	// 111 
+	"no connections",
+
+	// 112 
+	"no connections",
+	
+	// 113 
+	"no connections",
+	
+	// 114 
+	"no connections",
+	
+	// 115 
+	"no connections",
+	
+	// 116 
+	"no connections",
+	
+	// 117 
+	"no connections",
+	
+	// 118 
+	"no connections",
+
+	// 119 
+	"no connections",
+
+	// 120 
+	"no connections",
+	
+	// 121 
+	"no connections",
+
+	// 122 
+	"no connections",
+	
+	// 123 
+	"no connections",
+	
+	// 124 
+	"no connections",
+	
+	// 125 
+	"no connections",
+	
+	// 126 
+	"no connections",
+	
+	// 127 
+	"no connections",
+	
+	// 128 
+	"no connections",
+
+	// 129 
+	"no connections",
+
+	// 130 
+	"no connections",
+	
+	// 131 
+	"no connections",
+
+	// 132 
+	"no connections",
+	
+	// 133 
+	"no connections",
+	
+	// 134 
+	"no connections",
+	
+	// 135 
+	"no connections",
+	
+	// 136 
+	"no connections",
+	
+	// 137 
+	"no connections",
+	
+	// 138 
+	"no connections",
+
+	// 139 
+	"no connections",
+
+	// 140 
+	"no connections",
+	
+	// 141 
+	"no connections",
+
+	// 142 
+	"no connections",
+	
+	// 143 
+	"no connections",
+	
+	// 144 
+	"no connections",
+	
+	// 145 
+	"no connections",
+	
+	// 146 
+	"no connections",
+	
+	// 147 
+	"no connections",
+	
+	// 148 
+	"no connections",
+
+	// 149 
+	"no connections",
+
+	// 150 
+	"no connections",
+	
+	// 151 
+	"no connections",
+
+	// 152 
+	"PARA-PROG, 16 Bits data bus, /RESET /CS /OE /WE /RESET-MCU",
+	
+	// 153 
+	"no connections",
+	
+	// 154 
+	"no connections",
+	
+	// 155 
+	"no connections",
+	
+	// 156 
+	"no connections",
+	
+	// 157 
+	"no connections",
+	
+	// 158 
+	"no connections",
+
+	// 159 
+	"no connections",
+
+	// 160 
+	"no connections",
+	
+	// 161 
+	"no connections",
+
+	// 162 
+	"no connections",
+	
+	// 163 
+	"no connections",
+	
+	// 164 
+	"no connections",
+	
+	// 165 
+	"no connections",
+	
+	// 166 
+	"no connections",
+	
+	// 167 
+	"no connections",
+	
+	// 168 
+	"no connections",
+
+	// 169 
+	"no connections",
+
+	// 170 
+	"no connections",
+	
+	// 171 
+	"no connections",
+
+	// 172 
+	"no connections",
+	
+	// 173 
+	"no connections",
+	
+	// 174 
+	"no connections",
+	
+	// 175 
+	"no connections",
+	
+	// 176 
+	"no connections",
+	
+	// 177 
+	"no connections",
+	
+	// 178 
+	"no connections",
+
+	// 179 
 	"no connections"
+
 };	

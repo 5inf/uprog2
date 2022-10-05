@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2012-2020 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2012-2022 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -23,15 +23,9 @@
 //###############################################################################
 
 #include <main.h>
-#include "exec/stm32f0xx/exec_stm32f0xx.h"
-#include "exec/stm32f1xx/exec_stm32f1xx.h"
-#include "exec/stm32f2xx/exec_stm32f2xx.h"
-#include "exec/stm32f3xx/exec_stm32f3xx.h"
-#include "exec/stm32f4xx/exec_stm32f4xx.h"
 #include "exec/stm32f7xx/exec_stm32f7xx.h"
-#include "exec/stm32l4xx/exec_stm32l4xx.h"
 
-void print_stm32swd_error(int errc)
+void print_stm32f7_error(int errc)
 {
 	printf("\n");
 	switch(errc)
@@ -40,6 +34,9 @@ void print_stm32swd_error(int errc)
 				break;
 
 		case 0x41:	set_error("(timeout: no ACK)",errc);
+				break;
+
+		case 0x42:	set_error("(timeout: prog/erase)",errc);
 				break;
 
 		case 0x50:	set_error("(wrong ID)",errc);
@@ -51,12 +48,146 @@ void print_stm32swd_error(int errc)
 		case 0x61:	set_error("(Erase timeout error)",errc);
 				break;
 
+
+
 		default:	set_error("(unexpected error)",errc);
 	}
 	print_error();
 }
 
-int prog_stm32swd(void)
+/*
+int stm32f7_wropt(int std)
+{
+	int i,e;
+	
+	if(std == 1)
+	{
+		//OPTR
+		memory[0x103]=0xFF;	memory[0x102]=0xFF;	memory[0x101]=0xF8;	memory[0x100]=0xAA;
+		//PCROP1_STRT
+		memory[0x107]=0xFF;	memory[0x106]=0xFF;	memory[0x105]=0xFF;	memory[0x104]=0xFF;
+		//PCROP1_END
+		memory[0x10B]=0xFF;	memory[0x10A]=0xFF;	memory[0x109]=0x00;	memory[0x108]=0x00;
+		//WRP1A
+		memory[0x10F]=0xFF;	memory[0x10E]=0x00;	memory[0x10D]=0xFF;	memory[0x10C]=0xFF;
+		//WRP1B
+		memory[0x113]=0xFF;	memory[0x112]=0x00;	memory[0x111]=0xFF;	memory[0x110]=0xFF;
+	}
+	else
+	{
+		//OPTR
+		memory[0x103]=memory[0x03];	memory[0x102]=memory[0x02];	memory[0x101]=memory[0x01];	memory[0x100]=memory[0x00];
+		//PCROP1_STRT
+		memory[0x107]=memory[0x0B];	memory[0x106]=memory[0x0A];	memory[0x105]=memory[0x09];	memory[0x104]=memory[0x08];
+		//PCROP1_END
+		memory[0x10B]=memory[0x13];	memory[0x10A]=memory[0x12];	memory[0x109]=memory[0x11];	memory[0x108]=memory[0x10];
+		//WRP1A
+		memory[0x10F]=memory[0x1B];	memory[0x10E]=memory[0x1A];	memory[0x10D]=memory[0x19];	memory[0x10C]=memory[0x18];
+		//WRP1B
+		memory[0x113]=memory[0x23];	memory[0x112]=memory[0x22];	memory[0x111]=memory[0x21];	memory[0x110]=memory[0x20];
+	}
+	i=0;
+	// CR=0x00000000 (clear all)
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x14;		//TAR = CR
+	memory[i++]=0xdd;	memory[i++]=0x00;	memory[i++]=0x00;	memory[i++]=0x00;		memory[i++]=0x00;		//0x00 -> clear all
+
+	// KEYR=0x45670123
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x08;		//TAR = KEYR
+	memory[i++]=0xdd;	memory[i++]=0x45;	memory[i++]=0x67;	memory[i++]=0x01;		memory[i++]=0x23;
+
+	// KEYR=0xCDEF89AB
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x08;		//TAR = KEYR
+	memory[i++]=0xdd;	memory[i++]=0xCD;	memory[i++]=0xEF;	memory[i++]=0x89;		memory[i++]=0xAB;
+
+	// OPTKEYR=0x08192A3B
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x0C;		//TAR = OPTKEYR
+	memory[i++]=0xdd;	memory[i++]=0x08;	memory[i++]=0x19;	memory[i++]=0x2A;		memory[i++]=0x3B;
+
+	// OPTKEYR=0x4C5D6E7F
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x0C;		//TAR = OPTKEYR
+	memory[i++]=0xdd;	memory[i++]=0x4C;	memory[i++]=0x5D;	memory[i++]=0x6E;		memory[i++]=0x7F;
+
+	// OPTR
+	memory[i++]=0xd1;	memory[i++]=0x40;		memory[i++]=0x02;		memory[i++]=0x20;			memory[i++]=0x20;		//TAR = OPTR
+	memory[i++]=0xdd;	memory[i++]=memory[0x103];	memory[i++]=memory[0x102];	memory[i++]=memory[0x101];		memory[i++]=memory[0x100];
+	
+	// PCROP1_STRT
+	memory[i++]=0xd1;	memory[i++]=0x40;		memory[i++]=0x02;		memory[i++]=0x20;			memory[i++]=0x24;		//TAR = PCROP1_STRT
+	memory[i++]=0xdd;	memory[i++]=memory[0x107];	memory[i++]=memory[0x106];	memory[i++]=memory[0x105];		memory[i++]=memory[0x104];
+
+	// PCROP1_END
+	memory[i++]=0xd1;	memory[i++]=0x40;		memory[i++]=0x02;		memory[i++]=0x20;			memory[i++]=0x28;		//TAR = PCROP1_END
+	memory[i++]=0xdd;	memory[i++]=memory[0x10B];	memory[i++]=memory[0x10A];	memory[i++]=memory[0x109];		memory[i++]=memory[0x108];
+	
+	// WRP1A
+	memory[i++]=0xd1;	memory[i++]=0x40;		memory[i++]=0x02;		memory[i++]=0x20;			memory[i++]=0x2C;		//TAR = WRP1A
+	memory[i++]=0xdd;	memory[i++]=memory[0x10F];	memory[i++]=memory[0x10E];	memory[i++]=memory[0x10D];		memory[i++]=memory[0x10C];
+
+	// WRP1B
+	memory[i++]=0xd1;	memory[i++]=0x40;		memory[i++]=0x02;		memory[i++]=0x20;			memory[i++]=0x30;		//TAR = WRP1B
+	memory[i++]=0xdd;	memory[i++]=memory[0x113];	memory[i++]=memory[0x112];	memory[i++]=memory[0x111];		memory[i++]=memory[0x110];
+
+	// CLER SR
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x10;		//TAR = SR
+	memory[i++]=0xdd;	memory[i++]=0x00;	memory[i++]=0x00;	memory[i++]=0xFF;		memory[i++]=0xFF;		//
+
+	// CR=0x00020000 (OPTSTRT)
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x14;		//TAR = CR
+	memory[i++]=0xdd;	memory[i++]=0x00;	memory[i++]=0x02;	memory[i++]=0x00;		memory[i++]=0x00;		//0x00 -> clear all
+
+	// SR
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x10;		//TAR = SR
+
+//	printf( "SEND %d BYTES\npp\n",i);
+//	waitkey();
+	e=prg_comm(0x9d,i,0,0,ROFFSET,0,0,0,i/5);
+	
+	return e;
+}
+
+*/
+
+int stm32f7_erase(void)
+{
+	int i,e;
+	
+	i=0;
+	// CR=0x00000000 (clear all)
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x3C;		memory[i++]=0x10;		//TAR = CR
+	memory[i++]=0xdd;	memory[i++]=0x00;	memory[i++]=0x00;	memory[i++]=0x00;		memory[i++]=0x00;		//0x00 -> clear all
+
+	// KEYR=0x45670123
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x3C;		memory[i++]=0x04;		//TAR = KEYR
+	memory[i++]=0xdd;	memory[i++]=0x45;	memory[i++]=0x67;	memory[i++]=0x01;		memory[i++]=0x23;
+
+	// KEYR=0xCDEF89AB
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x3C;		memory[i++]=0x04;		//TAR = KEYR
+	memory[i++]=0xdd;	memory[i++]=0xCD;	memory[i++]=0xEF;	memory[i++]=0x89;		memory[i++]=0xAB;
+
+	// CLER SR
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x10;		//TAR = SR
+	memory[i++]=0xdd;	memory[i++]=0x00;	memory[i++]=0x02;	memory[i++]=0xFF;		memory[i++]=0xFF;		//
+
+	// CR=0x00000004 (MER1)
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x14;		//TAR = CR
+	memory[i++]=0xdd;	memory[i++]=0x00;	memory[i++]=0x00;	memory[i++]=0x00;		memory[i++]=0x04;		//MER1
+
+	// CR=0x00010004 (MER1+STRT)
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x14;		//TAR = CR
+	memory[i++]=0xdd;	memory[i++]=0x00;	memory[i++]=0x01;	memory[i++]=0x00;		memory[i++]=0x04;		//MER1+STRT
+
+	// SR
+	memory[i++]=0xd1;	memory[i++]=0x40;	memory[i++]=0x02;	memory[i++]=0x20;		memory[i++]=0x10;		//TAR = SR
+
+//	printf( "SEND %d BYTES\n",i);
+//	waitkey();
+	e=prg_comm(0x9d,i,0,0,ROFFSET,0,0,0,i/5);
+	return e;
+}
+
+
+
+int prog_stm32f7(void)
 {
 	int errc,blocks,i,j;
 	unsigned long addr,len,maddr;
@@ -124,7 +255,7 @@ int prog_stm32swd(void)
 		{
 			run_ram=1;
 			printf("## Action: run code in RAM using %s\n",sfile);
-			goto STM32SWD_ORUN;
+			goto stm32f7_ORUN;
 		}
 	}
 	else if(find_cmd("dr"))
@@ -138,14 +269,14 @@ int prog_stm32swd(void)
 		{
 			debug_ram = 1;
 			printf("## Action: debug code in RAM using %s\n",sfile);
-			goto STM32SWD_ORUN;
+			goto stm32f7_ORUN;
 		}
 	}
 	else if(find_cmd("df"))
 	{
 		debug_flash = 1;
 		printf("## Action: debug code in FLASH\n");
-		goto STM32SWD_ORUN;
+		goto stm32f7_ORUN;
 	}
 	else
 	{
@@ -172,32 +303,23 @@ int prog_stm32swd(void)
 		main_verify=check_cmd_verify("vm","code flash");
 		main_readout=check_cmd_read("rm","code flash",&main_prog,&main_verify);
 
-		if(algo_nr < 37)
+		if(find_cmd("po"))
 		{
-			option_prog=check_cmd_prog("po","option bytes");
-			option_verify=check_cmd_verify("vo","option bytes");
-			option_readout=check_cmd_read("ro","option bytes",&option_prog,&option_verify);
+			if(have_expar == 1)
+			{
+				printf("## Action: option bytes program to %08lX\n",expar);
+				option_prog=1;
+			}
+			else
+			{
+				printf("## Action: option bytes disabled (no value given)\n");
+				option_prog=0;
+			}
 		}
-		else
+		if(find_cmd("ro"))
 		{
-			if(find_cmd("po"))
-			{
-				if(have_expar == 1)
-				{
-					printf("## Action: option bytes program to %08lX\n",expar);
-					option_prog=1;
-				}
-				else
-				{
-					printf("## Action: option bytes disabled (no value given)\n");
-					option_prog=0;
-				}
-			}
-			if(find_cmd("ro"))
-			{
-				printf("## Action: option bytes readout\n");
-				option_readout=1;
-			}
+			printf("## Action: option bytes readout\n");
+			option_readout=1;
 		}
 
 		if(find_cmd("st"))
@@ -208,10 +330,10 @@ int prog_stm32swd(void)
 	}
 	printf("\n");
 
-STM32SWD_ORUN:
+stm32f7_ORUN:
 
 	//open file if read 
-	if((main_readout == 1) || ((option_readout == 1) && (algo_nr < 37)))
+	if((main_readout == 1) || (option_readout == 1))
 	{
 		errc=writeblock_open();
 	}
@@ -233,80 +355,38 @@ STM32SWD_ORUN:
 
 		errc=prg_comm(0xbf,0,256,0,ROFFSET,0x20,0x04,0xe0,1);
 
-		if(algo_nr < 53)
-		{
-			printf("ID : %03X\n",((memory[ROFFSET+0x01] << 8) + memory[ROFFSET+0x00]) & 0xfff);
-			if((ignore_id == 0) && ((((memory[ROFFSET+0x01] << 8) + memory[ROFFSET+0x00]) & 0xfff) > 0xf00)) errc=0x50;
-		}
+//		printf("ID : %03X\n",((memory[ROFFSET+0x01] << 8) + memory[ROFFSET+0x00]) & 0xfff);
+//		if((ignore_id == 0) && ((((memory[ROFFSET+0x01] << 8) + memory[ROFFSET+0x00]) & 0xfff) > 0xf00)) errc=0x50;
 
 //		printf("DHCSR: %02X%02X%02X%02X\n",memory[7],memory[6],memory[5],memory[4]);
 //		printf("DEMCR: %02X%02X%02X%02X\n",memory[11],memory[10],memory[9],memory[8]);
 //		printf("DHCSR: %02X%02X%02X%02X\n",memory[15],memory[14],memory[13],memory[12]);
 
 
-		if((option_erase == 1) && (errc == 0) && (algo_nr < 37) && (param[9] > 0))
+		if((option_erase == 1) && (errc == 0))
 		{
-			printf("ERASE OPTIONBYTES\n");
-			errc=prg_comm(0x4e,0,4,0,0,param[9],0,0,0);	//erase direct
-//			show_data(0,4);
+			progress("OPT RESET",10,0);
+	//		errc=stm32f7_wropt(1);
+			if(errc > 0) goto STM32_EXIT;
+				
+			i=0;j=0;
+				
+			while(i==0)
+			{
+				progress("OPT RESET",10,j+1);
+				errc=prg_comm(0x194,0,4,0,0,0,0,0,0);		// read DRWX
+				j++;
+				if(j>10) i=1;
+				if(((memory[2] & 1) == 0) && (errc==0)) i=1;
+		
+			}
+			progress("OPT RESET",10,11);
+			printf("\n");
+
 			printf("RE-INIT\n");
 			errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
+			if(errc > 0) goto STM32_EXIT;
 		}
-
-		
-
-		if((main_erase == 1) && (errc == 0))
-		{
-			printf("ERASE FLASH (MODE=%ld)\n",param[8]);
-			if(param[11] > 0)
-			{
-				errc=prg_comm(0x4e,0,4,0,0,param[8],0,0,param[11]);	//erase direct
-//				show_data(0,4);
-				if(memory[0] & 0x10) 
-				{
-					errc= 0x60;
-				}
-				else
-				{
-					printf("RE-INIT\n");
-//					prg_comm(0x0f,0,0,0,0,0,0,0,0);			//exit
-					errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
-				}
-			}
-			else
-			{
-
-				progress("FLASH ERASE",60,0);
-				errc=prg_comm(0x4e,0,4,0,0,param[8],0,0,2);	//erase direct, 1s timeout
-				
-				i=0;j=0;
-				
-				while(i==0)
-				{
-					progress("FLASH ERASE",60,j+1);
-					errc=prg_comm(0x194,0,4,0,0,0,0,0,0);		// read DRWX
-					j++;
-					if(j>60) i=1;
-					if(((memory[2] & 1) == 0) && (errc==0)) i=1;
-			
-				}
-				printf("\n");
-				
-				if(((memory[2] & 1) != 0) || (errc !=0))
-				{
-					errc= 0x61;
-				}
-				else
-				{
-					printf("RE-INIT\n");
-					prg_comm(0x0f,0,0,0,0,0,0,0,0);			//exit
-					errc=prg_comm(0xbe,0,16,0,0,0,0,0,0);		//re-init
-				}
-			
-			}			
-		}
-
-
 
 		//transfer loader to ram
 		if((run_ram == 0) && (errc == 0) && ((main_prog == 1) || (option_prog == 1) || (option_erase == 1) || (unsecure == 1)))
@@ -314,17 +394,7 @@ STM32SWD_ORUN:
 			printf("TRANSFER LOADER...");
 			for(j=0;j<512;j++)
 			{
-				switch(algo_nr)
-				{
-					case 33:	memory[j]=exec_stm32f0xx[j]; break;
-					case 34:	memory[j]=exec_stm32f1xx[j]; break;
-					case 35:	memory[j]=exec_stm32f2xx[j]; break;
-					case 36:	memory[j]=exec_stm32f3xx[j]; break;
-					case 37:	memory[j]=exec_stm32f4xx[j]; break;
-					case 52:	memory[j]=exec_stm32l4xx[j]; break;
-					case 65:	memory[j]=exec_stm32f7xx[j]; break;
-					default:	memory[j]=0xff;
-				}
+				memory[j]=exec_stm32f7xx[j];
 			}
 
 			addr=param[4];				//RAM start
@@ -357,17 +427,8 @@ STM32SWD_ORUN:
 	}
 	
 	if((run_ram == 0) && (errc == 0) && (dev_start == 0))
-	{
-		
-		if((unsecure == 1) && (errc == 0) && (algo_nr == 37))
-		{
-			printf("UNSECURE DEVICE\n");
-			expar=0x0FFFAAED;
-			have_expar=1;
-			option_prog = 1;
-		}
-
-		if((unsecure == 1) && (errc == 0) && (algo_nr == 65))
+	{		
+		if((unsecure == 1) && (errc == 0))
 		{
 			printf("UNSECURE DEVICE\n");
 			expar=0xC0FFAAFD;
@@ -462,34 +523,7 @@ STM32SWD_ORUN:
 			}
 		}
 
-
-		if((option_prog == 1) && (errc == 0) && (algo_nr < 37))
-		{
-			printf("PROGRAM OPTIONBYTES: ");
-			read_block(param[2],param[3],0);	//read option bytes
-			addr=param[2];
-			maddr=0;
-
-			printf("ADDR = %08lX\n",addr);
-			
-			show_data(0,16);
-			
-			//transfer data
-			errc=prg_comm(0xb2,256,0,maddr,0,0x04,0x00,0x20,1);
-
-			//execute prog
-			errc=prg_comm(0x59,0,0,0,0,
-					0x72,
-					(addr >> 8) & 0xff,
-					(addr >> 16) & 0xff,
-					(addr >> 24) & 0xff);
-
-			for(i=0;i<16;i++) printf(" %02X",memory[i]);
-
-			printf("\n");
-		}
-
-		if((option_prog == 1) && (errc == 0) && (algo_nr == 37))
+		if((option_prog == 1) && (errc == 0))
 		{
 //			printf("PROGRAM OPTIONBYTES: ");
 			memory[0]=expar & 0xff;
@@ -517,40 +551,15 @@ STM32SWD_ORUN:
 POEND:					
 			printf("\n");
 
-
-
 			printf(" %02X %02X %02X %02X\n",memory[3],memory[2],memory[1],memory[0]);
 			printf("\n");
 		}
 
 
-		if(((option_readout == 1) || (option_verify == 1)) && (errc == 0) && (algo_nr < 37))
-		{
-			addr=param[2];
-
-//			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,algo_nr);
-			
-
-			printf("READ OPTIONBYTES   : ");
-
-			errc=prg_comm(0xbf,0,256,0,ROFFSET,
-				(addr >> 8) & 0xff,
-				(addr >> 16) & 0xff,
-				(addr >> 24) & 0xff,
-				1);
-
-			for(i=0;i<16;i++) printf(" %02X",memory[ROFFSET+i]);
-
-			printf("\n");
-		}
-
-
-		if(((option_readout == 1) || (option_verify == 1)) && (errc == 0) && (algo_nr == 37))
+		if(((option_readout == 1) || (option_verify == 1)) && (errc == 0))
 		{
 			addr=0x40023c00;
 
-//			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,algo_nr);
-			
 			errc=prg_comm(0xbf,0,256,0,ROFFSET,
 				(addr >> 8) & 0xff,
 				(addr >> 16) & 0xff,
@@ -576,55 +585,6 @@ POEND:
 
 			addr=param[2];
 
-//			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,algo_nr);
-			
-			errc=prg_comm(0xbf,0,16,0,ROFFSET,
-				(addr >> 8) & 0xff,
-				(addr >> 16) & 0xff,
-				(addr >> 24) & 0xff,
-				1);
-			
-			for(i=0;i<16;i++) printf(" %02X",memory[ROFFSET+i]);
-
-			printf("\n");
-
-			
-		}
-
-
-		if(((option_readout == 1) || (option_verify == 1)) && (errc == 0) && (algo_nr == 65))
-		{
-			addr=0x40023c00;
-
-//			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,algo_nr);
-			
-			errc=prg_comm(0xbf,0,256,0,ROFFSET,
-				(addr >> 8) & 0xff,
-				(addr >> 16) & 0xff,
-				(addr >> 24) & 0xff,
-				1);
-
-			printf("READ OPTIONBYTES BLOCK 1  : ");
-
-			printf(" %02X %02X %02X %02X\n",	memory[ROFFSET+0x17],
-							memory[ROFFSET+0x16],
-							memory[ROFFSET+0x15],
-							memory[ROFFSET+0x14]);
-
-
-			printf("READ OPTIONBYTES BLOCK 2  : ");
-
-			printf(" %02X %02X %02X %02X\n",	memory[ROFFSET+0x1B],
-							memory[ROFFSET+0x1A],
-							memory[ROFFSET+0x19],
-							memory[ROFFSET+0x18]);
-
-			printf("\n");
-
-			addr=param[2];
-
-//			printf("ADDR = %08lx  LEN= %d Blocks\n",addr,algo_nr);
-			
 			errc=prg_comm(0xbf,0,16,0,ROFFSET,
 				(addr >> 8) & 0xff,
 				(addr >> 16) & 0xff,
@@ -641,40 +601,12 @@ POEND:
 			
 		}
 
-
-		if((option_readout == 1) && (errc == 0) && (algo_nr < 37))
-		{
-			writeblock_data(0,param[3],param[2]);
-		}
-
-		//verify option bytes
-		if((option_verify == 1) && (errc == 0) && (algo_nr < 37))
-		{
-			read_block(param[2],param[3],0);	//read option bytes
-			printf("VERIFY OPTION BYTES\n");
-			addr = param[2];
-			len = param[3];
-			maddr=0;
-			for(j=0;j<len;j++)
-			{
-				if(memory[maddr+j] != memory[maddr+j+ROFFSET])
-				{
-					printf("ERR -> ADDR= %08lX  FILE= %02X  READ= %02X\n",
-						addr+j,memory[maddr+j],memory[maddr+j+ROFFSET]);
-					errc=1;
-				}
-			}
-		}
-
-
 		//open file if was read 
-		if((main_readout == 1) || ((option_readout == 1) && (algo_nr < 37)))
+		if((main_readout == 1) || (option_readout == 1))
 		{
 			writeblock_close();
 		}
 	}
-
-
 
 	if((run_ram == 1) && (errc == 0))
 	{
@@ -737,7 +669,7 @@ STM32_EXIT:
 
 	prg_comm(0x2ef,0,0,0,0,0,0,0,0);	//dev 1
 
-	print_stm32swd_error(errc);
+	print_stm32f7_error(errc);
 
 	return errc;
 }

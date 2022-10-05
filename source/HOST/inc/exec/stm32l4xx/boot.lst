@@ -44,7 +44,7 @@ ARM GAS  boot.asm 			page 1
    7              		
    8              	reset_vector:
    9              	
-  10 0000 00800020 			.word 0x20008000	// start SP
+  10 0000 C0030020 			.word 0x200003C0	// start SP
   11 0004 09000020 			.word 0x20000009	// start PC
   12              	
   13              	main_start:

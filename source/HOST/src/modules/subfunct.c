@@ -26,6 +26,8 @@
 #include <poll.h>
 #include <termios.h>
 
+extern int usb_io(int,int);
+
 //----------------------------------------------------------------------------------
 // send a command to programmer
 //----------------------------------------------------------------------------------
@@ -38,48 +40,89 @@ int prg_comm(int cmd,int txlen,int rxlen,long txaddr,long rxaddr,int p1,int p2,i
 	lr = rxlen & 0xff;
 	hr = (rxlen >> 8) & 0xff;
 
-	shm[4]=(0xab + (cmd >> 8)) & 0xff;
-	shm[5]=cmd & 0xff;
-	shm[6]=lt;
-	shm[7]=ht;
-	shm[8]=lr;
-	shm[9]=hr;
-	shm[10]=p1 & 0xff;
-	shm[11]=p2 & 0xff;
-	shm[12]=p3 & 0xff;
-	shm[13]=p4 & 0xff;
 
-	if(txlen > 0)
+	if(interface_type < 9)
 	{
-		for(i=0;i<txlen;i++)
+		shm[4]=(0xab + (cmd >> 8)) & 0xff;
+		shm[5]=cmd & 0xff;
+		shm[6]=lt;
+		shm[7]=ht;
+		shm[8]=lr;
+		shm[9]=hr;
+		shm[10]=p1 & 0xff;
+		shm[11]=p2 & 0xff;
+		shm[12]=p3 & 0xff;
+		shm[13]=p4 & 0xff;
+
+		if(txlen > 0)
 		{
-			shm[14+i]=memory[txaddr+i];
+			for(i=0;i<txlen;i++)
+			{
+				shm[14+i]=memory[txaddr+i];
+			}
 		}
+		shm[txlen+14]=0xcc;		//last byte is 0xcc
+
+		shm[1]=0xcd;			//start transfer
+	
+//		printf("sent data\n");
+//		printf("CMD = %02X %02X\n",shm[4],shm[5]);
+	
+		while(shm[1] == 0xcd) usleep(10);
+
+//		printf("get data\n");
+	
+		//now read back result
+		offset=0;
+		while(offset < rxlen)
+		{
+			memory[rxaddr+offset]=shm[14+offset];
+			offset++;
+		}
+
+//		printf("RES = %02X %02X\n",shm[1],shm[14]);
+
+		return shm[14+offset] & 0xff;
 	}
-	shm[txlen+14]=0xcc;		//last byte is 0xcc
-
-	shm[1]=0xcd;			//start transfer
 	
-//	printf("sent data\n");
+	else
 	
-//	printf("CMD = %02X %02X\n",shm[4],shm[5]);
-	
-	while(shm[1] == 0xcd) usleep(10);
-
-//	printf("get data\n");
-
-	
-	//now read back result
-	offset=0;
-	while(offset < rxlen)
 	{
-		memory[rxaddr+offset]=shm[14+offset];
-		offset++;
+		unsigned char combuf[9000];
+		
+		com_buf[0]=(0xab + (cmd >> 8)) & 0xff;
+		com_buf[1]=cmd & 0xff;
+		com_buf[2]=lt;
+		com_buf[3]=ht;
+		com_buf[4]=lr;
+		com_buf[5]=hr;
+		com_buf[6]=p1 & 0xff;
+		com_buf[7]=p2 & 0xff;
+		com_buf[8]=p3 & 0xff;
+		com_buf[9]=p4 & 0xff;
+
+		if(txlen > 0)
+		{
+			for(i=0;i<txlen;i++)
+			{
+				com_buf[10+i]=memory[txaddr+i];
+			}
+		}
+		com_buf[txlen+10]=0xcc;		//last byte is 0xcc
+	
+		usb_io(txlen,rxlen);
+
+		offset=0;
+		while(offset < rxlen)
+		{
+			memory[rxaddr+offset]=com_buf[11+offset];
+			offset++;
+		}
+
+//		printf("RES = %02X %02X\n",shm[1],shm[14]);
+
+		return com_buf[11+offset] & 0xff;
 	}
-
-//	printf("RES = %02X %02X\n",shm[1],shm[14]);
-
-	return shm[14+offset] & 0xff;
 }
 
 
@@ -101,9 +144,9 @@ int read_volt()
 		v_batt/=10;
 		v_ext/=10;
 		v_prog/=10;
-		if(interface_type == 1) printf("V-batt  = %4.1fV\n",v_batt);
-		printf("V-Ext   = %4.1fV\n",v_ext);
-		printf("V-PROG  = %4.1fV\n",v_prog);
+		if((interface_type == 1) || (interface_type == 3)) printf("V-batt  = %4.1fV\n",v_batt);
+		printf("V-Ext     = %3.1fV\n",v_ext);
+		printf("V-PROG    = %3.1fV\n",v_prog);
 	}
 	else
 	{
@@ -128,11 +171,20 @@ int read_info()
 	{
 		blver=memory[0];
 		ver=blver & 0x3f;
+		programmer_type=(blver >> 6) & 3;
 		ver=ver/10;
-		max_blocksize=2048;			//fixed from v1.20
-		printf("SYS-Ver = %4.1f\n",ver);
+		max_blocksize=256*memory[1];
+		switch(programmer_type)
+		{
+			case 1: 	printf("ProgType  = ParaProg\n");break;
+			case 2: 	printf("ProgType  = EProg2\n");break;
+			case 3: 	printf("ProgType  = reserved\n");break;
+			default: 	printf("ProgType  = UPROG2\n");
+		}
+		printf("SYS-Ver   = %3.1f\n",ver);
+		printf("Blocksize = %d\n",max_blocksize);
 		sysversion=265*memory[2]+memory[3];
-		printf("PRG-Ver =  %04d\n",memory[2]*256+memory[3]);
+		printf("PRG-Ver   = %04d\n",memory[2]*256+memory[3]);
 	}
 	else
 	{
@@ -176,6 +228,18 @@ int must_prog(long mad,int blen)
 	for(i=0;i<blen;i++)
 	{
 		if(memory[mad+i] != 255) j=1;
+	}
+//	printf("ADDR= %04X RES: %d\n",mad,j);
+	return j;
+}
+
+int must_prog_used(long mad,int blen)
+{
+	int i,j;
+	j=0;
+	for(i=0;i<blen;i++)
+	{
+		if(memory_used[mad+i] != 0) j=1;
 	}
 //	printf("ADDR= %04X RES: %d\n",mad,j);
 	return j;
@@ -371,7 +435,7 @@ void show_ldata(unsigned long addr, int len, unsigned long maddr)
 	
 	for(i=0;i<len;i+=4)
 	{
-		printf(" %08X",(unsigned long)memory[addr+i] + (unsigned long)(memory[addr+i+1] << 8) + (unsigned long)(memory[addr+i+2] << 16)+ (unsigned long)(memory[addr+i+3] << 24));
+		printf(" %08lX",((unsigned long)memory[addr+i] + (unsigned long)(memory[addr+i+1] << 8) + (unsigned long)(memory[addr+i+2] << 16)+ (unsigned long)(memory[addr+i+3] << 24)) & 0xFFFFFFFF);
 	}
 	printf("\n");
 	
@@ -558,4 +622,17 @@ void set_error2(char *emessage,int errnum,unsigned long addr)
 void print_error(void)
 {
 	printf("%s\n",error_line);
+}
+
+
+void paraprog_view(int offset)
+{
+	printf("CTRL= ");
+	if(memory[offset+7] & 0x80) printf("w"); else printf("W");
+	if(memory[offset+7] & 0x40) printf("o"); else printf("O");
+	if(memory[offset+7] & 0x20) printf("c "); else printf("C ");
+	if(memory[offset+7] & 0x10) printf("D"); else printf("d");
+	if(memory[offset+7] & 0x02) printf("r"); else printf("R");
+			
+	printf("   ADDR= %02X%02X%02X%02X   DATA= %02X%02X\n",memory[offset+5],memory[offset+4],memory[offset+3],memory[offset+2],memory[offset+1],memory[offset+0]);
 }

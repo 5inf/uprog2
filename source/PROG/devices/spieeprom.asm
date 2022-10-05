@@ -104,7 +104,6 @@ spieeprom_read1_1:	call	spi_zerobyte
 			SPIEEP_INH
 			jmp	main_loop_ok
 
-
 ;------------------------------------------------------------------------------
 ; write 
 ; PAR1	=	ADDRL

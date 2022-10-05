@@ -240,7 +240,6 @@ nec2_bvfy:	ldi	r18,0x13			;CMD
 		rjmp	nec2_bprog_1
 
 
-
 nec2_acmd:	clr	r19
 		NEC2_SEND	NEC2_COMM_SOH
 		NEC2_SENDC	0x07			;LEN

@@ -74,6 +74,12 @@ void print_rh850_error(int errc)
 		case 0xDA:	set_error("(protection error)",errc);
 				break;
 
+		case 0xDD:	set_error("(lock bit unlock error)",errc);
+				break;
+
+		case 0xDE:	set_error("(otp enable error)",errc);
+				break;
+
 		case 0xE0:	set_error("(blank check error)",errc);
 				break;
 
@@ -87,6 +93,9 @@ void print_rh850_error(int errc)
 				break;
 
 		case 0xE7:	set_error("(sequencer error)",errc);
+				break;
+
+		case 0xEA:	set_error("(otp access error)",errc);
 				break;
 
 		default:	set_error("(unexpected error)",errc);
@@ -165,7 +174,7 @@ int prog_rh850(void)
 {
 //	unsigned long flashblock_a[32];
 //	unsigned int flashblocks;
-	int errc,blocks,bsize,stmp;
+	int errc,blocks,bsize,stmp,flen;
 	unsigned long addr,len,maddr,i,j,freq;
 	int main_blank=0;
 	int main_erase=0;
@@ -173,11 +182,28 @@ int prog_rh850(void)
 	int main_verify=0;
 	int main_readout=0;
 	int main_crc=0;
+	int main_otp08=0;
+	int main_otp16=0;
+	int main_otp24=0;
+	int main_otp32=0;
+	int main_otp40=0;
+	int main_otp48=0;
+	int main_otp56=0;
+	int main_otp64=0;
+	int main_lbt08=0;
+	int main_lbt16=0;
+	int main_lbt24=0;
+	int main_lbt32=0;
+	int main_lbt40=0;
+	int main_lbt48=0;
+	int main_lbt56=0;
+	int main_lbt64=0;
+	int blockdiv=1;
+	
 	int dev_start=0;
 	int dflash_blank=0;
 	int dflash_erase=0;
 	int dflash_prog=0;
-	int partial_mode=0;	//partial
 	int dflash_verify=0;
 	int dflash_readout=0;
 	int dflash_crc=0;
@@ -187,6 +213,8 @@ int prog_rh850(void)
 	int extended_verify=0;
 	int extended_readout=0;
 	int extended_crc=0;
+	int extended_otp=0xff;	
+	int extended_lbt=0xff;	
 	int opt_read=0;
 	int get_prot=0xff;
 	int set_prot=0xff;
@@ -194,7 +222,8 @@ int prog_rh850(void)
 	int opt1_write=0;
 	int opt2_write=0;
 	int opt3_write=0;
-	int sb_write=0;
+	int otp_get=0;
+	int lock_get=0;
 	int osc_sel=0;
 	float dfreq;
 	int verify_mode=0;
@@ -203,6 +232,7 @@ int prog_rh850(void)
 	int prog_id=0;
 	int check_id=0;
 	int authmode=-1;
+	int full_prog=0;
 	unsigned long p6=0,p7=0;
 //	unsigned char devtype[16];
 	unsigned char idkey[32];
@@ -214,57 +244,85 @@ int prog_rh850(void)
 
 	if((strstr(cmd,"help")) && ((strstr(cmd,"help") - cmd) == 1))
 	{
-		printf("-- 5v -- use 5V vdd\n");
-		printf("-- fr12  12MHz Osc (default 8MHz)\n");
-		printf("-- fr16  16MHz Osc (default 8MHz)\n");
-		printf("-- fr20  20MHz Osc (default 8MHz)\n");
-		printf("-- fr24  24MHz Osc (default 8MHz)\n");
-		printf("-- frint internal Osc (default 8MHz crystal)\n");
+		printf("-- 5v   -- use 5V vdd\n");
+		printf("-- fr12    12MHz Osc (default 8MHz)\n");
+		printf("-- fr16    16MHz Osc (default 8MHz)\n");
+		printf("-- fr20    20MHz Osc (default 8MHz)\n");
+		printf("-- fr24    24MHz Osc (default 8MHz)\n");
+		printf("-- frint   internal Osc (default 8MHz crystal)\n");
 
-		printf("-- em -- main flash erase\n");
-		printf("-- bm -- main flash blank check\n");
-		printf("-- pm -- main flash program\n");
-		printf("-- vm -- main flash verify\n");
-		printf("-- rm -- main flash readout\n");
-		printf("-- cm -- main flash CRC\n");
+		printf("-- em   -- main flash erase\n");
+		printf("-- bm   -- main flash blank check\n");
+		printf("-- pm   -- main flash program\n");
+		printf("-- vm   -- main flash verify\n");
+		printf("-- rm   -- main flash readout\n");
+		printf("-- cm   -- main flash CRC\n");
+		printf("-- om08 -- main flash set OTP (first 8K)\n");
+		printf("-- om16 -- main flash set OTP (first 16K)\n");
+		printf("-- om24 -- main flash set OTP (first 24K)\n");
+		printf("-- om32 -- main flash set OTP (first 32K)\n");
+		printf("-- om40 -- main flash set OTP (first 40K)\n");
+		printf("-- om48 -- main flash set OTP (first 48K)\n");
+		printf("-- om56 -- main flash set OTP (first 56K)\n");
+		printf("-- om64 -- main flash set OTP (first 64K)\n");
+		printf("-- lm08 -- main flash set LOCK BITS (first 8K)\n");
+		printf("-- lm16 -- main flash set LOCK BITS (first 16K)\n");
+		printf("-- lm24 -- main flash set LOCK BITS (first 24K)\n");
+		printf("-- lm32 -- main flash set LOCK BITS (first 32K)\n");
+		printf("-- lm40 -- main flash set LOCK BITS (first 40K)\n");
+		printf("-- lm48 -- main flash set LOCK BITS (first 48K)\n");
+		printf("-- lm56 -- main flash set LOCK BITS (first 56K)\n");
+		printf("-- lm64 -- main flash set LOCK BITS (first 64K)\n");
 
-		printf("-- ed -- data flash erase\n");
-		printf("-- bd -- data flash blank check\n");
-		printf("-- pd -- data flash program\n");
-		printf("-- vd -- data flash verify\n");
-		printf("-- rd -- data flash readout\n");
-		printf("-- cd -- data flash CRC\n");
+		printf("-- ed   -- data flash erase\n");
+		printf("-- bd   -- data flash blank check\n");
+		printf("-- pd   -- data flash program\n");
+//		printf("-- vd   -- data flash verify\n");
+		printf("-- rd   -- data flash readout\n");
+		printf("-- cd   -- data flash CRC\n");
 	
-		printf("-- ex -- ext user area erase\n");
-		printf("-- bx -- ext user area blank check\n");
-		printf("-- px -- ext user area program\n");
-		printf("-- vx -- ext user area verify\n");
-		printf("-- rx -- ext user area readout\n");
-		printf("-- cx -- ext user area CRC\n");
+		printf("-- ex   -- ext user area erase\n");
+		printf("-- bx   -- ext user area blank check\n");
+		printf("-- px   -- ext user area program\n");
+		printf("-- vx   -- ext user area verify\n");
+		printf("-- rx   -- ext user area readout\n");
+		printf("-- cx   -- ext user area CRC\n");
+		printf("-- ox   -- ext user area set OTP\n");
+		printf("-- lx   -- ext user area set LOCK BIT\n");
 
-		printf("-- ro -- read option bytes\n");
-		printf("-- wopt0 write option byte 0\n");
-		printf("-- wopt1 write option byte 1\n");
-		printf("-- wopt2 write option byte 2\n");
-		printf("-- wopt3 write option byte 3\n");
+		printf("-- ro   -- read option bytes\n");
+		printf("-- wopt0   write option byte 0\n");
+		printf("-- wopt1   write option byte 1\n");
+		printf("-- wopt2   write option byte 2\n");
+		printf("-- wopt3   write option byte 3\n");
 		
-		printf("-- gp -- get protection status\n");
-		printf("-- nr -- protect readout\n");
-		printf("-- nw -- protect write\n");
-		printf("-- ne -- protect erase\n");
+		printf("-- gp   -- get protection status\n");
+		printf("-- go   -- get OTP status\n");
+		printf("-- gl   -- get lockbit status\n");
+		printf("-- nr   -- protect readout\n");
+		printf("-- nw   -- protect write\n");
+		printf("-- ne   -- protect erase\n");
+		printf("-- sb   -- small blocks (256/16)\n");
+		printf("-- fp   -- full prog\n");
 
-//		printf("-- rr -- run code in RAM\n");
-		printf("-- st -- start device\n");
- 		printf("-- d2 -- switch to device 2\n");
+		printf("-- rr   -- run code in RAM\n");
+		printf("-- st   -- start device\n");
+ 		printf("-- d2   -- switch to device 2\n");
 
 		printf("-- cid: -- check ID (16 Bytes hex)\n");
 		printf("-- sid: -- set ID without SPIE (16 Bytes hex)\n");
 		printf("-- pid: -- program ID with SPIE (16 Bytes hex)\n");
 
-		printf("-- em -- main flash erase\n");
-
 		return 0;
 	}
+
+	if(param[18] == 2)
+	{
+		printf("## device does not support programming mode 2\n");
+		printf(">> Force full programming\n");
+		full_prog=1;
+	}
+
 
 	if(find_cmd("d2"))
 	{
@@ -308,17 +366,16 @@ int prog_rh850(void)
 		printf("## using internal oscillator\n");
 	}
 
-	if(find_cmd("sb"))
+	if(find_cmd("fp"))
 	{
-		sb_write=1;		
-		printf("## write single byte\n");
+		full_prog=1;		
+		printf("## force full programming\n");
 	}
 
-
-	if(find_cmd("pt"))
+	if(find_cmd("sb"))
 	{
-		partial_mode=1;		
-		printf("## partial mode\n");
+		blockdiv=4;		
+		printf("## use small blocks (256/16 bytes)\n");
 	}
 
 	if(find_cmd("rr"))
@@ -421,7 +478,7 @@ int prog_rh850(void)
 	dflash_prog=check_cmd_prog("pd","data flash");
 	extended_prog=check_cmd_prog("px","extended user area");
 	main_verify=check_cmd_verify("vm","code flash");
-	dflash_verify=check_cmd_verify("vd","data flash");
+//	dflash_verify=check_cmd_verify("vd","data flash");
 	extended_verify=check_cmd_verify("vx","extended user area");
 
 	main_readout=check_cmd_read("rm","code flash",&main_prog,&main_verify);
@@ -443,6 +500,112 @@ int prog_rh850(void)
 	{
 		set_prot &= 0xDF;
 		printf("## Action: set erase protection\n");
+	}
+
+	if(find_cmd("go"))
+	{
+		otp_get=1;
+		printf("## Action: get OTP status\n");
+	}
+
+	if(find_cmd("gl"))
+	{
+		lock_get=1;
+		printf("## Action: get lockbits status\n");
+	}
+
+	if(find_cmd("om08"))
+	{
+		main_otp08=1;
+		printf("## Action: set main flash to OTP (first 8K)\n");
+	}
+	if(find_cmd("om16"))
+	{
+		main_otp16=1;
+		printf("## Action: set main flash to OTP (first 16K)\n");
+	}
+	if(find_cmd("om24"))
+	{
+		main_otp24=1;
+		printf("## Action: set main flash to OTP (first 24K)\n");
+	}
+	if(find_cmd("om32"))
+	{
+		main_otp32=1;
+		printf("## Action: set main flash to OTP (first 32K)\n");
+	}
+	if(find_cmd("om40"))
+	{
+		main_otp40=1;
+		printf("## Action: set main flash to OTP (first 40K)\n");
+	}
+	if(find_cmd("om48"))
+	{
+		main_otp48=1;
+		printf("## Action: set main flash to OTP (first 48K)\n");
+	}
+	if(find_cmd("om56"))
+	{
+		main_otp56=1;
+		printf("## Action: set main flash to OTP (first 56K)\n");
+	}
+	if(find_cmd("om64"))
+	{
+		main_otp64=1;
+		printf("## Action: set main flash to OTP (first 64K)\n");
+	}
+
+	if(find_cmd("lm08"))
+	{
+		main_lbt08=1;
+		printf("## Action: set main flash LOCK BITS (first 8K)\n");
+	}
+	if(find_cmd("lm16"))
+	{
+		main_lbt16=1;
+		printf("## Action: set main flash LOCK BITS (first 16K)\n");
+	}
+	if(find_cmd("lm24"))
+	{
+		main_lbt24=1;
+		printf("## Action: set main flash LOCK BITS (first 24K)\n");
+	}
+	if(find_cmd("lm32"))
+	{
+		main_lbt32=1;
+		printf("## Action: set main flash LOCK BITS (first 32K)\n");
+	}
+	if(find_cmd("lm40"))
+	{
+		main_lbt40=1;
+		printf("## Action: set main flash LOCK BITS (first 40K)\n");
+	}
+	if(find_cmd("lm48"))
+	{
+		main_lbt48=1;
+		printf("## Action: set main flash LOCK BITS (first 48K)\n");
+	}
+	if(find_cmd("lm56"))
+	{
+		main_lbt56=1;
+		printf("## Action: set main flash LOCK BITS (first 56K)\n");
+	}
+	if(find_cmd("lm64"))
+	{
+		main_lbt64=1;
+		printf("## Action: set main flash LOCK BITS (first 64K)\n");
+	}
+
+	if(find_cmd("ox"))
+	{
+		extended_otp=0xfe;
+		printf("## Action: set extended user area flash to OTP\n");
+	}
+
+	if(find_cmd("lx"))
+	{
+		extended_lbt=0xfe;
+		printf("## Action: set extended user area flash LOCK BIT\n");
 	}
 
 	if(find_cmd("st"))
@@ -672,10 +835,10 @@ RH850_INIT:
 		}
 
 		printf(">> DEVICE = ");
-		for(i=4;i<21;i++) printf("%c",memory[ROFFSET+i]);
-		printf("\n");
+		for(i=4;i<13;i++) printf("%c",memory[ROFFSET+i]);
+		printf("x\n");
 		
-		if(check_id ==1 ) goto RH850_NCHK;
+		if((check_id ==1 ) && (authmode != 0xff)) goto RH850_NCHK;
 		
 	}
 
@@ -693,7 +856,7 @@ RH850_INIT:
 
 //	waitkey();
 
-	errc=prg_comm(0x15c,0,2,0,ROFFSET,0,0,0,0);				//get prot status
+	errc=prg_comm(0x15c,0,2,0,ROFFSET,0,0,0,0x21);				//get prot status
 	printf(">> PROT STATUS  = 0x%02X\n",memory[ROFFSET]);
 	if(memory[ROFFSET] & 0x80)
 		printf("   * READ ENABLED\n");
@@ -726,7 +889,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}		
 		}
 
@@ -737,13 +900,13 @@ RH850_NCHK:
 			for(i=0;i<4;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}		
 			errc=prg_comm(0x14a,0,100,0,ROFFSET,0,0,0,0x01);
 			for(i=0;i<4;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i+4,addr);
+				printf("OPTB%ld = 0x%08lX\n",i+4,addr & 0xFFFFFFFF);
 			}		
 		}
 	
@@ -754,7 +917,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -771,7 +934,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 		}
@@ -783,7 +946,7 @@ RH850_NCHK:
 			for(i=0;i<4;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 			for(i=0;i<16;i++) memory[i]=memory[ROFFSET+i+4];
@@ -802,7 +965,7 @@ RH850_NCHK:
 			for(i=0;i<4;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 		}
@@ -815,7 +978,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -832,7 +995,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 		}
@@ -844,7 +1007,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -861,7 +1024,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 		}
@@ -873,7 +1036,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 			for(i=0;i<32;i++) memory[i]=memory[ROFFSET+i+4];
@@ -890,7 +1053,7 @@ RH850_NCHK:
 			for(i=0;i<8;i++)
 			{
 				addr=memory[ROFFSET+4+4*i] | (memory[ROFFSET+5+4*i] << 8) | (memory[ROFFSET+6+4*i] << 16)| (memory[ROFFSET+7+4*i] << 24);
-				printf("OPTB%ld = 0x%08lX\n",i,addr);
+				printf("OPTB%ld = 0x%08lX\n",i,addr & 0xFFFFFFFF);
 			}
 		
 		}
@@ -902,6 +1065,7 @@ RH850_NCHK:
 			if(param[1] > 0)
 			{
 				blocks=(param[14] >> 8) & 0xff;
+			//	waitkey();
 				progress("CFLASH A ERASE ",blocks,0);
 				for(i=0;i<blocks;i++)
 				{				
@@ -1107,30 +1271,36 @@ RH850_NCHK:
 			}
 		}
 
-		if(partial_mode == 1) param[1]-=256;
-
 		if((main_prog == 1) && (errc == 0))
 		{
 			if(param[1] > 0)
 			{ 
-				read_block(param[0],param[1],0);	//bank A
+				read_block_used(param[0],param[1],0);	//bank A
 				addr=param[0];
-				bsize=1024;
+				bsize=1024/blockdiv;
 				blocks=param[1] / bsize;
 				maddr=0;
-		
-			
+
 				addr=param[0];
 				errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 				addr=param[0]+param[1]-1;
 				errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 				errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//prepare prog
+				addr=param[0];
 
 				progress("CFLASH A PROG ",blocks,0);
 				if(blocks > 1)
 				for(i=1;i<blocks;i++)
 				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
+					if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+					{
+						errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x17);
+					}
+					else
+					{
+						errc=prg_comm(0x16F,0,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x17);
+					}
+					
 					if(errc > 0) 
 					{
 						printf("\n Error at addr %08lX\n",addr);
@@ -1141,15 +1311,22 @@ RH850_NCHK:
 					maddr+=bsize;
 					progress("CFLASH A PROG ",blocks,i+1);					
 				}
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x03);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x03);
+				}
 				printf("\n");
 			}
 
 			if(param[3] > 0)
 			{ 
-				read_block(param[2],param[3],0);	//bank B
+				read_block_used(param[2],param[3],0);	//bank B
 				addr=param[2];
-				bsize=1024;
+				bsize=1024/blockdiv;
 				blocks=param[3] / bsize;
 				maddr=0;
 
@@ -1158,38 +1335,47 @@ RH850_NCHK:
 				addr=param[2]+param[3]-1;
 				errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 				errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//bcheck
+				addr=param[2];
 
 				progress("CFLASH B PROG ",blocks,0);
 				for(i=1;i<blocks;i++)
 				{
-					errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
+					if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+					{
+						errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x17);
+					}
+					else
+					{
+						errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x17);
+					}
+					
 					if(errc > 0) 
 					{
 						printf("\n Error at addr %08lX\n",addr);
 						goto RH850_END;
 					}
+
 					addr+=bsize;
 					maddr+=bsize;
-					progress("CFLASH B PROG ",blocks,i+1);					
+					progress("CFLASH A PROG ",blocks,i+1);					
 				}
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x03);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x03);
+				}
 				printf("\n");
 			}
 		}
 		
-		if(partial_mode == 1)
-		{
-			p6=param[6];
-			p7=param[7];
-			param[6]=0xFF20FD80;
-			param[7]=144;
-		}
-
 		if((dflash_prog == 1) && (errc == 0) && (param[7]>0))
 		{
-			read_block(param[6],param[7],0);	//DFLASH
+			read_block_used(param[6],param[7],0);	//DFLASH
 			addr=param[6];
-			bsize=1024;
+			bsize=64/blockdiv;
 			blocks=param[7] / bsize;
 			maddr=0;
 
@@ -1201,48 +1387,48 @@ RH850_NCHK:
 			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			addr=param[6]+param[7]-1;
 			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//prog
-
-			if(partial_mode == 1)
-			{
-				errc=prg_comm(0x158,bsize,0,maddr,0,144,0,0x13,0x03);
-				progress("DFLASH PROG   ",1,1);
-				goto nbx;
-			}
-			
+			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//prog			
+			addr=param[6];
 
 			progress("DFLASH PROG   ",blocks,0);
 
 			for(i=1;i<blocks;i++)
 			{
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
-
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x17);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x17);
+				}
+					
 				if(errc > 0) 
 				{
 					printf("\n Error at addr %08lX\n",addr);
 					goto RH850_END;
 				}
+
 				addr+=bsize;
 				maddr+=bsize;
-				progress("DFLASH PROG   ",blocks,i+1);					
+				progress("DFLASH PROG ",blocks,i+1);					
 			}
-			errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
-nbx:
+			if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+			{
+				errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x03);
+			}
+			else
+			{
+				errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x03);
+			}
 			printf("\n");
-		}
-
-
-		if(partial_mode == 1)
-		{
-			param[6]=p6;
-			param[7]=p7;
 		}
 
 		if((extended_prog == 1) && (errc == 0) && (param[5]>0))
 		{
-			read_block(param[4],param[5],0);	//EXTFLASH
+			read_block_used(param[4],param[5],0);	//EXTFLASH
 			addr=param[4];
-			bsize=1024;
+			bsize=1024/blockdiv;
 			blocks=param[5] / bsize;
 			maddr=0;
 
@@ -1251,22 +1437,38 @@ nbx:
 			addr=param[4]+param[5]-1;
 			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x13,0);				//bcheck
-
+			addr=param[4];
 
 			progress("EXTFLASH PROG ",blocks,0);
 			for(i=1;i<blocks;i++)
 			{
-				errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x17);
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x17);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x17);
+				}
+					
 				if(errc > 0) 
 				{
 					printf("\n Error at addr %08lX\n",addr);
 					goto RH850_END;
 				}
+
 				addr+=bsize;
 				maddr+=bsize;
 				progress("EXTFLASH PROG ",blocks,i+1);					
 			}
-			errc=prg_comm(0x153,bsize,0,maddr,0,0,0,0x13,0x03);
+			if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+			{
+				errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x13,0x03);
+			}
+			else
+			{
+				errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x93,0x03);
+			}
 			printf("\n");
 
 		}
@@ -1281,8 +1483,7 @@ nbx:
 				errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 				addr=param[0]+param[1]-1;
 				errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-				errc=prg_comm(0x155,0,100,0,ROFFSET,0,0,0,0);				//prepare read
-			
+				errc=prg_comm(0x155,0,100,0,ROFFSET,0,0,0,0);				//prepare read			
 				addr=param[0];
 				bsize=2048;
 				blocks=param[1] / bsize;
@@ -1305,7 +1506,7 @@ nbx:
 
 				if(errc == 0)
 				{
-					read_block(param[0],param[1],0);
+					read_block_used(param[0],param[1],0);
 					addr = param[0];
 					len = param[1];
 					i=0;
@@ -1316,7 +1517,7 @@ nbx:
 						{
 							printf("ERR -> ADDR= %08lX  FILE= %02X  READ= %02X\n",
 								addr+j,memory[j],memory[j+ROFFSET]);
-							errc=1;
+							errc=0xE3;
 						}
 					}
 				}
@@ -1328,9 +1529,9 @@ nbx:
 				errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 				addr=param[2]+param[3]-1;
 				errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-				errc=prg_comm(0x155,0,100,0,ROFFSET,0,0,0,0);				//prepare read
-			
+				errc=prg_comm(0x155,0,100,0,ROFFSET,0,0,0,0);				//prepare read			
 				addr=param[2];
+				
 				bsize=2048;
 				blocks=param[3] / bsize;
 				maddr=0;
@@ -1351,7 +1552,7 @@ nbx:
 
 				if(errc == 0)
 				{
-					read_block(param[2],param[3],0);
+					read_block_used(param[2],param[3],0);
 					addr = param[2];
 					len = param[3];
 					i=0;
@@ -1362,7 +1563,7 @@ nbx:
 						{
 							printf("ERR -> ADDR= %08lX  FILE= %02X  READ= %02X\n",
 								addr+j,memory[j],memory[j+ROFFSET]);
-							errc=1;
+							errc=0xE3;
 						}
 					}
 				}
@@ -1400,7 +1601,7 @@ nbx:
 			//verify extended
 			if(errc == 0)
 			{
-				read_block(param[4],param[5],0);
+				read_block_used(param[4],param[5],0);
 				addr = param[4];
 				len = param[5];
 				i=0;
@@ -1411,86 +1612,43 @@ nbx:
 					{
 						printf("ERR -> ADDR= %08lX  FILE= %02X  READ= %02X\n",
 							addr+j,memory[j],memory[j+ROFFSET]);
-						errc=1;
+						errc=0xE3;
 					}
 				}
 			}
 		}
 
-		if((verify_mode == 0) && (dflash_verify == 1) && (errc == 0) && (param[7]>0))
-		{
-//			waitkey();
-			addr=param[6];
-			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			addr=param[6]+param[7]-1;
-			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			errc=prg_comm(0x155,0,100,0,ROFFSET,0,0,0,0);				//prepare read
-
-			addr=param[6];
-			bsize=2048;
-			blocks=param[7] / bsize;
-			maddr=0;
-			progress("DFLASH READ   ",blocks,0);
-			for(i=0;i<blocks;i++)
-			{
-				errc=prg_comm(0x156,0,bsize,0,ROFFSET+maddr,0,0,0,0);
-				if(errc > 0) 
-				{
-					printf("\n Error at addr %08lX\n",addr);
-					goto RH850_END;
-				}
-				addr+=bsize;
-				maddr+=bsize;
-				progress("DFLASH READ   ",blocks,i+1);
-			}
-			printf("\n");
-
-			//verify dflash
-			if(errc == 0)
-			{
-				read_block(param[6],param[7],0);
-				addr = param[6];
-				len = param[7];
-				i=0;
-				printf("DFLASH VERIFY\n");
-				for(j=0;j<len;j++)
-				{
-					if(memory[j] != memory[j+ROFFSET])
-					{
-						printf("ERR -> ADDR= %08lX  FILE= %02X  READ= %02X\n",
-							addr+j,memory[j],memory[j+ROFFSET]);
-						errc=1;
-					}
-				}
-			}
 		
-		}
-		
-
-
 		if((verify_mode == 1) && (main_verify == 1) && (errc == 0))
 		{
 			if(param[1] > 0)
 			{ 
-				read_block(param[0],param[1],0);	//bank A
+				read_block_used(param[0],param[1],0);	//bank A
 				addr=param[0];
-				bsize=1024;
+				bsize=1024/blockdiv;
 				blocks=param[1] / bsize;
 				maddr=0;
 
 				addr=param[0];
-	//			printf("Start = %08lx\n",addr);
 				errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 				addr=param[0]+param[1]-1;
-	//			printf("End = %08lx\n",addr);
 				errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-				errc=prg_comm(0x20e,0,100,0,ROFFSET,0,0,0x16,0);				//verify
+				errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x16,0);				//verify
+				addr=param[0];
 
 				progress("CFLASH A VERIFY ",blocks,0);
 				if(blocks > 1)
 				for(i=1;i<blocks;i++)
 				{
-					errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x17);
+					if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+					{
+						errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x17);
+					}
+					else
+					{
+						errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x17);
+					}
+					
 					if(errc > 0) 
 					{
 						printf("\n Error at addr %08lX\n",addr);
@@ -1501,15 +1659,22 @@ nbx:
 					maddr+=bsize;
 					progress("CFLASH A VERIFY ",blocks,i+1);					
 				}
-				errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x03);
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x03);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x03);
+				}
 				printf("\n");
 			}
 
 			if(param[3] > 0)
 			{ 
-				read_block(param[2],param[3],0);	//bank B
+				read_block_used(param[2],param[3],0);	//bank B
 				addr=param[2];
-				bsize=1024;
+				bsize=1024/blockdiv;
 				blocks=param[3] / bsize;
 				maddr=0;
 
@@ -1517,62 +1682,49 @@ nbx:
 				errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 				addr=param[2]+param[3]-1;
 				errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-				errc=prg_comm(0x20e,0,100,0,ROFFSET,0,0,0x16,0);				//verify
+				errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x16,0);				//verify
+				addr=param[2];
 
 				progress("CFLASH B VERIFY ",blocks,0);
+				if(blocks > 1)
 				for(i=1;i<blocks;i++)
 				{
-					errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x17);
+					if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+					{
+						errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x17);
+					}
+					else
+					{
+						errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x17);
+					}
+					
 					if(errc > 0) 
 					{
 						printf("\n Error at addr %08lX\n",addr);
 						goto RH850_END;
 					}
+
 					addr+=bsize;
 					maddr+=bsize;
 					progress("CFLASH B VERIFY ",blocks,i+1);					
 				}
-				errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x03);
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x03);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x03);
+				}
 				printf("\n");
 			}
 		}
 
-		if((verify_mode == 1) && (dflash_verify == 1) && (errc == 0) && (param[7]>0))
-		{
-			read_block(param[6],param[7],0);	//DFLASH
-			addr=param[6];
-			bsize=1024;
-			blocks=param[7] / bsize;
-			maddr=0;
-
-			addr=param[6];
-			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			addr=param[6]+param[7]-1;
-			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			errc=prg_comm(0x20e,0,100,0,ROFFSET,0,0,0x16,0);				//verify
-
-			progress("DFLASH VERIFY   ",blocks,0);
-			for(i=1;i<blocks;i++)
-			{
-				errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x17);
-				if(errc > 0) 
-				{
-					printf("\n Error at addr %08lX\n",addr);
-					goto RH850_END;
-				}
-				addr+=bsize;
-				maddr+=bsize;
-				progress("DFLASH VERIFY   ",blocks,i+1);					
-			}
-			errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x03);
-			printf("\n");
-		}
-
 		if((verify_mode == 1) && (extended_verify == 1) && (errc == 0) && (param[5]>0))
 		{
-			read_block(param[4],param[5],0);	//EXTFLASH
+			read_block_used(param[4],param[5],0);	//EXTFLASH
 			addr=param[4];
-			bsize=1024;
+			bsize=1024/blockdiv;
 			blocks=param[5] / bsize;
 			maddr=0;
 
@@ -1580,22 +1732,88 @@ nbx:
 			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
 			addr=param[4]+param[5]-1;
 			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			errc=prg_comm(0x20e,0,100,0,ROFFSET,0,0,0x16,0);				//bcheck
+			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x16,0);				//bcheck
+			addr=param[4];
 
 			progress("EXTFLASH VERIFY ",blocks,0);
+			if(blocks > 1)
 			for(i=1;i<blocks;i++)
 			{
-				errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x17);
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x17);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x17);
+				}
+				
 				if(errc > 0) 
 				{
 					printf("\n Error at addr %08lX\n",addr);
 					goto RH850_END;
 				}
+
 				addr+=bsize;
 				maddr+=bsize;
 				progress("EXTFLASH VERIFY ",blocks,i+1);					
 			}
-			errc=prg_comm(0x20f,bsize,0,maddr,0,0,0,0x16,0x03);
+			if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+			{
+				errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x03);
+			}
+			else
+			{
+				errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x03);
+			}
+			printf("\n");
+		}
+
+		if((verify_mode == 1) && (dflash_verify == 1) && (errc == 0) && (param[7]>0))
+		{
+			read_block_used(param[6],param[7],0);	//DFLASH
+			addr=param[6];
+			bsize=64/blockdiv;
+			blocks=param[7] / bsize;
+			maddr=0;
+			addr=param[6];
+			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
+			addr=param[6]+param[7]-1;
+			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
+			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0x16,0);				//prog			
+			addr=param[6];
+
+			progress("DFLASH VERIFY ",blocks,0);
+
+			for(i=1;i<blocks;i++)
+			{
+				if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+				{
+					errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x17);
+				}
+				else
+				{
+					errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x17);
+				}
+					
+				if(errc > 0) 
+				{
+					printf("\n Error at addr %08lX\n",addr);
+					goto RH850_END;
+				}
+
+				addr+=bsize;
+				maddr+=bsize;
+				progress("DFLASH VERIFY ",blocks,i+1);					
+			}
+			if((must_prog_used(maddr,bsize)) || (full_prog == 1))
+			{
+				errc=prg_comm(0x158,bsize,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x16,0x03);
+			}
+			else
+			{
+				errc=prg_comm(0x16F,1,0,maddr,0,(bsize & 0xff),(bsize >> 8),0x96,0x03);
+			}
 			printf("\n");
 		}
 
@@ -1662,7 +1880,6 @@ nbx:
 			}	
 		}
 
-
 		if((extended_readout == 1) && (errc == 0) && (param[5]>0))
 		{
 			addr=param[4];
@@ -1692,14 +1909,46 @@ nbx:
 			writeblock_data(0,param[5],param[4]);
 		}
 
+		if((dflash_readout == 1) && (errc == 0) && (param[7]>0))
+		{
+//			waitkey();
+			addr=param[6];
+			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
+			addr=param[6]+param[7]-1;
+			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
+			errc=prg_comm(0x155,0,100,0,ROFFSET,0,0,0,0);				//prepare read
+
+			addr=param[6];
+			bsize=2048;
+			blocks=param[7] / bsize;
+			maddr=0;
+			progress("DFLASH READ   ",blocks,0);
+			for(i=0;i<blocks;i++)
+			{
+				errc=prg_comm(0x156,0,bsize,0,ROFFSET+maddr,0,0,0,0);
+				if(errc > 0) 
+				{
+					printf("\n Error at addr %08lX\n",addr);
+					goto RH850_END;
+				}
+				addr+=bsize;
+				maddr+=bsize;
+				progress("DFLASH READ   ",blocks,i+1);
+			}
+			printf("\n");
+			writeblock_data(0,param[7],param[6]);
+		}
+
+
+
 		if((run_ram == 1) && (errc == 0) && (param[9]>0))
 		{
-			len=read_block(param[8],param[9],0);	//DFLASH
+			len=read_block_used(param[8],param[9],0);	//RAM
 			len=(len+1023) & 0xFC00;
 			
 
 			addr=param[8];
-			len=param[9];
+		//	len=param[9];
 			bsize=1024;
 			blocks=len  / bsize;
 			maddr=0;
@@ -1755,71 +2004,9 @@ nbx:
 
 		}
 
-
-
-		if((sb_write == 1) && (errc == 0))
-		{
-			waitkey();
-			addr=0xFF200000;
-			memory[0]=0xAA;
-			memory[1]=0x11;
-			memory[2]=0x22;
-			memory[3]=0x33;
-
-//			errc=prg_comm(0x159,0,0,0,0,0,0,0,0x20);
-
-			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			addr+=1;
-			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			errc=prg_comm(0x152,0,100,0,ROFFSET,0,0,0,0);				//prog
-			errc=prg_comm(0x158,4,0,0,0,4,0,0,0x03);
-
-			printf("\n");
-		}
-
-
-
-		if((dflash_readout == 1) && (errc == 0) && (param[7]>0))
-		{
-//			waitkey();
-			addr=param[6];
-			errc=prg_comm(0x14e,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			addr=param[6]+param[7]-1;
-			errc=prg_comm(0x14f,0,0,0,0,(addr & 0xff),(addr>>8) & 0xff,(addr>>16) & 0xff,(addr >> 24) & 0xff);
-			errc=prg_comm(0x155,0,100,0,ROFFSET,0,0,0,0);				//prepare read
-
-			addr=param[6];
-			bsize=2048;
-			blocks=param[7] / bsize;
-			maddr=0;
-			progress("DFLASH READ   ",blocks,0);
-			for(i=0;i<blocks;i++)
-			{
-				errc=prg_comm(0x156,0,bsize,0,ROFFSET+maddr,0,0,0,0);
-				if(errc > 0) 
-				{
-					printf("\n Error at addr %08lX\n",addr);
-					goto RH850_END;
-				}
-				addr+=bsize;
-				maddr+=bsize;
-				progress("DFLASH READ   ",blocks,i+1);
-			}
-			printf("\n");
-
-			if(partial_mode == 1)
-			{
-				writeblock_data(0xFD80,144,0xFF20FD80);
-			}
-			else
-			{
-				writeblock_data(0,param[7],param[6]);
-			}
-		}
 	}		
 		
-		
-		
+			
 	if((main_readout == 1) || (dflash_readout == 1) || (extended_readout == 1))
 	{
 		i=writeblock_close();
@@ -1911,6 +2098,208 @@ nbx:
 	{
 		printf("SET PROTECTION TO 0x%02X\n",(set_prot & get_prot));
 		errc=prg_comm(0x159,0,0,0,0,0,0,0,(set_prot & get_prot));
+	}	
+
+	if((extended_otp == 0xfe) && (errc == 0))
+	{
+		if((main_otp08 == 0) && (main_otp16 == 0) && (main_otp24 == 0) && (main_otp32 == 0) 
+		&& (main_otp40 == 0) && (main_otp48 == 0) && (main_otp56 == 0) && (main_otp64 == 0))
+		{
+			printf("SET EXTENDED USER AREA TO OTP\n");
+			errc=prg_comm(0x14d,0,0,0,0,0,0xFF,extended_otp,0x2D);
+			otp_get=1;
+		}
+		else
+		{
+			printf("SET EXTENDED USER AREA TO OTP\n");		
+		}
+	}
+
+	if((main_otp08 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 8K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xFE,extended_otp,0x2D);
+		otp_get=1;
+	}
+	if((main_otp16 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 16K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xFC,extended_otp,0x2D);
+		otp_get=1;
+	}
+	if((main_otp24 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 24K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xF8,extended_otp,0x2D);
+		otp_get=1;
+	}
+	if((main_otp32 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 32K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xF0,extended_otp,0x2D);
+		otp_get=1;
+	}
+	if((main_otp40 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 40K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xE0,extended_otp,0x2D);
+		otp_get=1;
+	}
+	if((main_otp48 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 48K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xC0,extended_otp,0x2D);
+		otp_get=1;
+	}
+	if((main_otp56 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 56K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0x80,extended_otp,0x2D);
+		otp_get=1;
+	}
+	if((main_otp64 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH TO OTP (first 64K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0x00,extended_otp,0x2D);
+		otp_get=1;
+	}
+
+	if((otp_get == 1) & (errc == 0))
+	{
+		errc=prg_comm(0x15c,0,200,0,ROFFSET,0,0,0,0x2e);
+		printf("OTP STATUS BANK A\n");
+		printf("-----------------\n");
+		for(j=0;j<65;j++)
+		{
+			printf("%02X ",memory[ROFFSET+j]);
+			if((j % 16) == 15) printf("\n");
+		}
+		printf("\n\n");
+
+		if(param[3] > 0)
+		{
+			printf("OTP STATUS BANK B\n");
+			printf("-----------------\n");
+			for(j=65;j<97;j++)
+			{
+				printf("%02X ",memory[ROFFSET+j]);
+				if((j % 16) == 0) printf("\n");
+			}
+			printf("\n");
+		}
+
+		printf("OTP STATUS EXTENDED USER AREA\n");
+		printf("-----------------------------\n");
+		for(j=97;j<98;j++)
+		{
+			printf("%02X ",memory[ROFFSET+j]);
+		}
+		printf("\n\n");
+	}	
+
+	if((extended_lbt == 0xfe) && (errc == 0))
+	{
+		if((main_lbt08 == 0) && (main_lbt16 == 0) && (main_lbt24 == 0) && (main_lbt32 == 0) 
+		&& (main_lbt40 == 0) && (main_lbt48 == 0) && (main_lbt56 == 0) && (main_lbt64 == 0))
+		{
+			printf("SET EXTENDED USER AREA LOCK BIT\n");
+			errc=prg_comm(0x14d,0,0,0,0,0,0xFF,extended_lbt,0x22);
+			lock_get=1;
+		}
+		else
+		{
+			printf("SET EXTENDED USER AREA LOCK BIT\n");		
+		}
+	}
+
+
+	if((extended_lbt == 1) & (errc == 0))
+	{
+		printf("SET EXTENDED USER AREA LOCK BIT\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xFF,extended_lbt,0x22);
+		lock_get=1;
+	}
+
+	if((main_lbt08 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 8K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xFE,extended_lbt,0x22);
+		lock_get=1;
+	}
+	if((main_lbt16 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 16K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xFC,extended_lbt,0x22);
+		lock_get=1;
+	}
+	if((main_lbt24 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 24K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xF8,extended_lbt,0x22);
+		lock_get=1;
+	}
+	if((main_lbt32 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 32K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xF0,extended_lbt,0x22);
+		lock_get=1;
+	}
+	if((main_lbt40 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 40K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xE0,extended_lbt,0x22);
+		lock_get=1;
+	}
+	if((main_lbt48 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 48K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0xC0,extended_lbt,0x22);
+		lock_get=1;
+	}
+	if((main_lbt56 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 56K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0x80,extended_lbt,0x22);
+		lock_get=1;
+	}
+	if((main_lbt64 == 1) & (errc == 0))
+	{
+		printf("SET MAIN FLASH LOCK BITS (first 64K)\n");
+		errc=prg_comm(0x14d,0,0,0,0,0,0x00,extended_lbt,0x22);
+		lock_get=1;
+	}
+
+	if((lock_get == 1) & (errc == 0))
+	{
+		errc=prg_comm(0x15c,0,200,0,ROFFSET,0,0,0,0x23);
+		printf("LOCKBITS BANK A\n");
+		printf("---------------\n");
+		for(j=0;j<65;j++)
+		{
+			printf("%02X ",memory[ROFFSET+j]);
+			if((j % 16) == 15) printf("\n");
+		}
+		printf("\n\n");
+
+		if(param[3] > 0)
+		{
+			printf("LOCKBITS BANK B\n");
+			printf("---------------\n");
+			for(j=65;j<97;j++)
+			{
+				printf("%02X ",memory[ROFFSET+j]);
+				if((j % 16) == 0) printf("\n");
+			}
+			printf("\n");
+		}
+		
+		printf("LOCKBITS EXTENDED USER AREA\n");
+		printf("---------------------------\n");
+		for(j=97;j<98;j++)
+		{
+			printf("%02X ",memory[ROFFSET+j]);
+		}
+		printf("\n\n");
 	}	
 
 	if((set_id == 1) & (errc == 0))

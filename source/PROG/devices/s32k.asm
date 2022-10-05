@@ -272,6 +272,7 @@ s32k_data_erase:	.db S32K_WRITE_ABORT,	0x00,	0x00,0x00,0x00,0x1e	;clear all erro
 			.db S32K_WRITE_CTRL,	0x00,	0x54,0x00,0x00,0x00	;request debug reset
 			.db S32K_WRITE_TAR,	0x00,	0x00,0x00,0x00,0x01	;initiate erase			
 
+			
 
 ;-------------------------------------------------------------------------------
 ; S9KEA mass erase
@@ -347,6 +348,82 @@ s9kea_data_erase:	.db S32K_WRITE_ABORT,	0x00,	0x00,0x00,0x00,0x1e	;clear all err
 
 
 ;-------------------------------------------------------------------------------
+; S32K unlock
+;-------------------------------------------------------------------------------
+s32k_unlock:		ldi		ZL,LOW(s32k_data_unlock*2)
+			ldi		ZH,HIGH(s32k_data_unlock*2)
+			ldi		YL,0
+			ldi		YH,1
+
+			sbi		CTRLPORT,S32K_TRIGGER
+			cbi		CTRLPORT,S32K_TRIGGER			
+			
+			ldi		r24,5
+s32k_unlock_0:		rcall		swd32_write_dap_table
+			dec		r24
+			brne		s32k_unlock_0
+
+			rcall		s32k_swrite_drw
+			rcall		swd32_write_dap_table
+			rcall		s32k_swrite_drw
+
+			rcall		swd32_write_dap_table
+			rcall		swd32_write_dap_table
+
+			jmp		main_loop_ok
+
+s32k_swrite_drw:	ld		r20,Y+
+			ld		r21,Y+
+			ld		r22,Y+
+			ld		r23,Y+
+			ldi		XL,SWD32_WRITE_DRW
+			jmp		swd32_write_dap
+
+
+s32k_data_unlock:	.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x00	;FSTAT			
+			.db S32K_WRITE_DRW,	0x00,	0x70,0x00,0x00,0x80	;clear flags			
+			.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x04	;FCCOB0			
+			.db S32K_WRITE_DRW,	0x00,	0x45,0x00,0x00,0x00	;VFYKEY
+			.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x08	;FCCOB4			
+			.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x0C	;FCCOB8			
+			
+			.db S32K_WRITE_TAR,	0x00,	0x40,0x02,0x00,0x00	;FSTAT			
+			.db S32K_WRITE_DRW,	0x00,	0x80,0x00,0x00,0x80	;start cmd
+
+
+;-------------------------------------------------------------------------------
+; S32K get MDM status
+;-------------------------------------------------------------------------------
+s32k_gstatus:		ldi		ZL,LOW(s32k_data_gstatus*2)
+			ldi		ZH,HIGH(s32k_data_gstatus*2)
+			ldi		r24,4
+
+			sbi		CTRLPORT,S32K_TRIGGER
+			cbi		CTRLPORT,S32K_TRIGGER			
+
+
+s32k_gstatus_0:		rcall		swd32_write_dap_table
+			dec		r24
+			brne		s32k_gstatus_0
+
+			ldi		XL,S32K_READ_CSW	;read status
+			rcall		swd32_read_dap
+
+			ldi		XL,S32K_READ_CSW	;read status
+			rcall		swd32_read_dap
+	
+			call		gen_wres
+
+			jmp		main_loop_ok
+
+s32k_data_gstatus:	.db S32K_WRITE_ABORT,	0x00,	0x00,0x00,0x00,0x1e	;clear all errors
+			.db S32K_WRITE_SELECT,	0x00,	0x01,0x00,0x00,0x00	;switch to MDM-AP
+			.db S32K_WRITE_CTRL,	0x00,	0x50,0x00,0x00,0x00	;power up debug interface
+			.db S32K_WRITE_CTRL,	0x00,	0x54,0x00,0x00,0x00	;request debug reset
+
+
+
+;-------------------------------------------------------------------------------
 ; SAMD mass erase
 ;-------------------------------------------------------------------------------
 samd_erase:		ldi		ZL,LOW(samd_data_erase*2)
@@ -356,7 +433,6 @@ samd_erase:		ldi		ZL,LOW(samd_data_erase*2)
 samd_erase_1:		rcall		swd32_write_dap_table
 			dec		r24
 			brne		samd_erase_1
-			ldi		r24,100
 
 			ldi		ZL,10
 			ldi		ZH,4

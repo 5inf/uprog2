@@ -100,7 +100,7 @@ prg_exec_jtab1:	jmp	prg_exec_e1		;code 00 unknown
 		jmp	prg_exec_e1		;code 47 unknown
 		jmp	s12xe_dprog		;code 48 s12xe program DFLASH
 		jmp	prg_exec_e1		;code 49 unknown
-		jmp	prg_exec_e1		;code 4a unknown
+		jmp	swd32_cmd2		;code 4A TLE send command to bootcode
 		jmp	s12xe_setpll		;code 4b s12xe set PLL
 		jmp	s12xe_merase		;code 4c s12xe main erase
 		jmp	s12xe_derase		;code 4d s12xe dflash erase
@@ -188,7 +188,7 @@ prg_exec_jtab1:	jmp	prg_exec_e1		;code 00 unknown
 		jmp	swd32_exit_debug	;code 9a STM32 leave debug mode
 		jmp	r8c_exec2		;code 9b R8C exec first block
 		jmp	r8c_exec3		;code 9c R8C exec consecutive blocks
-		jmp	prg_exec_e1		;code 9d unknown
+		jmp	swd32_swdexec		;code 9d STM32L4 swd exec sequence
 		jmp	act_reset		;code 9e activate reset
 		jmp	rel_reset		;code 9f release reset
 
@@ -197,7 +197,7 @@ prg_exec_jtab1:	jmp	prg_exec_e1		;code 00 unknown
 		jmp	i2c_read		;code a2 I2C eeprom read
 		jmp	i2c_write		;code a3 I2C eeprom write
 		jmp	lps25h_start		;code a4 start LPS25H conversion
-		jmp	prg_exec_e1		;code a5 unknown
+		jmp	swd32_swdexec2		;code a5 swd exec sequence (extended)
 		jmp	prg_exec_e2		;reserved
 		jmp	prg_exec_e2		;reserved
 		jmp	prg_exec_e2		;reserved
@@ -362,15 +362,15 @@ prg_exec_jtab2:
 		jmp	rh850_read_opt		;code 14a RH850 get option bytes
 		jmp	rh850_write_opt		;code 14b RH850 write option bytes
 		jmp	rh850_get_crc		;code 14c RH850 get CRC
-		jmp	prg_exec_e1		;code 14d RH850 unknown
+		jmp	rh850_set_otp		;code 14d RH850 set OTP
 		jmp	rh850_set_addr1		;code 14e RH850 set start address
 		jmp	rh850_set_addr2		;code 14f RH850 set end address
 
 		jmp	rh850_bcheck		;code 150 RH850 blank check
 		jmp	rh850_erase		;code 151 RH850 erase
 		jmp	rh850_prog_start	;code 152 RH850 start programming
-		jmp	rh850_prog_block	;code 153 RH850 program/verify 1K block
-		jmp	rh850_skip_block	;code 154 RH850 skip 1K block
+		jmp	prg_exec_e1		;code 153 unknown
+		jmp	prg_exec_e1		;code 154 unknown
 		jmp	rh850_read_start	;code 155 RH850 start reading
 		jmp	rh850_read_block	;code 156 RH850 read 2 blocks
 		jmp	rh850_derase		;code 157 RH850 erase 2K blocks (32)
@@ -391,14 +391,14 @@ prg_exec_jtab2:
 		jmp	v850_bcheck_main	;code 165 V850 blank check main memory
 		jmp	v850_chip_erase		;code 166 V850 chip erase
 		jmp	v850_protect		;code 167 V850 set write prohibition
-		jmp	prg_exec_e1		;code 168 V850 prog 2K
+		jmp	prg_exec_e1		;code 168 unknown
 		jmp	v850_verifym_start	;code 169 V850 init verify
 		jmp	v850_verify_blocks	;code 16a V850 verify 2K
 		jmp	v850_prog_2k		;code 16b V850 prog2K komplete
 		jmp	v850_bcheck		;code 16c V850 blank check (universal)
 		jmp	v850_verify_start	;code 16d V850 init verify (universal)
 		jmp	prg_exec_e1		;code 16e unknown
-		jmp	prg_exec_e1		;code 16f unknown
+		jmp	rh850_skip_blockx	;code 16f RH850 skip block
 
 		jmp	mlx363_init		;code 170 MLX90363 init
 		jmp	mlx363_exit		;code 171 MLX90363 exit
@@ -451,14 +451,14 @@ prg_exec_jtab2:
 		jmp	prg_exec_e1		;code 19e unknown
 		jmp	prg_exec_e1		;code 19f this is the only check command wich never reaches programmer
 
-		jmp	prg_exec_e1		;code 1a0 unknown
-		jmp	prg_exec_e1		;code 1a1 unknown
-		jmp	prg_exec_e1		;code 1a2 unknown
-		jmp	prg_exec_e1		;code 1a3 unknown
-		jmp	prg_exec_e1		;code 1a4 unknown
+		jmp	prg_exec_e2		;reserved
+		jmp	prg_exec_e2		;reserved
+		jmp	prg_exec_e2		;reserved
+		jmp	prg_exec_e2		;reserved
+		jmp	prg_exec_e2		;reserved
 		jmp	prg_exec_e1		;code 1a5 unknown
 		jmp	prg_exec_e1		;code 1a6 unknown
-		jmp	prg_exec_e1		;code 1a7 unknown
+		jmp	prg_exec_e2		;reserved
 		jmp	prg_exec_e1		;code 1a8 unknown
 		jmp	prg_exec_e1		;code 1a9 unknown
 		jmp	veml3328_start		;code 1aa VEML3328 start conversion
@@ -482,8 +482,8 @@ prg_exec_jtab2:
 		jmp	pic1_prog2_row		;code 1bb pic16 prog rows (new protocol)
 		jmp	pic1_prog2_word		;code 1bc pic16 prog single word (new protocol)
 		jmp	prg_exec_e1		;code 1bd unknown
-		jmp	prg_exec_e1		;code 1be unknown
-		jmp	prg_exec_e1		;code 1bf unknown
+		jmp	s32k_gstatus		;code 1be S32K get status
+		jmp	s32k_unlock		;code 1bf S32K unlock with backdoor key
 
 		jmp	cc2640_init		;code 1c0 CC2640 init
 		jmp	cc2640_merase		;code 1c1 CC2640 mass erase
@@ -555,8 +555,8 @@ prg_exec_jtab3:	jmp	s08_cmd			;code 200 HCS08 single byte command
 		jmp	rh850_idcode_set	;code 20b RH850 set ID code
 		jmp	rh850_bst_start		;code 20c RH850 bootstrap start
 		jmp	rh850_bst_block		;code 20d RH850 bootstrap block
-		jmp	rh850_vfy_start		;code 20e RH850 verify start
-		jmp	rh850_vfy_block		;code 20f RH850 verify block
+		jmp	prg_exec_e1		;code 20e unknown
+		jmp	prg_exec_e1		;code 20f unknown
 
 		jmp	at8252_init		;code 210 AT89S8252 init 
 		jmp	at8252_exit		;code 211 AT89S8252 exit
@@ -597,7 +597,7 @@ prg_exec_jtab3:	jmp	s08_cmd			;code 200 HCS08 single byte command
 		jmp	onewire_read_id		;code 232 read ROM data
 		jmp	onewire_read_mem	;code 233 read memory data
 		jmp	onewire_write_mem	;code 234 write memory data
-		jmp	prg_exec_e1		;code 235 unknown
+		jmp	swd32_read_apid		;code 235 SWD read AP IDR
 		jmp	swd32_wreg		;code 236 SWD write register
 		jmp	swd32_cont		;code 237 SWD continue at address
 		jmp	swd32_setbrk		;code 238 SWD set breakpoint
@@ -629,12 +629,12 @@ prg_exec_jtab3:	jmp	s08_cmd			;code 200 HCS08 single byte command
 		jmp	avrjtag_write_ee	;code 250 AVR JTAG write EEPROM page
 		jmp	avrjtag_nop32		;code 251 AVR JTAG 32bit NOP instruction
 		jmp	samd_erase		;code 252 erase SAMD
-		jmp	prg_exec_e1		;code 253 unknown
-		jmp	prg_exec_e1		;code 254 unknown
-		jmp	prg_exec_e1		;code 255 unknown
-		jmp	prg_exec_e1		;code 256 unknown
-		jmp	prg_exec_e1		;code 257 unknown
-		jmp	prg_exec_e1		;code 258 unknown
+		jmp	tle986x_init		;code 253 TLE986X initialisation
+		jmp	swd32ra_init		;code 254 init 1 renesas RA
+		jmp	swd32ra_era		;code 255 renesas RA all erase
+		jmp	swd32_rread_tar		;code 256 SWD readback TAR register
+		jmp	swd32_get_register	;code 257 SWD get AP/DP register
+		jmp	swd32ra_reset		;code 258 Renases RA reset
 		jmp	prg_exec_e1		;code 259 unknown
 		jmp	prg_exec_e1		;code 25a unknown
 		jmp	prg_exec_e1		;code 25b unknown
@@ -926,4 +926,5 @@ prog_clr_dir:	in	XL,CTRLDDR
 		jmp	main_loop_ok
 		
 		;this table is reserved for debugging commands
+		
 		

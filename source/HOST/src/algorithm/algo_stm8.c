@@ -479,7 +479,7 @@ int prog_stm8(void)
 
 	if((main_verify == 1) && (errc == 0))
 	{
-		read_file();
+		read_block(param[0],param[1],0);
 		printf("VERIFY FLASH\n");
 		flash_addr=param[0];
 		flash_size=param[1];

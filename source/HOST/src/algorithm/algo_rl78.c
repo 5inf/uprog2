@@ -225,7 +225,6 @@ ONLY_DD:
 
 	prg_comm(0xfe,0,0,0,0,3,3,0,0);	//enable PU
 
-
 	if(dev_start == 0)
 	{
 		printf("INIT\n");

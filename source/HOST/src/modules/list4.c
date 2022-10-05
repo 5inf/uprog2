@@ -74,6 +74,7 @@ void list4_devices(void)
 	list4group(13,0,0,"Renesas RL78");
 	list4group(42,0,0,"Renesas V850");
 	list4group(26,0,0,"Renesas RH850");
+	list4group(72,0,0,"Renesas RA6");
 	list4group(20,0,0,"STMicro ST7");
 	list4group(8,0,0,"STMicro STM8");
 	list4group(16,0,0,"STMicro SPC56xx (BAM)");
@@ -91,6 +92,7 @@ void list4_devices(void)
 	list4group(62,0,0,"NXP S12Z");
 	list4group(54,0,0,"NXP MPC57xx (JTAG)");
 	list4group(64,0,0,"Silabs EFM32/EFR32");	
+	list4group(46,0,0,"Infineon TLE986x/TLE987x");	
 	list4group(32,0,0,"Cypress PSoC4");
 	list4group(21,0,0,"I2C EEPROM");
 	list4group(22,0,0,"SPI Flash");

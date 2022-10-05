@@ -3,7 +3,7 @@
 devicedat valid_devices[1000] = {
 
 	"LIST",
-	100,
+	200,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -17,7 +17,7 @@ devicedat valid_devices[1000] = {
 
 
 	"LIST4",
-	112,
+	212,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -30,7 +30,7 @@ devicedat valid_devices[1000] = {
 	0x0000,0x0000,
 
 	"KILL",
-	101,
+	201,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -43,7 +43,7 @@ devicedat valid_devices[1000] = {
 	0x0000,0x0000,
 
 	"WSERVER",
-	104,
+	204,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -56,7 +56,7 @@ devicedat valid_devices[1000] = {
 	0x0000,0x0000,
 
 	"S19TOHEX",
-	110,
+	210,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -70,7 +70,20 @@ devicedat valid_devices[1000] = {
 
 
 	"UPDATE",
-	99,
+	199,
+	0x00000000,0x00000000,		//dummy data
+	0x0000,0x0000,
+	0x0000,0x0000,
+	0x0000,0x0000,
+	0x0000,0x0000,		//RAM
+	0x00000000,		//ID
+	0x0000,0x0000,
+	0x0000,0x0000,
+	0x0000,0x0000,
+	0x0000,0x0000,
+
+	"SELF-TEST",
+	151,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -83,7 +96,7 @@ devicedat valid_devices[1000] = {
 	0x0000,0x0000,
 
 	"RUNDEV",
-	98,
+	198,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -97,46 +110,7 @@ devicedat valid_devices[1000] = {
 
 
 	"FGEN",
-	97,
-	0x00000000,0x00000000,		//dummy data
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,		//RAM
-	0x00000000,		//ID
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-
-	"LA1M",
-	96,
-	0x00000000,0x00000000,		//dummy data
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,		//RAM
-	0x00000000,		//ID
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-
-	"LA100K",
-	95,
-	0x00000000,0x00000000,		//dummy data
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,		//RAM
-	0x00000000,		//ID
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-	0x0000,0x0000,
-
-	"LA10K",
-	94,
+	197,
 	0x00000000,0x00000000,		//dummy data
 	0x0000,0x0000,
 	0x0000,0x0000,
@@ -188,9 +162,10 @@ devicedat valid_devices[1000] = {
 #include	"devices/devices_DATAFLASH.h"
 #include	"devices/devices_ATXMEGA.h"
 #include	"devices/devices_RH850.h"
+#include	"devices/devices_RH850F1K.h"
+#include	"devices/devices_RH850F1L.h"
 #include	"devices/devices_V850.h"
 #include	"devices/devices_CC2640.h"
-
 
 
 
@@ -212,6 +187,9 @@ devicedat valid_devices[1000] = {
 #include	"devices/devices_ONEWIRE.h"
 //#include	"devices/devices_SAMD21.h"
 #include	"devices/devices_VEML3328.h"
+
+#include	"devices/devices_RA6.h"
+#include	"devices_paraprog/devices_PFLASH.h"
 
 	"END",0,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18
 };

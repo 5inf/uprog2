@@ -28,7 +28,7 @@
 .def		const_1		= r3
 
 .equ		sysver_high	= 0x00	
-.equ		sysver_low	= 0x13
+.equ		sysver_low	= 0x14
 
 .equ		buffer		= 0x100		;data buffer
 .equ		stack		= 0x10ff	;system/return stack
@@ -138,10 +138,13 @@
 .include	"devices/at89s8252.asm"
 .include	"devices/s12z.asm"
 .include	"devices/efm32swd.asm"
+.include	"devices/swd_ra.asm"
+.include	"devices/tle986xswd.asm"
 .include	"devices/onewire.asm"
 .include	"devices/esp32.asm"
 .include	"modules/generics.asm"
 .include	"devices/avrjtag.asm"
+.include	"devices/mb91.asm"
 .include	"tables/st7_code.inc"
 
 ;tables

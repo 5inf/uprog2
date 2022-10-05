@@ -287,7 +287,7 @@ int prog_s12xe(void)
 	{
 		printf("UNSECURE DEVICE\n");
 		errc=prg_comm(0x44,0,0,0,0,0,0,fcdiv,bfreq-1);		//main erase + unsecure
-		if((errc == 0xc0) || (errc == 0xc4))
+		if((errc == 0x80) || (errc == 0xc0) || (errc == 0xc4))
 		{
 			errc = 0;
 		}

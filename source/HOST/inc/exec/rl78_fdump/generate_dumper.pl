@@ -35,7 +35,7 @@ $head="rl78_fdump";
 
 sub gencode
 {
-	for($i=0;$i<2048;$i++)
+	for($i=0;$i<3200;$i++)
 	{
 		$romdata[$i]="FF";
 	}
@@ -67,7 +67,7 @@ sub gencode
 			$addr=sprintf("%u",hex($addr));
 			$llen=substr($line,2,2);
 			$llen=sprintf("%u",hex($llen))-3;
-	#		print $addr."\t".$llen."\n";
+#			print $addr."\t".$llen."\n";
 			for($i=0;$i<$llen;$i++)
 			{
 				$romdata[$addr+$i]=substr($line,8+2*$i,2);

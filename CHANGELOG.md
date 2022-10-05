@@ -1,3 +1,19 @@
+# 24.06.2022 Version 1.42
+* Loader-Version ist jetzt 1.7, das gesamte Image muss neu programmiert werden
+* Change beim System: Daemon wird nur noch beim BT-Programmer genutzt
+* Change beim System: Handshake lässt sich per Befehl abschalten
+* Change beim System: Watchdog im AVR soll
+* Bugfix: Unsecure beinm S12X zeigte Pseudofehler an
+* Bugfix: Update ging nicht über den ganzen Bereich
+* Bugfix: Dataflash Programm/Verify beim 78K0R entfernt, da laut DB bicht möglich
+* Feature: Dump-Funktion beim 78K0R eingebaut
+* Feature: Programmer für parallele Speicerbausteine (in Arbeit)
+* Neue Devices: Infineon TLE986x/TLE987x
+* Neue Devices: Renesas RA6T/RA6M
+* Feature: beim RH850 werden jetzt (soweit unterstützt) nur noch Blöcke != 0xFF programmiert
+* Optimierung: Besseres OptionByte Handling beim STM32L4
+* Modellpflege: div. PIC14
+
 # 21.11.2021 Version 1.41
 * System-Version ist jetzt 0019, Update erfolgt automatisch
 * Bugfix: Update-Daten waren teilweise unvollständig

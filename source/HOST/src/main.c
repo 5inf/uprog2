@@ -2,7 +2,7 @@
 //#										#
 //# UPROG2 universal programmer							#
 //#										#
-//# copyright (c) 2010-2021 Joerg Wolfram (joerg@jcwolfram.de)			#
+//# copyright (c) 2010-2022 Joerg Wolfram (joerg@jcwolfram.de)			#
 //#										#
 //#										#
 //# This program is free software; you can redistribute it and/or		#
@@ -37,6 +37,8 @@
 #include <wires.h>
 
 extern int daemon_task(int);
+extern int check_usb(int);
+extern void close_usb(void);
 
 int main(int argc, char *argv[])
 {
@@ -60,8 +62,9 @@ int main(int argc, char *argv[])
 
 	//try to allocate memory for programming data
 	memory = malloc(ROFFSET * 2 * sizeof(unsigned char));
+	memory_used = malloc(ROFFSET * sizeof(unsigned char));
 
-	if(memory == NULL)
+	if((memory == NULL) || (memory_used == NULL))
 	{
 		printf("No memory available\n");
 		return 1;
@@ -72,9 +75,9 @@ int main(int argc, char *argv[])
 	printf("\n");
 	printf("#################################################################################\n");
 	printf("#                                                                               #\n");
-	printf("#  UNI-Programmer UPROG2 V1.41                                                  #\n");
+	printf("#  UNI-Programmer UPROG2 V1.42                                                  #\n");
 	printf("#                                                                               #\n");
-	printf("#  (c) 2012-2021 Joerg Wolfram                                                  #\n");
+	printf("#  (c) 2012-2022 Joerg Wolfram                                                  #\n");
 	printf("#                                                                               #\n");
 	printf("#  usage: uprog2 device -commands [up to 4 files/data]                          #\n");
 	printf("#         uprog2 KILL                            kill active daemon             #\n");
@@ -109,13 +112,12 @@ int main(int argc, char *argv[])
 		return(0);	
 	}
 
+	interface_type=0;
 		
 	if((strncmp(argv[1],"KILL",4) != 0) && (force_exit == 0))
 	{
-
 		if(pids == 1)
 		{
-			printf("\nuprog2 daemon is not active, starting daemon and searching for programmer...\n\n");		
 
 			if(argc > 2)
 			{
@@ -128,23 +130,37 @@ int main(int argc, char *argv[])
 
 			if(find_cmd("vp"))
 			{
-				if(pids == 1)
-				{
-					use_vanilla_pid=1;
-					printf("\n## TRY TO USE VANILLA USB PID \n");
-		
-				}
+				use_vanilla_pid = 1;
+				printf("\n## TRY TO USE ORIGINAL FTDI PID\n");					
+			
 			}
-	
-			mypid=fork();
-		
-			if(mypid == 0)
-			{
-				return(daemon_task(use_vanilla_pid));
+			
+			printf("CHECK USB PROGRAMMER... ");					
+			if(check_usb(use_vanilla_pid) == 0)
+			{ 
+				interface_type=9;
+				printf("FOUND\n\n");
 			}
 			else
-			{	//wait until daemon is active
-				usleep(200000);
+			{
+				close_usb(); 
+				printf("NOT FOUND!\n\n");
+			}
+				
+			//use direct mode if we use the USB programmer
+			if(interface_type != 9)
+			{ 
+				printf("\nuprog2 daemon is not active, starting daemon and searching for programmer...\n\n");		
+				mypid=fork();
+		
+				if(mypid == 0)
+				{
+					return(daemon_task(use_vanilla_pid));
+				}
+				else
+				{	//wait until daemon is active
+					usleep(200000);
+				}
 			}
 		}
 	}
@@ -153,45 +169,48 @@ int main(int argc, char *argv[])
 		printf("!!! DEBUG MODE ACTIVATED !!!\n\n");
 #endif
 
-	shmid=shmget(1887699,SHM_SIZE,0);
-	if(shmid < 0) 
+	if(interface_type < 9)
 	{
-		printf("Shared memory segment is not available. Possible daemon is not active.\n\n"); return 1;
-	}
+
+		shmid=shmget(1887699,SHM_SIZE,0);
+		if(shmid < 0) 
+		{
+			printf("Shared memory segment is not available. Possible daemon is not active.\n\n"); return 1;
+		}
 	
-	shm=shmat(shmid,NULL,0);
-	if(shm == (unsigned char *) -1)
-	{
-		printf("Cannot attach memory segment.\n\n"); return 1;
-	}
+		shm=shmat(shmid,NULL,0);
+		if(shm == (unsigned char *) -1)
+		{
+			printf("Cannot attach memory segment.\n\n"); return 1;
+		}
 
-	//wait for deamon to find a programmer
-	usleep(10000);
-	while(shm[0] == 0) usleep(1000);
+		//wait for deamon to find a programmer
+		usleep(10000);
+		while(shm[0] == 0) usleep(1000);
 	
 	
-	if(shm[0] == 0x1f)
-	{
-		printf("No programmer found, aborting\n\n"); 
-		shm[0]=1;					//force exit
-		shmdt(shm);
-		return 1;
-	}
+		if(shm[0] == 0x1f)
+		{
+			printf("No programmer found, aborting\n\n"); 
+			shm[0]=1;					//force exit
+			shmdt(shm);
+			return 1;
+		}
 
-	if(shm[2] == 2)
-	{
-		printf(">> USB programmer is active.\n\n"); 
-		shm[0]=1;					//send ACK to daemon
-		interface_type=2;
+		if(shm[2] == 1)
+		{
+			printf(">> Bluetooth programmer is active.\n\n"); 
+			shm[0]=1;					//send ACK to daemon
+			interface_type=1;
+		}
+	
+		if(shm[2] == 3)
+		{
+			printf(">> Parallel Bluetooth programmer is active.\n\n"); 
+			shm[0]=1;					//send ACK to daemon
+			interface_type=3;
+		}
 	}
-
-	if(shm[2] == 1)
-	{
-		printf(">> Bluetooth programmer is active.\n\n"); 
-		shm[0]=1;					//send ACK to daemon
-		interface_type=1;
-	}
-
 
 	//now search par 1 for a valid device
 	jj=0;
@@ -211,7 +230,7 @@ int main(int argc, char *argv[])
 		jj++;
 	}while(strncmp("END",valid_devices[jj].name,20) != 0);
 
-	if(algo_nr == 100)
+	if(algo_nr == 200)
 	{
 		list_devices();
 		return(0);
@@ -224,14 +243,14 @@ int main(int argc, char *argv[])
 	}
 
 
-	if(algo_nr < 80)
+	if(algo_nr < 190)
 	{
 //		printf("ALGO: %d \n",algo_nr);
 		printf("*** %s can be programmed with: %s ***\n\n",name,cables[algo_nr]);
 	}	
 
 	// (dummy)devices >99 (LIST,KILL,WSERVER) need no command
-	if((algo_nr < 100) || (algo_nr > 109))
+	if((algo_nr < 200) || (algo_nr > 209))
 	{
 		cmd_found = 0;
 		if(argc > 2)
@@ -397,7 +416,7 @@ int main(int argc, char *argv[])
 	}
 
 	
-	if(algo_nr == 110)
+	if(algo_nr == 210)
 	{
 		tfile_found=1;				//we have a filename
 		tfile_mode=0;				//Motorola S-Record
@@ -416,18 +435,33 @@ int main(int argc, char *argv[])
 		}
 	}
 
-
-	if(algo_nr < 100)
+	if((algo_nr < 200) || (algo_nr == 202))
 	{
 		errcode=read_info();
-		if(errcode == 0) read_volt();
-		if(errcode == 0) 
+		if(programmer_type == 0)
 		{
-			if(check_update()== -1) read_volt();
+			if(errcode == 0) read_volt();
+			if(errcode == 0) 
+			{
+				if(check_update()== -1) read_volt();
+			}
 		}
-	}
+
+		if(programmer_type == 1)
+		{
+			if(errcode == 0) read_volt();
+			if(errcode == 0) 
+			{
+				if(check_update_par()== -1) read_volt();
+			}
+		}
 	
-	if(errcode == 0)
+	}
+
+	//###############################################################################
+	//# default UPROG2								#
+	//###############################################################################	
+	if((errcode == 0) && (programmer_type == 0))
 	{
 		switch (algo_nr)
 		{
@@ -459,11 +493,11 @@ int main(int argc, char *argv[])
 			case 30:	errcode=prog_xc9500();		break;
 			case 31:	errcode=prog_cc25xx();		break;
 			case 32:	errcode=prog_psoc4();		break;
-			case 33:	errcode=prog_stm32swd();	break;	//f0
-			case 34:	errcode=prog_stm32swd();	break;	//f1
-			case 35:	errcode=prog_stm32swd();	break;	//f2
-			case 36:	errcode=prog_stm32swd();	break;	//f3
-			case 37:	errcode=prog_stm32swd();	break;	//f4
+			case 33:	errcode=prog_stm32f0();		break;	//f0
+			case 34:	errcode=prog_stm32f1();		break;	//f1
+			case 35:	errcode=prog_stm32f2();		break;	//f2
+			case 36:	errcode=prog_stm32f3();		break;	//f3
+			case 37:	errcode=prog_stm32f4();		break;	//f4
 			case 38:	errcode=prog_pic16a();		break;	//pic12
 			case 40:	errcode=prog_atxmega();		break;
 
@@ -471,13 +505,13 @@ int main(int argc, char *argv[])
 			case 43:	errcode=prog_mlx363();		break;
 			case 44:	errcode=prog_ppcjtag();		break;
 			case 45:	errcode=prog_ppcjtag2();	break;
-
+			case 46:	errcode=prog_tle986x();		break;
 			case 47:	errcode=prog_spieeprom();	break;
 
 			case 49:	errcode=read_lps25h();		break;
 			case 50:	errcode=prog_mlx316();		break;
 			case 51:	errcode=prog_cc2640();		break;
-			case 52:	errcode=prog_stm32swd();	break;	//l4
+			case 52:	errcode=prog_stm32l4();		break;	//l4
 			case 53:	errcode=prog_s32kswd();		break;	//s32k
 			case 54:	errcode=prog_ppcjtag3();	break;
 			case 55:	errcode=prog_pic16c();		break;	//pic16 new
@@ -490,22 +524,26 @@ int main(int argc, char *argv[])
 			case 62:	errcode=prog_s12z();		break;
 			case 63:	errcode=prog_ppcjtag4();	break;
 			case 64:	errcode=prog_efm32swd();	break;	//EFM32
-			case 65:	errcode=prog_stm32swd();	break;	//f7
+			case 65:	errcode=prog_stm32f7();		break;	//f7
 			case 66:	errcode=prog_onewire();		break;	//onewire EEPROM
 			case 67:	errcode=prog_avrjtag();		break;	//AVR over JTAG
 //			case 68:	errcode=prog_samdswd();		break;	//ATSAMD over SWD
+			case 69:	errcode=read_veml3328();	break;
+			case 70:	errcode=prog_pic16e();		break;	//pic16 new + EEPROM
 
-			case 89:	errcode=prog_dgen();		break;
-			case 97:	errcode=prog_fgen();		break;
+			case 72:	errcode=prog_ra6();		break;	//renesas RA6M1/M2/T1
 
-			case 101:	printf("Shutting down daemon and disconnect programmer...\n");
+			case 189:	errcode=prog_dgen();		break;
+			case 197:	errcode=prog_fgen();		break;
+
+			case 201:	printf("Shutting down daemon and disconnect programmer...\n");
 					shm[0]=0x2f;
 					break;
 
-			case 99:	update();			//update
+			case 199:	update();			//update
 					break;
 
-			case 110:	errcode=s19tohex();		//dataset converter mode
+			case 210:	errcode=s19tohex();		//dataset converter mode
 					break;
 
 			default:
@@ -513,7 +551,35 @@ int main(int argc, char *argv[])
 		}
 		
 	}
-	if((algo_nr < 101) && (errcode != 0x9f))
+
+	//###############################################################################
+	//# paraprog STM32F411								#
+	//###############################################################################	
+	if((errcode == 0) && (programmer_type == 1))
+	{
+		switch (algo_nr)
+		{
+			case 151:	errcode=paraprog_self_test();	break;
+
+			case 152:	errcode=prog_pflash();		break;
+
+			case 201:	printf("Shutting down daemon and disconnect programmer...\n");
+					shm[0]=0x2f;
+					break;
+
+			case 210:	errcode=s19tohex();		//dataset converter mode
+					break;
+
+			case 199:	update_par();		//update
+					break;
+
+			default:
+			printf("WRONG ALGORITHM\n");
+		}
+		
+	}
+	
+	if((algo_nr < 201) && (errcode != 0x9f))
 	{
 		prg_comm(0xfa,0,0,0,0,0,0,0,0);	//set back to 3,3V mode
 	}
@@ -529,6 +595,9 @@ int main(int argc, char *argv[])
 		printf("\n!!!! ERROR: Address was out of range for S19/S28 !!!!\n\n");
 		errcode = 0xA0;
 	}
+
+	if(interface_type == 9) close_usb(); 
+
 
 
 	free(memory);

@@ -6,7 +6,7 @@ myNAME = rl78-dump-flash
 
 ################################################################################
 
-DEVICE=r5f10agg
+DEVICE=r5f10a6a
 PROGDEV=RL78DMP
 
 TOOLPREFIX=/usr/local/toolchain/rl78-elf/bin/rl78-elf
@@ -20,7 +20,7 @@ OC=$(TOOLPREFIX)-objcopy
 OD=$(TOOLPREFIX)-objdump
 SZ=$(TOOLPREFIX)-size
 
-CFLAGS  = -O2 -fno-ident -fno-common -fno-builtin -fomit-frame-pointer -mrelax -nostartfiles -nostdlib -fshort-double
+CFLAGS  = -Os -fno-ident -fno-common -fno-builtin -fomit-frame-pointer -mrelax -nostartfiles -nostdlib -fshort-double
 CFLAGS +=-I$(UNILIBPREFIX)/include
 CFLAGS +=-L$(UNILIBPREFIX)/lib
 CFLAGS +=-I./inc -Duarch=necrl78

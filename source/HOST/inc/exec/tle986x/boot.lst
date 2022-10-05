@@ -1,0 +1,164 @@
+
+boot.elf:     file format elf32-littlearm
+boot.elf
+architecture: arm, flags 0x00000112:
+EXEC_P, HAS_SYMS, D_PAGED
+start address 0x18000000
+
+Program Header:
+    LOAD off    0x00010000 vaddr 0x18000000 paddr 0x18000000 align 2**16
+         filesz 0x00000078 memsz 0x00000178 flags rwx
+private flags = 5000200: [Version5 EABI] [soft-float ABI]
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         00000078  18000000  18000000  00010000  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .heap         00000100  18000078  18000078  00010078  2**0
+                  ALLOC
+  2 .ARM.attributes 00000021  00000000  00000000  00010078  2**0
+                  CONTENTS, READONLY
+SYMBOL TABLE:
+18000000 l    d  .text	00000000 .text
+18000078 l    d  .heap	00000000 .heap
+00000000 l    d  .ARM.attributes	00000000 .ARM.attributes
+00000000 l    df *ABS*	00000000 build/src/boot.o
+48028000 l       *ABS*	00000000 GPIO_BASE
+00000000 l       *ABS*	00000000 GPIO_P0_DATA
+00000004 l       *ABS*	00000000 GPIO_P0_DIR
+00000008 l       *ABS*	00000000 GPIO_P1_DATA
+0000000c l       *ABS*	00000000 GPIO_P1_DIR
+00000010 l       *ABS*	00000000 GPIO_P2_DATA
+00000014 l       *ABS*	00000000 GPIO_P2_DIR
+00000018 l       *ABS*	00000000 GPIO_P0_PUDSEL
+0000001c l       *ABS*	00000000 GPIO_P0_PUDEN
+00000020 l       *ABS*	00000000 GPIO_P1_PUDSEL
+00000024 l       *ABS*	00000000 GPIO_P1_PUDEN
+00000028 l       *ABS*	00000000 GPIO_P2_PUDSEL
+0000002c l       *ABS*	00000000 GPIO_P2_PUDEN
+00000030 l       *ABS*	00000000 GPIO_P0_ALTSEL0
+00000034 l       *ABS*	00000000 GPIO_P0_ALTSEL1
+00000038 l       *ABS*	00000000 GPIO_P1_ALTSEL0
+0000003c l       *ABS*	00000000 GPIO_P1_ALTSEL1
+00000040 l       *ABS*	00000000 GPIO_P0_OD
+00000044 l       *ABS*	00000000 GPIO_P1_OD
+18000000 l       .text	00000000 reset_addr
+18000008 l       .text	00000000 main_loop
+1800000e l       .text	00000000 main_loop_wait
+18000028 l       .text	00000000 erase_flash
+1800003a l       .text	00000000 prog_flash
+18000026 l       .text	00000000 tloop
+1800002a l       .text	00000000 erase_flash_1
+1800003e l       .text	00000000 prog_flash_1
+18000046 l       .text	00000000 prog_flash_2
+00000000         *UND*	00000000 reset_addr
+00000100 g       *ABS*	00000000 heap_size
+00000000 g       *ABS*	00000000 _sidata
+18000078 g       .text	00000000 __exidx_end
+18000078 g       .text	00000000 _etext
+18000078 g       .text	00000000 _sbss
+18000078 g       .text	00000000 __bss_start__
+18000078 g       .text	00000000 _sdata
+18000178 g       .heap	00000000 _heap_end
+18000078 g       .text	00000000 __exidx_start
+18000078 g       .text	00000000 _ebss
+18000078 g       .heap	00000000 _heap_start
+18000078 g       .text	00000000 __bss_end__
+00000400 g       *ABS*	00000000 stack_size
+18000008 g       .text	00000000 main
+18001c00 g       *ABS*	00000000 _stack_end
+18002000 g       *ABS*	00000000 _stack_start
+18000078 g       .text	00000000 _edata
+
+
+
+Disassembly of section .text:
+
+18000000 <reset_addr>:
+18000000:	180003fc 	stmdane	r0, {r2, r3, r4, r5, r6, r7, r8, r9}
+18000004:	18000009 	stmdane	r0, {r0, r3}
+
+18000008 <main>:
+18000008:	4915      	ldr	r1, [pc, #84]	; (18000060 <prog_flash_2+0x1a>)
+1800000a:	2200      	movs	r2, #0
+1800000c:	600a      	str	r2, [r1, #0]
+
+1800000e <main_loop_wait>:
+1800000e:	6808      	ldr	r0, [r1, #0]
+18000010:	4290      	cmp	r0, r2
+18000012:	d0fc      	beq.n	1800000e <main_loop_wait>
+18000014:	1c07      	adds	r7, r0, #0
+18000016:	4a13      	ldr	r2, [pc, #76]	; (18000064 <prog_flash_2+0x1e>)
+18000018:	4017      	ands	r7, r2
+1800001a:	22ff      	movs	r2, #255	; 0xff
+1800001c:	4010      	ands	r0, r2
+1800001e:	2854      	cmp	r0, #84	; 0x54
+18000020:	d002      	beq.n	18000028 <erase_flash>
+18000022:	2852      	cmp	r0, #82	; 0x52
+18000024:	d009      	beq.n	1800003a <prog_flash>
+
+18000026 <tloop>:
+18000026:	e7ef      	b.n	18000008 <main>
+
+18000028 <erase_flash>:
+18000028:	2610      	movs	r6, #16
+
+1800002a <erase_flash_1>:
+1800002a:	1c38      	adds	r0, r7, #0
+1800002c:	4d0e      	ldr	r5, [pc, #56]	; (18000068 <prog_flash_2+0x22>)
+1800002e:	47a8      	blx	r5
+18000030:	2280      	movs	r2, #128	; 0x80
+18000032:	18bf      	adds	r7, r7, r2
+18000034:	3e01      	subs	r6, #1
+18000036:	d1f8      	bne.n	1800002a <erase_flash_1>
+18000038:	e7e6      	b.n	18000008 <main>
+
+1800003a <prog_flash>:
+1800003a:	4c0c      	ldr	r4, [pc, #48]	; (1800006c <prog_flash_2+0x26>)
+1800003c:	2610      	movs	r6, #16
+
+1800003e <prog_flash_1>:
+1800003e:	1c38      	adds	r0, r7, #0
+18000040:	4d0b      	ldr	r5, [pc, #44]	; (18000070 <prog_flash_2+0x2a>)
+18000042:	47a8      	blx	r5
+18000044:	2120      	movs	r1, #32
+
+18000046 <prog_flash_2>:
+18000046:	6822      	ldr	r2, [r4, #0]
+18000048:	603a      	str	r2, [r7, #0]
+1800004a:	3404      	adds	r4, #4
+1800004c:	3704      	adds	r7, #4
+1800004e:	3901      	subs	r1, #1
+18000050:	d1f9      	bne.n	18000046 <prog_flash_2>
+18000052:	2000      	movs	r0, #0
+18000054:	4d07      	ldr	r5, [pc, #28]	; (18000074 <prog_flash_2+0x2e>)
+18000056:	47a8      	blx	r5
+18000058:	3e01      	subs	r6, #1
+1800005a:	d1f0      	bne.n	1800003e <prog_flash_1>
+1800005c:	e7d4      	b.n	18000008 <main>
+1800005e:	bf00      	nop
+18000060:	18000c00 	stmdane	r0, {sl, fp}
+18000064:	ffffff00 			; <UNDEFINED> instruction: 0xffffff00
+18000068:	000038d5 	ldrdeq	r3, [r0], -r5
+1800006c:	18000400 	stmdane	r0, {sl}
+18000070:	000038e5 	andeq	r3, r0, r5, ror #17
+18000074:	000038dd 	ldrdeq	r3, [r0], -sp
+
+Disassembly of section .heap:
+
+18000078 <_heap_start>:
+	...
+
+Disassembly of section .ARM.attributes:
+
+00000000 <.ARM.attributes>:
+   0:	00002041 	andeq	r2, r0, r1, asr #32
+   4:	61656100 	cmnvs	r5, r0, lsl #2
+   8:	01006962 	tsteq	r0, r2, ror #18
+   c:	00000016 	andeq	r0, r0, r6, lsl r0
+  10:	726f4305 	rsbvc	r4, pc, #335544320	; 0x14000000
+  14:	2d786574 	cfldr64cs	mvdx6, [r8, #-464]!	; 0xfffffe30
+  18:	0600334d 	streq	r3, [r0], -sp, asr #6
+  1c:	094d070a 	stmdbeq	sp, {r1, r3, r8, r9, sl}^
+  20:	Address 0x00000020 is out of bounds.
+

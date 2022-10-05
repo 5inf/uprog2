@@ -66,18 +66,18 @@ rh850_init:		mov	r21,r17
 			ldi	XL,RH850_DIRSET			;set direction
 			out	CTRLDDR,XL
 			call	api_vcc_on			;VCC on
-			ldi	ZL,100
+			ldi	ZL,150
 			ldi	ZH,0
 			call	wait_ms
 			sbi	CTRLPORT,RH850_FLMD0		;FLMD0=1
 			sbi	CTRLPORT,RH850_SCK
 			sbi	CTRLPORT,RH850_FPDR
 			sbi	CTRLPORT,RH850_FPDT
-			ldi	ZL,10
+			ldi	ZL,1
 			ldi	ZH,0
 			call	wait_ms
-			sbi	CTRLPORT,RH850_RESET		;release RESET with FLMD0=1
-			ldi	ZL,1
+			sbi	CTRLPORT,RH850_RESET		;set RESET with FLMD0=1
+			ldi	ZL,5
 			ldi	ZH,0
 			call	wait_ms
 			cbi	CTRLPORT,RH850_RESET		;release RESET with FLMD0=1
@@ -543,41 +543,7 @@ rh850_prog_start:	call	api_resetptr
 			rcall	rh850_sendbyte
 			ldi	XL,0x09			;LENL
 			rcall	rh850_sendbyte
-			ldi	XL,0x13			;write command
-			rcall	rh850_sendbyte
-			lds	XL,devbuf+3		;SA HH
-			rcall	rh850_sendbyte		
-			lds	XL,devbuf+2		;SA HL
-			rcall	rh850_sendbyte		
-			lds	XL,devbuf+1		;SA LH
-			rcall	rh850_sendbyte		
-			lds	XL,devbuf+0		;SA LL
-			rcall	rh850_sendbyte		
-			lds	XL,devbuf+7		;EA HH
-			rcall	rh850_sendbyte		
-			lds	XL,devbuf+6		;EA HL
-			rcall	rh850_sendbyte		
-			lds	XL,devbuf+5		;EA LH
-			rcall	rh850_sendbyte		
-			lds	XL,devbuf+4		;EA LL
-			rcall	rh850_sendbyte		
-			rcall	rh850_send_csum
-			rcall	rh850_send_etx		;ETX senden
-			
-			rcall	rh850_get_status
-			jmp	main_loop
-
-
-;------------------------------------------------------------------------------
-; Verify start
-;------------------------------------------------------------------------------
-rh850_vfy_start:	call	api_resetptr
-			rcall	rh850_send_soh		;SOH senden
-			ldi	XL,0x00			;LENH
-			rcall	rh850_sendbyte
-			ldi	XL,0x09			;LENL
-			rcall	rh850_sendbyte
-			ldi	XL,0x16			;verify command
+			mov	XL,r18			;write command
 			rcall	rh850_sendbyte
 			lds	XL,devbuf+3		;SA HH
 			rcall	rh850_sendbyte		
@@ -636,24 +602,22 @@ rh850_bst_start:	call	api_resetptr
 
 	
 ;------------------------------------------------------------------------------
-; PROGRAM 1K block
+; PROGRAM/verify block
+; PAR3 = CMD
 ; PAR4=ETX/ETB
 ;------------------------------------------------------------------------------
 rh850_prog_blockx:	movw	r24,r16
-			rjmp	rh850_prog_block_0
-
-rh850_prog_block:	ldi	r24,0
-			ldi	r25,4
-
-rh850_prog_block_0:	mov	r18,r19
+			mov	r6,r18
+			mov	r18,r19
 			adiw	r24,1
 			call	api_resetptr
+			
 			rcall	rh850_send_sod		;SOD senden
 			mov	XL,r25			;LENH
 			rcall	rh850_sendbyte
 			mov	XL,r24			;LENL
 			rcall	rh850_sendbyte
-			ldi	XL,0x13			;write command
+			mov	XL,r6			;write command
 			rcall	rh850_sendbyte
 			sbiw	r24,1
 			
@@ -661,11 +625,49 @@ rh850_prog_block_1:	call	api_buf_bread
 			rcall	rh850_sendbyte
 			sbiw	r24,1
 			brne	rh850_prog_block_1
-
-			ldi	ZL,1
+	
+			rcall	rh850_send_csum
+			mov	XL,r18			;ETX/ETB
+			rcall	rh850_sendbyte
+		
+			ldi	ZL,2
 			ldi	ZH,0
 			call	api_wait_ms
-	
+		
+			call	api_resetptr
+			rcall	rh850_get_status
+			jmp	main_loop
+
+
+;------------------------------------------------------------------------------
+; SKIP block
+; PAR3=command
+; PAR4=ETX/ETB
+;------------------------------------------------------------------------------
+rh850_skip_blockx:	movw	r24,r16
+			mov	r6,r18
+			mov	r18,r19
+			adiw	r24,1
+			call	api_resetptr
+			
+			rcall	rh850_send_sod		;SOD senden
+			ldi	XL,0x00			;LENH
+			rcall	rh850_sendbyte
+			ldi	XL,0x05			;LENL
+			rcall	rh850_sendbyte
+			mov	XL,r6			;write command
+			rcall	rh850_sendbyte
+			sbiw	r24,1
+			
+			ldi	XL,0x00			;HH
+			rcall	rh850_sendbyte
+			ldi	XL,0x00			;HL
+			rcall	rh850_sendbyte
+			mov	XL,r25			;LENH
+			rcall	rh850_sendbyte
+			mov	XL,r24			;LENL
+			rcall	rh850_sendbyte
+
 			rcall	rh850_send_csum
 			mov	XL,r18			;ETX/ETB
 			rcall	rh850_sendbyte
@@ -677,7 +679,6 @@ rh850_prog_block_1:	call	api_buf_bread
 			call	api_resetptr
 			rcall	rh850_get_status
 			jmp	main_loop
-
 
 ;------------------------------------------------------------------------------
 ; set OTP
@@ -736,50 +737,6 @@ rh850_otp_get:		call	api_resetptr
 			jmp	main_loop_ok
 
 ;------------------------------------------------------------------------------
-; Verify 1K block
-; PAR4=ETX/ETB
-;------------------------------------------------------------------------------
-rh850_vfy_blockx:	movw	r24,r16
-			rjmp	rh850_vfy_block_0
-
-rh850_vfy_block:	ldi	r24,0
-			ldi	r25,4
-
-rh850_vfy_block_0:	mov	r18,r19
-			adiw	r24,1
-			call	api_resetptr
-			rcall	rh850_send_sod		;SOD senden
-			mov	XL,r25			;LENH
-			rcall	rh850_sendbyte
-			mov	XL,r24			;LENL
-			rcall	rh850_sendbyte
-			ldi	XL,0x16			;write command
-			rcall	rh850_sendbyte
-			sbiw	r24,1
-			
-rh850_vfy_block_1:	call	api_buf_bread
-			rcall	rh850_sendbyte
-			sbiw	r24,1
-			brne	rh850_vfy_block_1
-
-			ldi	ZL,1
-			ldi	ZH,0
-			call	api_wait_ms
-	
-			rcall	rh850_send_csum
-			mov	XL,r18			;ETX/ETB
-			rcall	rh850_sendbyte
-		
-			ldi	ZL,1
-			ldi	ZH,0
-			call	api_wait_ms
-		
-			call	api_resetptr
-			rcall	rh850_get_status
-			jmp	main_loop
-						
-
-;------------------------------------------------------------------------------
 ; Bootstrap 1K block
 ; PAR4=ETX/ETB
 ;------------------------------------------------------------------------------
@@ -822,36 +779,6 @@ rh850_bst_block_1:	call	api_buf_bread
 			rcall	rh850_get_status
 			jmp	main_loop
 						
-	
-;------------------------------------------------------------------------------
-; SKIP 1K block
-; PAR4=ETX/ETB
-;------------------------------------------------------------------------------
-rh850_skip_block:	rcall	rh850_send_sod		;SOD senden
-			ldi	XL,0x00			;LENH
-			rcall	rh850_sendbyte
-			ldi	XL,0x05			;LENL
-			rcall	rh850_sendbyte
-			ldi	XL,0x93			;skip command
-			rcall	rh850_sendbyte
-			
-			ldi	XL,0x00			;skip size
-			rcall	rh850_sendbyte
-			ldi	XL,0x00			;skip size
-			rcall	rh850_sendbyte
-			ldi	XL,0x04			;skip size
-			rcall	rh850_sendbyte
-			ldi	XL,0x00			;skip size
-			rcall	rh850_sendbyte
-		
-			rcall	rh850_send_csum
-			mov	XL,r19			;ETX/ETB
-			rcall	rh850_sendbyte
-		
-			call	api_resetptr
-			rcall	rh850_get_status
-			jmp	main_loop
-
 ;------------------------------------------------------------------------------
 ; Readout start
 ;------------------------------------------------------------------------------
@@ -1055,9 +982,39 @@ rh850_set_prot:		rcall	rh850_send_soh		;SOH senden
 			rcall	rh850_get_status
 			jmp	main_loop
 
+
 ;------------------------------------------------------------------------------
-; get protection
-; byte0=state
+; set OTP
+; r18 = FLASH2 number (*8, 0=none)
+; r19 = EXT USER AREA (*8, 0=not)
+;------------------------------------------------------------------------------
+rh850_set_otp:		rcall	rh850_send_soh		;SOH senden
+			ldi	XL,0x00			;LENH
+			rcall	rh850_sendbyte
+			ldi	XL,0x63			;LENL
+			rcall	rh850_sendbyte
+			mov	XL,r19			;Oset command
+			rcall	rh850_sendbyte
+
+			mov	XL,r17
+			rcall	rh850_sendbyte
+
+			ldi	r24,96
+rh650_set_otp_1:	ldi	XL,0xff
+			rcall	rh850_sendbyte
+			dec	r24
+			brne	rh650_set_otp_1
+			mov	XL,r18
+			rcall	rh850_sendbyte
+
+			rcall	rh850_send_csum
+			rcall	rh850_send_etx		;ETX senden
+					
+			rcall	rh850_get_status
+			jmp	main_loop
+
+;------------------------------------------------------------------------------
+; get protection etc...
 ;------------------------------------------------------------------------------
 rh850_get_prot:		call	api_resetptr
 			rcall	rh850_send_soh		;SOH senden
@@ -1065,7 +1022,7 @@ rh850_get_prot:		call	api_resetptr
 			rcall	rh850_sendbyte
 			ldi	XL,0x01			;LENL
 			rcall	rh850_sendbyte
-			ldi	XL,0x21			;Pget command
+			mov	XL,r19			;Pget command
 			rcall	rh850_sendbyte
 			rcall	rh850_send_csum
 			rcall	rh850_send_etx		;ETX senden
@@ -1079,7 +1036,7 @@ rh850_get_prot:		call	api_resetptr
 			rcall	rh850_sendbyte
 			ldi	XL,0x01			;LENL
 			rcall	rh850_sendbyte
-			ldi	XL,0x21			;Pget command
+			mov	XL,r19			;Pget command
 			rcall	rh850_sendbyte
 			rcall	rh850_send_csum
 			rcall	rh850_send_etx		;ETX senden
@@ -1087,7 +1044,6 @@ rh850_get_prot:		call	api_resetptr
 			rcall	rh850_get_frame
 			
 			jmp	main_loop_ok
-
 
 ;------------------------------------------------------------------------------
 ; write option bytes
@@ -1386,7 +1342,7 @@ rh850_wait_recv:	push	ZH
 			clt
 rh850_wait_recv_1:	sbic	CTRLPIN,RH850_FPDT		;1 FPDT
 			rjmp	rh850_wait_recv_2			
-;			rcall	rh850_ret			
+			rcall	rh850_ret			
 			sbiw	ZL,1
 			brne	rh850_wait_recv_1
 			set					;timeout

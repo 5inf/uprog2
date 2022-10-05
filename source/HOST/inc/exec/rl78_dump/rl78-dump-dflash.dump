@@ -7,35 +7,30 @@ start address 0x00000000
 
 Program Header:
     LOAD off    0x00001000 vaddr 0x00000000 paddr 0x00000000 align 2**12
-         filesz 0x000006ae memsz 0x000006ae flags r-x
-    LOAD off    0x00001f00 vaddr 0x000fdf00 paddr 0x000fdf00 align 2**12
+         filesz 0x000006ea memsz 0x000006ea flags r-x
+    LOAD off    0x00001b00 vaddr 0x000ffb00 paddr 0x000ffb00 align 2**12
          filesz 0x00000000 memsz 0x0000000e flags rw-
 private flags = 0x0:
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .text         000006ae  00000000  00000000  00001000  2**8
+  0 .text         000006ea  00000000  00000000  00001000  2**8
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .plt          00000000  000006ae  000006ae  000016ae  2**1
+  1 .plt          00000000  000006ea  000006ea  000016ea  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          0000000e  000fdf00  000fdf00  00001f00  2**1
+  2 .bss          0000000e  000ffb00  000ffb00  00001b00  2**1
                   ALLOC
 SYMBOL TABLE:
 00000000 l    d  .text	00000000 .text
-000006ae l    d  .plt	00000000 .plt
-000fdf00 l    d  .bss	00000000 .bss
+000006ea l    d  .plt	00000000 .plt
+000ffb00 l    d  .bss	00000000 .bss
 00000000 l    df *ABS*	00000000 vectors.o
-000fff00 l       *ABS*	00000000 P0
 000fff01 l       *ABS*	00000000 P1
 000fff03 l       *ABS*	00000000 P3
 000fff04 l       *ABS*	00000000 P4
-000fff06 l       *ABS*	00000000 P6
-000fff07 l       *ABS*	00000000 P7
 000fff08 l       *ABS*	00000000 P8
-000fff09 l       *ABS*	00000000 P9
 000fff0c l       *ABS*	00000000 P12
 000fff0d l       *ABS*	00000000 P13
-000fff0e l       *ABS*	00000000 P14
 000fff10 l       *ABS*	00000000 SDR00
 000fff10 l       *ABS*	00000000 SDR00L
 000fff12 l       *ABS*	00000000 SDR01
@@ -46,16 +41,11 @@ SYMBOL TABLE:
 000fff1b l       *ABS*	00000000 TDR01H
 000fff1e l       *ABS*	00000000 ADCR
 000fff1f l       *ABS*	00000000 ADCRH
-000fff20 l       *ABS*	00000000 PM0
 000fff21 l       *ABS*	00000000 PM1
 000fff23 l       *ABS*	00000000 PM3
 000fff24 l       *ABS*	00000000 PM4
-000fff26 l       *ABS*	00000000 PM6
-000fff27 l       *ABS*	00000000 PM7
 000fff28 l       *ABS*	00000000 PM8
-000fff29 l       *ABS*	00000000 PM9
 000fff2c l       *ABS*	00000000 PM12
-000fff2e l       *ABS*	00000000 PM14
 000fff30 l       *ABS*	00000000 ADM0
 00000000 l       *ABS*	00000000 ADM0_ADCE
 00000007 l       *ABS*	00000000 ADM0_ADCS
@@ -66,25 +56,6 @@ SYMBOL TABLE:
 000fff39 l       *ABS*	00000000 EGN0
 000fff3a l       *ABS*	00000000 EGP1
 000fff3b l       *ABS*	00000000 EGN1
-000fff48 l       *ABS*	00000000 SDR10
-000fff48 l       *ABS*	00000000 SDR10L
-000fff4a l       *ABS*	00000000 SDR11
-000fff4a l       *ABS*	00000000 SDR11L
-000fff50 l       *ABS*	00000000 IICA0
-000fff51 l       *ABS*	00000000 IICS0
-00000000 l       *ABS*	00000000 IICS0_SPD0
-00000001 l       *ABS*	00000000 IICS0_STD0
-00000002 l       *ABS*	00000000 IICS0_ACKD0
-00000003 l       *ABS*	00000000 IICS0_TRC0
-00000004 l       *ABS*	00000000 IICS0_COI0
-00000005 l       *ABS*	00000000 IICS0_EXC0
-00000006 l       *ABS*	00000000 IICS0_ALD0
-00000007 l       *ABS*	00000000 IICS0_MSTS0
-000fff52 l       *ABS*	00000000 IICF0
-00000000 l       *ABS*	00000000 IICF0_IICRSV0
-00000001 l       *ABS*	00000000 IICF0_STCEN0
-00000006 l       *ABS*	00000000 IICF0_IICBSY0
-00000007 l       *ABS*	00000000 IICF0_STCF0
 000fff54 l       *ABS*	00000000 SUBCUDW
 000fff58 l       *ABS*	00000000 TRDGRC0
 000fff5a l       *ABS*	00000000 TRDGRD0
@@ -98,14 +69,6 @@ SYMBOL TABLE:
 000fff6a l       *ABS*	00000000 TDR05
 000fff6c l       *ABS*	00000000 TDR06
 000fff6e l       *ABS*	00000000 TDR07
-000fff70 l       *ABS*	00000000 TDR10
-000fff72 l       *ABS*	00000000 TDR11
-000fff72 l       *ABS*	00000000 TDR11L
-000fff73 l       *ABS*	00000000 TDR11H
-000fff74 l       *ABS*	00000000 TDR12
-000fff76 l       *ABS*	00000000 TDR13
-000fff76 l       *ABS*	00000000 TDR13L
-000fff77 l       *ABS*	00000000 TDR13H
 000fff80 l       *ABS*	00000000 FLPMC
 000fff81 l       *ABS*	00000000 FLARS
 000fff82 l       *ABS*	00000000 FLAPL
@@ -147,7 +110,6 @@ SYMBOL TABLE:
 000fffa0 l       *ABS*	00000000 CMC
 000fffa1 l       *ABS*	00000000 CSC
 00000000 l       *ABS*	00000000 CSC_HIOSTOP
-00000006 l       *ABS*	00000000 CSC_XTSTOP
 00000007 l       *ABS*	00000000 CSC_MSTOP
 000fffa2 l       *ABS*	00000000 OSTC
 000fffa3 l       *ABS*	00000000 OSTS
@@ -157,10 +119,6 @@ SYMBOL TABLE:
 00000005 l       *ABS*	00000000 CKC_MCS
 00000006 l       *ABS*	00000000 CKC_CSS
 00000007 l       *ABS*	00000000 CKC_CLS
-000fffa5 l       *ABS*	00000000 CKS0
-00000007 l       *ABS*	00000000 CKS0_PCLOE0
-000fffa6 l       *ABS*	00000000 CKS1
-00000007 l       *ABS*	00000000 CKS1_PCLOE1
 000fffa8 l       *ABS*	00000000 RESF
 000fffa9 l       *ABS*	00000000 LVIM
 00000000 l       *ABS*	00000000 LVIM_LVIF
@@ -183,10 +141,6 @@ SYMBOL TABLE:
 00000003 l       *ABS*	00000000 IF2L_LIN0WUPIF
 00000004 l       *ABS*	00000000 IF2L_KRIF
 000fffd1 l       *ABS*	00000000 IF2H
-00000003 l       *ABS*	00000000 IF2H_TMIF10
-00000004 l       *ABS*	00000000 IF2H_TMIF11
-00000005 l       *ABS*	00000000 IF2H_TMIF12
-00000006 l       *ABS*	00000000 IF2H_TMIF13
 00000007 l       *ABS*	00000000 IF2H_FLIF
 000fffd4 l       *ABS*	00000000 MK2
 000fffd4 l       *ABS*	00000000 MK2L
@@ -196,10 +150,6 @@ SYMBOL TABLE:
 00000003 l       *ABS*	00000000 MK2L_LIN0WUPMK
 00000004 l       *ABS*	00000000 MK2L_KRMK
 000fffd5 l       *ABS*	00000000 MK2H
-00000003 l       *ABS*	00000000 MK2H_TMMK10
-00000004 l       *ABS*	00000000 MK2H_TMMK11
-00000005 l       *ABS*	00000000 MK2H_TMMK12
-00000006 l       *ABS*	00000000 MK2H_TMMK13
 00000007 l       *ABS*	00000000 MK2H_FLMK
 000fffd8 l       *ABS*	00000000 PR02
 000fffd8 l       *ABS*	00000000 PR02L
@@ -209,10 +159,6 @@ SYMBOL TABLE:
 00000003 l       *ABS*	00000000 PR02L_LIN0WUPPR0
 00000004 l       *ABS*	00000000 PR02L_KRPR0
 000fffd9 l       *ABS*	00000000 PR02H
-00000003 l       *ABS*	00000000 PR02H_TMPR010
-00000004 l       *ABS*	00000000 PR02H_TMPR011
-00000005 l       *ABS*	00000000 PR02H_TMPR012
-00000006 l       *ABS*	00000000 PR02H_TMPR013
 00000007 l       *ABS*	00000000 PR02H_FLPR0
 000fffdc l       *ABS*	00000000 PR12
 000fffdc l       *ABS*	00000000 PR12L
@@ -222,10 +168,6 @@ SYMBOL TABLE:
 00000003 l       *ABS*	00000000 PR12L_LIN0WUPPR1
 00000004 l       *ABS*	00000000 PR12L_KRPR1
 000fffdd l       *ABS*	00000000 PR12H
-00000003 l       *ABS*	00000000 PR12H_TMPR110
-00000004 l       *ABS*	00000000 PR12H_TMPR111
-00000005 l       *ABS*	00000000 PR12H_TMPR112
-00000006 l       *ABS*	00000000 PR12H_TMPR113
 00000007 l       *ABS*	00000000 PR12H_FLPR1
 000fffe0 l       *ABS*	00000000 IF0
 000fffe0 l       *ABS*	00000000 IF0L
@@ -236,7 +178,6 @@ SYMBOL TABLE:
 00000004 l       *ABS*	00000000 IF0L_PIF2
 00000005 l       *ABS*	00000000 IF0L_PIF3
 00000006 l       *ABS*	00000000 IF0L_SPMIF
-00000007 l       *ABS*	00000000 IF0L_PIF5
 000fffe1 l       *ABS*	00000000 IF0H
 00000000 l       *ABS*	00000000 IF0H_CLMIF
 00000001 l       *ABS*	00000000 IF0H_STIF0
@@ -250,7 +191,6 @@ SYMBOL TABLE:
 000fffe2 l       *ABS*	00000000 IF1L
 00000000 l       *ABS*	00000000 IF1L_LIN0RVCIF
 00000001 l       *ABS*	00000000 IF1L_LIN0STAIF
-00000002 l       *ABS*	00000000 IF1L_IICAIF0
 00000003 l       *ABS*	00000000 IF1L_RTCIF
 00000004 l       *ABS*	00000000 IF1L_TMIF00
 00000005 l       *ABS*	00000000 IF1L_TMIF01
@@ -258,12 +198,8 @@ SYMBOL TABLE:
 00000007 l       *ABS*	00000000 IF1L_TMIF03
 000fffe3 l       *ABS*	00000000 IF1H
 00000000 l       *ABS*	00000000 IF1H_ADIF
-00000001 l       *ABS*	00000000 IF1H_TMIF11H
-00000002 l       *ABS*	00000000 IF1H_TMIF13H
 00000003 l       *ABS*	00000000 IF1H_TMIF01H
 00000004 l       *ABS*	00000000 IF1H_TMIF03H
-00000005 l       *ABS*	00000000 IF1H_STIF1
-00000006 l       *ABS*	00000000 IF1H_SRIF1
 00000007 l       *ABS*	00000000 IF1H_TMIF04
 000fffe4 l       *ABS*	00000000 MK0
 000fffe4 l       *ABS*	00000000 MK0L
@@ -274,7 +210,6 @@ SYMBOL TABLE:
 00000004 l       *ABS*	00000000 MK0L_PMK2
 00000005 l       *ABS*	00000000 MK0L_PMK3
 00000006 l       *ABS*	00000000 MK0L_SPMMK
-00000007 l       *ABS*	00000000 MK0L_PMK5
 000fffe5 l       *ABS*	00000000 MK0H
 00000000 l       *ABS*	00000000 MK0H_CLMMK
 00000001 l       *ABS*	00000000 MK0H_STMK0
@@ -288,7 +223,6 @@ SYMBOL TABLE:
 000fffe6 l       *ABS*	00000000 MK1L
 00000000 l       *ABS*	00000000 MK1L_LIN0RVCMK
 00000001 l       *ABS*	00000000 MK1L_LIN0STAMK
-00000002 l       *ABS*	00000000 MK1L_IICAMK0
 00000003 l       *ABS*	00000000 MK1L_RTCMK
 00000004 l       *ABS*	00000000 MK1L_TMMK00
 00000005 l       *ABS*	00000000 MK1L_TMMK01
@@ -296,12 +230,8 @@ SYMBOL TABLE:
 00000007 l       *ABS*	00000000 MK1L_TMMK03
 000fffe7 l       *ABS*	00000000 MK1H
 00000000 l       *ABS*	00000000 MK1H_ADMK
-00000001 l       *ABS*	00000000 MK1H_TMMK11H
-00000002 l       *ABS*	00000000 MK1H_TMMK13H
 00000003 l       *ABS*	00000000 MK1H_TMMK01H
 00000004 l       *ABS*	00000000 MK1H_TMMK03H
-00000005 l       *ABS*	00000000 MK1H_STMK1
-00000006 l       *ABS*	00000000 MK1H_SRMK1
 00000007 l       *ABS*	00000000 MK1H_TMMK04
 000fffe8 l       *ABS*	00000000 PR00
 000fffe8 l       *ABS*	00000000 PR00L
@@ -312,7 +242,6 @@ SYMBOL TABLE:
 00000004 l       *ABS*	00000000 PR00L_PPR02
 00000005 l       *ABS*	00000000 PR00L_PPR03
 00000006 l       *ABS*	00000000 PR00L_SPMPR0
-00000007 l       *ABS*	00000000 PR00L_PPR05
 000fffe9 l       *ABS*	00000000 PR00H
 00000000 l       *ABS*	00000000 PR00H_CLMPR0
 00000001 l       *ABS*	00000000 PR00H_STPR00
@@ -326,7 +255,6 @@ SYMBOL TABLE:
 000fffea l       *ABS*	00000000 PR01L
 00000000 l       *ABS*	00000000 PR01L_LIN0RVCPR0
 00000001 l       *ABS*	00000000 PR01L_LIN0STAPR0
-00000002 l       *ABS*	00000000 PR01L_IICAPR00
 00000003 l       *ABS*	00000000 PR01L_RTCPR0
 00000004 l       *ABS*	00000000 PR01L_TMPR000
 00000005 l       *ABS*	00000000 PR01L_TMPR001
@@ -334,12 +262,8 @@ SYMBOL TABLE:
 00000007 l       *ABS*	00000000 PR01L_TMPR003
 000fffeb l       *ABS*	00000000 PR01H
 00000000 l       *ABS*	00000000 PR01H_ADPR0
-00000001 l       *ABS*	00000000 PR01H_TMPR011H
-00000002 l       *ABS*	00000000 PR01H_TMPR013H
 00000003 l       *ABS*	00000000 PR01H_TMPR001H
 00000004 l       *ABS*	00000000 PR01H_TMPR003H
-00000005 l       *ABS*	00000000 PR01H_STPR01
-00000006 l       *ABS*	00000000 PR01H_SRPR01
 00000007 l       *ABS*	00000000 PR01H_TMPR004
 000fffec l       *ABS*	00000000 PR10
 000fffec l       *ABS*	00000000 PR10L
@@ -350,7 +274,6 @@ SYMBOL TABLE:
 00000004 l       *ABS*	00000000 PR10L_PPR12
 00000005 l       *ABS*	00000000 PR10L_PPR13
 00000006 l       *ABS*	00000000 PR10L_SPMPR1
-00000007 l       *ABS*	00000000 PR10L_PPR15
 000fffed l       *ABS*	00000000 PR10H
 00000000 l       *ABS*	00000000 PR10H_CLMPR1
 00000001 l       *ABS*	00000000 PR10H_STPR10
@@ -364,7 +287,6 @@ SYMBOL TABLE:
 000fffee l       *ABS*	00000000 PR11L
 00000000 l       *ABS*	00000000 PR11L_LIN0RVCPR1
 00000001 l       *ABS*	00000000 PR11L_LIN0STAPR1
-00000002 l       *ABS*	00000000 PR11L_IICAPR10
 00000003 l       *ABS*	00000000 PR11L_RTCPR1
 00000004 l       *ABS*	00000000 PR11L_TMPR100
 00000005 l       *ABS*	00000000 PR11L_TMPR101
@@ -372,12 +294,8 @@ SYMBOL TABLE:
 00000007 l       *ABS*	00000000 PR11L_TMPR103
 000fffef l       *ABS*	00000000 PR11H
 00000000 l       *ABS*	00000000 PR11H_ADPR1
-00000001 l       *ABS*	00000000 PR11H_TMPR111H
-00000002 l       *ABS*	00000000 PR11H_TMPR113H
 00000003 l       *ABS*	00000000 PR11H_TMPR101H
 00000004 l       *ABS*	00000000 PR11H_TMPR103H
-00000005 l       *ABS*	00000000 PR11H_STPR11
-00000006 l       *ABS*	00000000 PR11H_SRPR11
 00000007 l       *ABS*	00000000 PR11H_TMPR104
 000ffff0 l       *ABS*	00000000 MACRL
 000ffff2 l       *ABS*	00000000 MACRH
@@ -399,37 +317,22 @@ SYMBOL TABLE:
 000f0011 l       *ABS*	00000000 ADUL
 000f0012 l       *ABS*	00000000 ADLL
 000f0013 l       *ABS*	00000000 ADTES
-000f0016 l       *ABS*	00000000 PIOR0
-000f0017 l       *ABS*	00000000 PIOR1
-000f001a l       *ABS*	00000000 PIOR4
 000f001b l       *ABS*	00000000 PIOR5
 000f001d l       *ABS*	00000000 PIOR7
 000f0021 l       *ABS*	00000000 PITHL1
 000f0023 l       *ABS*	00000000 PITHL3
-000f0026 l       *ABS*	00000000 PITHL6
-000f0027 l       *ABS*	00000000 PITHL7
 000f002c l       *ABS*	00000000 PITHL12
-000f0030 l       *ABS*	00000000 PU0
 000f0031 l       *ABS*	00000000 PU1
 000f0033 l       *ABS*	00000000 PU3
 000f0034 l       *ABS*	00000000 PU4
-000f0036 l       *ABS*	00000000 PU6
-000f0037 l       *ABS*	00000000 PU7
 000f003c l       *ABS*	00000000 PU12
-000f003e l       *ABS*	00000000 PU14
 000f0041 l       *ABS*	00000000 PIM1
 000f0043 l       *ABS*	00000000 PIM3
-000f0046 l       *ABS*	00000000 PIM6
-000f0047 l       *ABS*	00000000 PIM7
 000f004c l       *ABS*	00000000 PIM12
 000f0051 l       *ABS*	00000000 POM1
-000f0056 l       *ABS*	00000000 POM6
-000f0057 l       *ABS*	00000000 POM7
 000f005c l       *ABS*	00000000 POM12
-000f006c l       *ABS*	00000000 PMC12
 000f0070 l       *ABS*	00000000 NFEN0
 000f0071 l       *ABS*	00000000 NFEN1
-000f0072 l       *ABS*	00000000 NFEN2
 000f0073 l       *ABS*	00000000 ISC
 000f0074 l       *ABS*	00000000 TIS0
 000f0075 l       *ABS*	00000000 TIS1
@@ -492,10 +395,7 @@ SYMBOL TABLE:
 000f00dc l       *ABS*	00000000 SPUFR
 000f00f0 l       *ABS*	00000000 PER0
 00000000 l       *ABS*	00000000 PER0_TAU0EN
-00000001 l       *ABS*	00000000 PER0_TAU1EN
 00000002 l       *ABS*	00000000 PER0_SAU0EN
-00000003 l       *ABS*	00000000 PER0_SAU1EN
-00000004 l       *ABS*	00000000 PER0_IICA0EN
 00000005 l       *ABS*	00000000 PER0_ADCEN
 00000007 l       *ABS*	00000000 PER0_RTCEN
 000f00f3 l       *ABS*	00000000 OSMC
@@ -538,37 +438,6 @@ SYMBOL TABLE:
 000f0120 l       *ABS*	00000000 SOL0L
 000f0122 l       *ABS*	00000000 SSE0
 000f0122 l       *ABS*	00000000 SSE0L
-000f0140 l       *ABS*	00000000 SSR10
-000f0140 l       *ABS*	00000000 SSR10L
-000f0142 l       *ABS*	00000000 SSR11
-000f0142 l       *ABS*	00000000 SSR11L
-000f0144 l       *ABS*	00000000 SIR10
-000f0144 l       *ABS*	00000000 SIR10L
-000f0146 l       *ABS*	00000000 SIR11
-000f0146 l       *ABS*	00000000 SIR11L
-000f0148 l       *ABS*	00000000 SMR10
-000f014a l       *ABS*	00000000 SMR11
-000f014c l       *ABS*	00000000 SCR10
-000f014e l       *ABS*	00000000 SCR11
-000f0150 l       *ABS*	00000000 SE1
-000f0150 l       *ABS*	00000000 SE1L
-000f0152 l       *ABS*	00000000 SS1
-000f0152 l       *ABS*	00000000 SS1L
-000f0154 l       *ABS*	00000000 ST1
-000f0154 l       *ABS*	00000000 ST1L
-000f0156 l       *ABS*	00000000 SPS1
-000f0156 l       *ABS*	00000000 SPS1L
-000f0158 l       *ABS*	00000000 SO1
-000f015a l       *ABS*	00000000 SOE1
-000f015a l       *ABS*	00000000 SOE1L
-000f015c l       *ABS*	00000000 EDR10
-000f015c l       *ABS*	00000000 EDR10L
-000f015e l       *ABS*	00000000 EDR11
-000f015e l       *ABS*	00000000 EDR11L
-000f0160 l       *ABS*	00000000 SOL1
-000f0160 l       *ABS*	00000000 SOL1L
-000f0162 l       *ABS*	00000000 SSE1
-000f0162 l       *ABS*	00000000 SSE1L
 000f0180 l       *ABS*	00000000 TCR00
 000f0182 l       *ABS*	00000000 TCR01
 000f0184 l       *ABS*	00000000 TCR02
@@ -624,37 +493,6 @@ SYMBOL TABLE:
 000f01bc l       *ABS*	00000000 TOL0L
 000f01be l       *ABS*	00000000 TOM0
 000f01be l       *ABS*	00000000 TOM0L
-000f01c0 l       *ABS*	00000000 TCR10
-000f01c2 l       *ABS*	00000000 TCR11
-000f01c4 l       *ABS*	00000000 TCR12
-000f01c6 l       *ABS*	00000000 TCR13
-000f01d0 l       *ABS*	00000000 TMR10
-000f01d2 l       *ABS*	00000000 TMR11
-000f01d4 l       *ABS*	00000000 TMR12
-000f01d6 l       *ABS*	00000000 TMR13
-000f01e0 l       *ABS*	00000000 TSR10
-000f01e0 l       *ABS*	00000000 TSR10L
-000f01e2 l       *ABS*	00000000 TSR11
-000f01e2 l       *ABS*	00000000 TSR11L
-000f01e4 l       *ABS*	00000000 TSR12
-000f01e4 l       *ABS*	00000000 TSR12L
-000f01e6 l       *ABS*	00000000 TSR13
-000f01e6 l       *ABS*	00000000 TSR13L
-000f01f0 l       *ABS*	00000000 TE1
-000f01f0 l       *ABS*	00000000 TE1L
-000f01f2 l       *ABS*	00000000 TS1
-000f01f2 l       *ABS*	00000000 TS1L
-000f01f4 l       *ABS*	00000000 TT1
-000f01f4 l       *ABS*	00000000 TT1L
-000f01f6 l       *ABS*	00000000 TPS1
-000f01f8 l       *ABS*	00000000 TO1
-000f01f8 l       *ABS*	00000000 TO1L
-000f01fa l       *ABS*	00000000 TOE1
-000f01fa l       *ABS*	00000000 TOE1L
-000f01fc l       *ABS*	00000000 TOL1
-000f01fc l       *ABS*	00000000 TOL1L
-000f01fe l       *ABS*	00000000 TOM1
-000f01fe l       *ABS*	00000000 TOM1L
 000f0200 l       *ABS*	00000000 ERADR
 000f0202 l       *ABS*	00000000 ECCIER
 000f0203 l       *ABS*	00000000 ECCER
@@ -664,40 +502,12 @@ SYMBOL TABLE:
 000f0208 l       *ABS*	00000000 RMODR
 000f0209 l       *ABS*	00000000 RTSTR
 000f020c l       *ABS*	00000000 WDTLIOTRM
-000f020d l       *ABS*	00000000 PRDCTL
-00000000 l       *ABS*	00000000 PRDCTL_PCANEN
 000f0220 l       *ABS*	00000000 PSRSEL
 000f0222 l       *ABS*	00000000 PSNZCNT0
-000f0223 l       *ABS*	00000000 PSNZCNT1
-000f0224 l       *ABS*	00000000 PSNZCNT2
-000f0225 l       *ABS*	00000000 PSNZCNT3
 000f0228 l       *ABS*	00000000 PWMDLY0
 000f022a l       *ABS*	00000000 PWMDLY1
-000f022c l       *ABS*	00000000 PWMDLY2
-000f0230 l       *ABS*	00000000 IICCTL00
-00000000 l       *ABS*	00000000 IICCTL00_SPT0
-00000001 l       *ABS*	00000000 IICCTL00_STT0
-00000002 l       *ABS*	00000000 IICCTL00_ACKE0
-00000003 l       *ABS*	00000000 IICCTL00_WTIM0
-00000004 l       *ABS*	00000000 IICCTL00_SPIE0
-00000005 l       *ABS*	00000000 IICCTL00_WREL0
-00000006 l       *ABS*	00000000 IICCTL00_LREL0
-00000007 l       *ABS*	00000000 IICCTL00_IICE0
-000f0231 l       *ABS*	00000000 IICCTL01
-00000000 l       *ABS*	00000000 IICCTL01_PRS0
-00000002 l       *ABS*	00000000 IICCTL01_DFC0
-00000003 l       *ABS*	00000000 IICCTL01_SMC0
-00000004 l       *ABS*	00000000 IICCTL01_DAD0
-00000005 l       *ABS*	00000000 IICCTL01_CLD0
-00000007 l       *ABS*	00000000 IICCTL01_WUP0
-000f0232 l       *ABS*	00000000 IICWL0
-000f0233 l       *ABS*	00000000 IICWH0
-000f0234 l       *ABS*	00000000 SVA0
-000f0235 l       *ABS*	00000000 IICSE0
 000f0240 l       *ABS*	00000000 TRJCR0
-000f0241 l       *ABS*	00000000 TRJIOC0
 000f0242 l       *ABS*	00000000 TRJMR0
-000f0243 l       *ABS*	00000000 TRJISR0
 000f0263 l       *ABS*	00000000 TRDSTR
 000f0264 l       *ABS*	00000000 TRDMR
 00000000 l       *ABS*	00000000 TRDMR_TRDSYNC
@@ -781,9 +591,6 @@ SYMBOL TABLE:
 000f02c9 l       *ABS*	00000000 POCRES
 00000000 l       *ABS*	00000000 POCRES_POCRES0
 00000004 l       *ABS*	00000000 POCRES_CLKRF
-000f02ca l       *ABS*	00000000 STPSTC
-00000004 l       *ABS*	00000000 STPSTC_STPLV
-00000007 l       *ABS*	00000000 STPSTC_STPOEN
 000f02cb l       *ABS*	00000000 TPGCSC
 00000005 l       *ABS*	00000000 TPGCSC_TWWDTSTP
 00000006 l       *ABS*	00000000 TPGCSC_TWDTLOSC
@@ -822,8 +629,6 @@ SYMBOL TABLE:
 000f02e1 l       *ABS*	00000000 SELHS0
 000f02e2 l       *ABS*	00000000 SELHS1
 000f02e8 l       *ABS*	00000000 DTCEN0
-00000000 l       *ABS*	00000000 DTCEN0_DTCEN00
-00000001 l       *ABS*	00000000 DTCEN0_DTCEN01
 00000002 l       *ABS*	00000000 DTCEN0_DTCEN02
 00000003 l       *ABS*	00000000 DTCEN0_DTCEN03
 00000004 l       *ABS*	00000000 DTCEN0_DTCEN04
@@ -833,8 +638,6 @@ SYMBOL TABLE:
 000f02e9 l       *ABS*	00000000 DTCEN1
 00000000 l       *ABS*	00000000 DTCEN1_DTCEN10
 00000001 l       *ABS*	00000000 DTCEN1_DTCEN11
-00000002 l       *ABS*	00000000 DTCEN1_DTCEN12
-00000003 l       *ABS*	00000000 DTCEN1_DTCEN13
 00000004 l       *ABS*	00000000 DTCEN1_DTCEN14
 00000005 l       *ABS*	00000000 DTCEN1_DTCEN15
 00000006 l       *ABS*	00000000 DTCEN1_DTCEN16
@@ -856,10 +659,6 @@ SYMBOL TABLE:
 00000006 l       *ABS*	00000000 DTCEN3_DTCEN36
 00000007 l       *ABS*	00000000 DTCEN3_DTCEN37
 000f02ec l       *ABS*	00000000 DTCEN4
-00000000 l       *ABS*	00000000 DTCEN4_DTCEN40
-00000001 l       *ABS*	00000000 DTCEN4_DTCEN41
-00000002 l       *ABS*	00000000 DTCEN4_DTCEN42
-00000003 l       *ABS*	00000000 DTCEN4_DTCEN43
 00000005 l       *ABS*	00000000 DTCEN4_DTCEN45
 00000006 l       *ABS*	00000000 DTCEN4_DTCEN46
 00000007 l       *ABS*	00000000 DTCEN4_DTCEN47
@@ -1047,67 +846,78 @@ SYMBOL TABLE:
 000f0723 l       *ABS*	00000000 SECCHK
 000f0789 l       *ABS*	00000000 ADTRGS0
 000f078d l       *ABS*	00000000 ADTRGS1
-0000ff00 l       *ABS*	00000000 P0_PIO
-0000ff20 l       *ABS*	00000000 P0_DIR
-00000030 l       *ABS*	00000000 P0_PEN
+0000ffff l       *ABS*	00000000 P0_PIO
+0000ffff l       *ABS*	00000000 P0_DIR
+0000ffff l       *ABS*	00000000 P0_PEN
+0000ffff l       *ABS*	00000000 P0_POM
 0000ff01 l       *ABS*	00000000 P1_PIO
 0000ff21 l       *ABS*	00000000 P1_DIR
 00000031 l       *ABS*	00000000 P1_PEN
+00000051 l       *ABS*	00000000 P1_POM
 0000ffff l       *ABS*	00000000 P2_PIO
 0000ffff l       *ABS*	00000000 P2_DIR
 0000ffff l       *ABS*	00000000 P2_PEN
+0000ffff l       *ABS*	00000000 P2_POM
 0000ff03 l       *ABS*	00000000 P3_PIO
 0000ff23 l       *ABS*	00000000 P3_DIR
 00000033 l       *ABS*	00000000 P3_PEN
+0000ffff l       *ABS*	00000000 P3_POM
 0000ff04 l       *ABS*	00000000 P4_PIO
 0000ff24 l       *ABS*	00000000 P4_DIR
 00000034 l       *ABS*	00000000 P4_PEN
+0000ffff l       *ABS*	00000000 P4_POM
 0000ffff l       *ABS*	00000000 P5_PIO
 0000ffff l       *ABS*	00000000 P5_DIR
 0000ffff l       *ABS*	00000000 P5_PEN
-0000ff06 l       *ABS*	00000000 P6_PIO
-0000ff26 l       *ABS*	00000000 P6_DIR
-00000036 l       *ABS*	00000000 P6_PEN
-0000ff07 l       *ABS*	00000000 P7_PIO
-0000ff27 l       *ABS*	00000000 P7_DIR
-00000037 l       *ABS*	00000000 P7_PEN
+0000ffff l       *ABS*	00000000 P5_POM
+0000ffff l       *ABS*	00000000 P6_PIO
+0000ffff l       *ABS*	00000000 P6_DIR
+0000ffff l       *ABS*	00000000 P6_PEN
+0000ffff l       *ABS*	00000000 P6_POM
+0000ffff l       *ABS*	00000000 P7_PIO
+0000ffff l       *ABS*	00000000 P7_DIR
+0000ffff l       *ABS*	00000000 P7_PEN
+0000ffff l       *ABS*	00000000 P7_POM
 0000ff08 l       *ABS*	00000000 P8_PIO
 0000ff28 l       *ABS*	00000000 P8_DIR
 0000ffff l       *ABS*	00000000 P8_PEN
-0000ff09 l       *ABS*	00000000 P9_PIO
-0000ff29 l       *ABS*	00000000 P9_DIR
+0000ffff l       *ABS*	00000000 P8_POM
+0000ffff l       *ABS*	00000000 P9_PIO
+0000ffff l       *ABS*	00000000 P9_DIR
 0000ffff l       *ABS*	00000000 P9_PEN
+0000ffff l       *ABS*	00000000 P9_POM
 0000ffff l       *ABS*	00000000 P10_PIO
 0000ffff l       *ABS*	00000000 P10_DIR
 0000ffff l       *ABS*	00000000 P10_PEN
+0000ffff l       *ABS*	00000000 P10_POM
 0000ffff l       *ABS*	00000000 P11_PIO
 0000ffff l       *ABS*	00000000 P11_DIR
 0000ffff l       *ABS*	00000000 P11_PEN
+0000ffff l       *ABS*	00000000 P11_POM
 0000ff0c l       *ABS*	00000000 P12_PIO
 0000ff2c l       *ABS*	00000000 P12_DIR
 0000003c l       *ABS*	00000000 P12_PEN
+0000005c l       *ABS*	00000000 P12_POM
 0000ff0d l       *ABS*	00000000 P13_PIO
 0000ffff l       *ABS*	00000000 P13_DIR
 0000ffff l       *ABS*	00000000 P13_PEN
-0000ff0e l       *ABS*	00000000 P14_PIO
-0000ff2e l       *ABS*	00000000 P14_DIR
-0000003e l       *ABS*	00000000 P14_PEN
+0000ffff l       *ABS*	00000000 P13_POM
+0000ffff l       *ABS*	00000000 P14_PIO
+0000ffff l       *ABS*	00000000 P14_DIR
+0000ffff l       *ABS*	00000000 P14_PEN
+0000ffff l       *ABS*	00000000 P14_POM
 0000ffff l       *ABS*	00000000 P15_PIO
 0000ffff l       *ABS*	00000000 P15_DIR
 0000ffff l       *ABS*	00000000 P15_PEN
-00000000 l       *ABS*	00000000 PORT_0
-00000006 l       *ABS*	00000000 PORT_1
-0000000c l       *ABS*	00000000 PORT_3
-00000012 l       *ABS*	00000000 PORT_4
-00000018 l       *ABS*	00000000 PORT_6
-0000001e l       *ABS*	00000000 PORT_7
-00000024 l       *ABS*	00000000 PORT_8
-0000002a l       *ABS*	00000000 PORT_9
-00000030 l       *ABS*	00000000 PORT_12
-00000036 l       *ABS*	00000000 PORT_13
-0000003c l       *ABS*	00000000 PORT_14
-00000152 l       .text	00000000 mystart
-0000015d l       .text	00000000 default_handler
+0000ffff l       *ABS*	00000000 P15_POM
+00000000 l       *ABS*	00000000 PORT_1
+00000008 l       *ABS*	00000000 PORT_3
+00000010 l       *ABS*	00000000 PORT_4
+00000018 l       *ABS*	00000000 PORT_8
+00000020 l       *ABS*	00000000 PORT_12
+00000028 l       *ABS*	00000000 PORT_13
+00000140 l       .text	00000000 mystart
+0000014b l       .text	00000000 default_handler
 00000000 l    df *ABS*	00000000 build/src/main.o
 000ffef0 l       *ABS*	00000000 r8
 000ffee8 l       *ABS*	00000000 r16
@@ -1136,10 +946,10 @@ SYMBOL TABLE:
 00000275 l       .text	00000000 .L2
 00000225 l       .text	00000000 .L4
 00000257 l       .text	00000000 .L8
-00000643 l       .text	00000000 .L10
-00000653 l       .text	00000000 .L11
-00000639 l       .text	00000000 .L13
-00000688 l       .text	00000000 .L12
+0000067f l       .text	00000000 .L10
+0000068f l       .text	00000000 .L11
+00000675 l       .text	00000000 .L13
+000006c4 l       .text	00000000 .L12
 00000000 l    df *ABS*	00000000 build/src/interrupts.o
 000ffef0 l       *ABS*	00000000 r8
 000ffee8 l       *ABS*	00000000 r16
@@ -1233,13 +1043,13 @@ SYMBOL TABLE:
 000ffeef l       *ABS*	00000000 r23
 000ffee7 l       *ABS*	00000000 r31
 00000000 l    df *ABS*	00000000 unilib_portio_asm.o
-000004b3 l       .text	00000000 set_pin_done
-000004de l       .text	00000000 set_pip_done
-000004ff l       .text	00000000 portpin_set_low
-00000557 l       .text	00000000 port_set_high
-00000568 l       .text	00000000 port_set_low
-000005a6 l       .text	00000000 gpl_return0
-0000059f l       .text	00000000 gpl_return1
+000004ef l       .text	00000000 set_pin_done
+0000051a l       .text	00000000 set_pip_done
+0000053b l       .text	00000000 portpin_set_low
+00000593 l       .text	00000000 port_set_high
+000005a4 l       .text	00000000 port_set_low
+000005e2 l       .text	00000000 gpl_return0
+000005db l       .text	00000000 gpl_return1
 00000000 l    df *ABS*	00000000 unilib_interrupts.o
 000ffef0 l       *ABS*	00000000 r8
 000ffee8 l       *ABS*	00000000 r16
@@ -1265,320 +1075,231 @@ SYMBOL TABLE:
 000ffef7 l       *ABS*	00000000 r15
 000ffeef l       *ABS*	00000000 r23
 000ffee7 l       *ABS*	00000000 r31
-000005f7 l       .text	00000000 .L12
-00000556 g       .text	00000000 port_set_nibble2
+00000633 l       .text	00000000 .L12
+00000592 g       .text	00000000 port_set_nibble2
 00000421 g     F .text	0000000c disable_interrupts
-000004e7 g       .text	00000000 portpin_set_high
-000fdf08 g     O .bss	00000002 printf_output
-000fdf0c g     O .bss	00000002 unilib_tick_counter
+00000523 g       .text	00000000 portpin_set_high
+0000049c g       .text	00000000 portpin_set_odio
+000ffb08 g     O .bss	00000002 printf_output
+000ffb0c g     O .bss	00000002 unilib_tick_counter
 0000045c g     F .text	00000002 OUTPUT_NONE
-000006ae g       .text	00000000 etext
-000fdf06 g     O .bss	00000002 memptr
+000006ea g       .text	00000000 etext
+000ffb06 g     O .bss	00000002 memptr
 00000447 g     F .text	00000006 set_outchar_routine
 0000000e g       *ABS*	00000000 _bss_size
 00000473 g       .text	00000000 portpin_set_output
 000002a8 g     F .text	0000002d unilib_pause
-00000489 g       .text	00000000 portpin_set_input_nopull
-000fdf02 g     O .bss	00000001 unilib_ints_enabled
-000006ae g       .plt	00000000 _data_image
+000004c5 g       .text	00000000 portpin_set_input_nopull
+000ffb02 g     O .bss	00000001 unilib_ints_enabled
+000006ea g       .plt	00000000 _data_image
 00000108 g       .text	00000000 unilib_and_table
-000fdf00 g       .plt	00000000 _data_section_start
-000005b6  w    F .text	00000003 isr_pwm3
+000ffb00 g       .plt	00000000 _data_section_start
+000005f2  w    F .text	00000003 isr_pwm3
 000003dc g     F .text	00000039 unilib_pause_ms
-00000527 g       .text	00000000 port_set_nibble0
-000fdf03 g     O .bss	00000001 unilib_cpu_prescaler
-00000556 g       .text	00000000 port_set_nibble3
-000fdf00 g     O .bss	00000002 unilib_lastclockmode
+00000563 g       .text	00000000 port_set_nibble0
+000ffb03 g     O .bss	00000001 unilib_cpu_prescaler
+00000592 g       .text	00000000 port_set_nibble3
+000ffb00 g     O .bss	00000002 unilib_lastclockmode
 000002d5 g     F .text	00000107 clock_config
-00000589 g       .text	00000000 portpin_get
-000005c2  w    F .text	00000003 isr_recv_uart1
+000005c5 g       .text	00000000 portpin_get
+000005fe  w    F .text	00000003 isr_recv_uart1
 00000000 g       *ABS*	00000000 _data_section_size
-000005bc  w    F .text	00000003 isr_recv_uart0
+000005f8  w    F .text	00000003 isr_recv_uart0
 00000000 g       .text	00000000 start
-0000057b g       .text	00000000 port_get
+000005b7 g       .text	00000000 port_get
 00000110 g       .text	00000000 unilib_port_table
-0000053e g       .text	00000000 port_set_nibble1
-000004ff g       .text	00000000 portpin_set_low
-000005b3  w    F .text	00000003 isr_pwm2
-000004b6 g       .text	00000000 portpin_set_input_pullup
+0000057a g       .text	00000000 port_set_nibble1
+0000053b g       .text	00000000 portpin_set_low
+000005ef  w    F .text	00000003 isr_pwm2
+000004f2 g       .text	00000000 portpin_set_input_pullup
 0000042d g     F .text	0000001a OUTPUT_MEMORY
-000fdf00 g       .bss	00000000 _bss_start
+000ffb00 g       .bss	00000000 _bss_start
 00000100 g       .text	00000000 unilib_or_table
 0000029b g     F .text	0000000d unilib_init
-000006ae g       *ABS*	00000000 _data_image_end
-000005c8  w    F .text	00000003 isr_ext1
-000005cb g     F .text	00000043 _tick_handler
+000006ea g       *ABS*	00000000 _data_image_end
+00000604  w    F .text	00000003 isr_ext1
+00000607 g     F .text	00000043 _tick_handler
 0000045e g     F .text	00000015 set_outchar_memory
 0000044d g     F .text	0000000f unilib_outchar
-000005ad  w    F .text	00000003 isr_pwm0
+000005e9  w    F .text	00000003 isr_pwm0
 00000200 g     F .text	000000aa out_byte
-00000517 g       .text	00000000 port_set
-000005c5  w    F .text	00000003 isr_ext0
-000005b0  w    F .text	00000003 isr_pwm1
-000005b9  w    F .text	00000003 isr_uart0_send
-000005bf  w    F .text	00000003 isr_uart1_send
+00000553 g       .text	00000000 port_set
+00000601  w    F .text	00000003 isr_ext0
+000005ec  w    F .text	00000003 isr_pwm1
+000005f5  w    F .text	00000003 isr_uart0_send
+000005fb  w    F .text	00000003 isr_uart1_send
 00000415 g     F .text	0000000c enable_interrupts
-000fdf00 g       .plt	00000000 edata
-000fdf04 g     O .bss	00000001 unilib_cpu_freq
-000004e1 g       .text	00000000 portpin_set
+000ffb00 g       .plt	00000000 edata
+000ffb04 g     O .bss	00000001 unilib_cpu_freq
+0000051d g       .text	00000000 portpin_set
 0000029a g     F .text	00000001 user_tick
-0000060b g     F .text	000000b9 main
-000fdf0a g     O .bss	00000002 unilib_tick_scale
+00000647 g     F .text	000000b9 main
+000ffb0a g     O .bss	00000002 unilib_tick_scale
 
 
 
 Disassembly of section .text:
 
 00000000 <start>:
-   0:	52 01                         	mov	c, #1
-   2:	5d                            	and	a, [hl]
-   3:	01                            	addw	ax, ax
-   4:	5d                            	and	a, [hl]
-   5:	01                            	addw	ax, ax
-   6:	5d                            	and	a, [hl]
-   7:	01                            	addw	ax, ax
-   8:	5d                            	and	a, [hl]
-   9:	01                            	addw	ax, ax
-   a:	5d                            	and	a, [hl]
-   b:	01                            	addw	ax, ax
-   c:	5d                            	and	a, [hl]
-   d:	01                            	addw	ax, ax
-   e:	5d                            	and	a, [hl]
-   f:	01                            	addw	ax, ax
-  10:	5d                            	and	a, [hl]
-  11:	01                            	addw	ax, ax
-  12:	c5                            	push	de
-  13:	05                            	addw	ax, de
-  14:	5d                            	and	a, [hl]
+   0:	40 01 4b 01                   	cmp	!f4b01 <ADTRGS1+0x4374>, #1
+   4:	4b 01                         	cmp	a, 0xfff01
+   6:	4b 01                         	cmp	a, 0xfff01
+   8:	4b 01                         	cmp	a, 0xfff01
+   a:	4b 01                         	cmp	a, 0xfff01
+   c:	4b 01                         	cmp	a, 0xfff01
+   e:	4b 01                         	cmp	a, 0xfff01
+  10:	4b 01                         	cmp	a, 0xfff01
+  12:	01                            	addw	ax, ax
+  13:	06 4b                         	addw	ax, 0xffe4b
   15:	01                            	addw	ax, ax
-  16:	5d                            	and	a, [hl]
-  17:	01                            	addw	ax, ax
-  18:	5d                            	and	a, [hl]
-  19:	01                            	addw	ax, ax
-  1a:	5d                            	and	a, [hl]
-  1b:	01                            	addw	ax, ax
-  1c:	5d                            	and	a, [hl]
-  1d:	01                            	addw	ax, ax
-  1e:	cb 05 5d 01                   	movw	0xfff05, #349
-  22:	b9                            	movw	[de], ax
-  23:	05                            	addw	ax, de
-  24:	bc 05                         	movw	[hl+5], ax
-  26:	5d                            	and	a, [hl]
-  27:	01                            	addw	ax, ax
-  28:	5d                            	and	a, [hl]
-  29:	01                            	addw	ax, ax
-  2a:	5d                            	and	a, [hl]
-  2b:	01                            	addw	ax, ax
-  2c:	ad 05                         	movw	ax, 0xfff05
-  2e:	5d                            	and	a, [hl]
+  16:	4b 01                         	cmp	a, 0xfff01
+  18:	4b 01                         	cmp	a, 0xfff01
+  1a:	4b 01                         	cmp	a, 0xfff01
+  1c:	4b 01                         	cmp	a, 0xfff01
+  1e:	07                            	addw	ax, hl
+  1f:	06 4b                         	addw	ax, 0xffe4b
+  21:	01                            	addw	ax, ax
+  22:	f5 05 f8                      	clrb	!ff805 <ADTRGS1+0xf078>
+  25:	05                            	addw	ax, de
+  26:	4b 01                         	cmp	a, 0xfff01
+  28:	4b 01                         	cmp	a, 0xfff01
+  2a:	4b 01                         	cmp	a, 0xfff01
+  2c:	e9 05 4b                      	mov	b, !f4b05 <ADTRGS1+0x4378>
   2f:	01                            	addw	ax, ax
-  30:	b0 05 5d                      	dec	!f5d05 <ADTRGS1+0x5578>
-  33:	01                            	addw	ax, ax
-  34:	5d                            	and	a, [hl]
-  35:	01                            	addw	ax, ax
-  36:	bf 05 c2                      	movw	!fc205 <ADTRGS1+0xba78>, ax
+  30:	ec 05 4b 01                   	br	!!14b05 <P0_DIR+0x4b06>
+  34:	4b 01                         	cmp	a, 0xfff01
+  36:	fb 05 fe                      	movw	hl, !ffe05 <unilib_tick_counter+0x2f9>
   39:	05                            	addw	ax, de
-  3a:	5d                            	and	a, [hl]
-  3b:	01                            	addw	ax, ax
-  3c:	5d                            	and	a, [hl]
-  3d:	01                            	addw	ax, ax
-  3e:	5d                            	and	a, [hl]
-  3f:	01                            	addw	ax, ax
-  40:	5d                            	and	a, [hl]
-  41:	01                            	addw	ax, ax
-  42:	5d                            	and	a, [hl]
-  43:	01                            	addw	ax, ax
-  44:	5d                            	and	a, [hl]
-  45:	01                            	addw	ax, ax
-  46:	5d                            	and	a, [hl]
-  47:	01                            	addw	ax, ax
-  48:	5d                            	and	a, [hl]
-  49:	01                            	addw	ax, ax
-  4a:	c8 05 5d                      	mov	[sp+5], #93
+  3a:	4b 01                         	cmp	a, 0xfff01
+  3c:	4b 01                         	cmp	a, 0xfff01
+  3e:	4b 01                         	cmp	a, 0xfff01
+  40:	4b 01                         	cmp	a, 0xfff01
+  42:	4b 01                         	cmp	a, 0xfff01
+  44:	4b 01                         	cmp	a, 0xfff01
+  46:	4b 01                         	cmp	a, 0xfff01
+  48:	4b 01                         	cmp	a, 0xfff01
+  4a:	04 06 4b                      	addw	ax, #0x4b06
   4d:	01                            	addw	ax, ax
-  4e:	5d                            	and	a, [hl]
-  4f:	01                            	addw	ax, ax
-  50:	5d                            	and	a, [hl]
-  51:	01                            	addw	ax, ax
-  52:	5d                            	and	a, [hl]
-  53:	01                            	addw	ax, ax
-  54:	5d                            	and	a, [hl]
-  55:	01                            	addw	ax, ax
-  56:	b3                            	decw	bc
-  57:	05                            	addw	ax, de
-  58:	5d                            	and	a, [hl]
-  59:	01                            	addw	ax, ax
-  5a:	b6 05                         	decw	0xfff05
-  5c:	5d                            	and	a, [hl]
-  5d:	01                            	addw	ax, ax
-  5e:	5d                            	and	a, [hl]
-  5f:	01                            	addw	ax, ax
-  60:	5d                            	and	a, [hl]
-  61:	01                            	addw	ax, ax
-  62:	5d                            	and	a, [hl]
-  63:	01                            	addw	ax, ax
-  64:	5d                            	and	a, [hl]
-  65:	01                            	addw	ax, ax
-  66:	5d                            	and	a, [hl]
-  67:	01                            	addw	ax, ax
-  68:	5d                            	and	a, [hl]
-  69:	01                            	addw	ax, ax
-  6a:	5d                            	and	a, [hl]
-  6b:	01                            	addw	ax, ax
-  6c:	5d                            	and	a, [hl]
-  6d:	01                            	addw	ax, ax
-  6e:	5d                            	and	a, [hl]
-  6f:	01                            	addw	ax, ax
-  70:	5d                            	and	a, [hl]
-  71:	01                            	addw	ax, ax
-  72:	5d                            	and	a, [hl]
-  73:	01                            	addw	ax, ax
-  74:	5d                            	and	a, [hl]
-  75:	01                            	addw	ax, ax
-  76:	5d                            	and	a, [hl]
-  77:	01                            	addw	ax, ax
-  78:	5d                            	and	a, [hl]
-  79:	01                            	addw	ax, ax
-  7a:	5d                            	and	a, [hl]
-  7b:	01                            	addw	ax, ax
-  7c:	5d                            	and	a, [hl]
-  7d:	01                            	addw	ax, ax
-  7e:	5d                            	and	a, [hl]
-  7f:	01                            	addw	ax, ax
-  80:	5d                            	and	a, [hl]
-  81:	01                            	addw	ax, ax
-  82:	5d                            	and	a, [hl]
-  83:	01                            	addw	ax, ax
-  84:	5d                            	and	a, [hl]
-  85:	01                            	addw	ax, ax
-  86:	5d                            	and	a, [hl]
-  87:	01                            	addw	ax, ax
-  88:	5d                            	and	a, [hl]
-  89:	01                            	addw	ax, ax
-  8a:	5d                            	and	a, [hl]
-  8b:	01                            	addw	ax, ax
-  8c:	5d                            	and	a, [hl]
-  8d:	01                            	addw	ax, ax
-  8e:	5d                            	and	a, [hl]
-  8f:	01                            	addw	ax, ax
-  90:	5d                            	and	a, [hl]
-  91:	01                            	addw	ax, ax
-  92:	5d                            	and	a, [hl]
-  93:	01                            	addw	ax, ax
-  94:	5d                            	and	a, [hl]
-  95:	01                            	addw	ax, ax
-  96:	5d                            	and	a, [hl]
-  97:	01                            	addw	ax, ax
-  98:	5d                            	and	a, [hl]
-  99:	01                            	addw	ax, ax
-  9a:	5d                            	and	a, [hl]
-  9b:	01                            	addw	ax, ax
-  9c:	5d                            	and	a, [hl]
-  9d:	01                            	addw	ax, ax
-  9e:	5d                            	and	a, [hl]
-  9f:	01                            	addw	ax, ax
-  a0:	5d                            	and	a, [hl]
-  a1:	01                            	addw	ax, ax
-  a2:	5d                            	and	a, [hl]
-  a3:	01                            	addw	ax, ax
-  a4:	5d                            	and	a, [hl]
-  a5:	01                            	addw	ax, ax
-  a6:	5d                            	and	a, [hl]
-  a7:	01                            	addw	ax, ax
-  a8:	5d                            	and	a, [hl]
-  a9:	01                            	addw	ax, ax
-  aa:	5d                            	and	a, [hl]
-  ab:	01                            	addw	ax, ax
-  ac:	5d                            	and	a, [hl]
-  ad:	01                            	addw	ax, ax
-  ae:	5d                            	and	a, [hl]
-  af:	01                            	addw	ax, ax
-  b0:	5d                            	and	a, [hl]
-  b1:	01                            	addw	ax, ax
-  b2:	5d                            	and	a, [hl]
-  b3:	01                            	addw	ax, ax
-  b4:	5d                            	and	a, [hl]
-  b5:	01                            	addw	ax, ax
-  b6:	5d                            	and	a, [hl]
-  b7:	01                            	addw	ax, ax
-  b8:	5d                            	and	a, [hl]
-  b9:	01                            	addw	ax, ax
-  ba:	5d                            	and	a, [hl]
-  bb:	01                            	addw	ax, ax
-  bc:	5d                            	and	a, [hl]
-  bd:	01                            	addw	ax, ax
-  be:	5d                            	and	a, [hl]
-  bf:	01                            	addw	ax, ax
+  4e:	4b 01                         	cmp	a, 0xfff01
+  50:	4b 01                         	cmp	a, 0xfff01
+  52:	4b 01                         	cmp	a, 0xfff01
+  54:	4b 01                         	cmp	a, 0xfff01
+  56:	ef 05                         	br	$5d <P12_POM+0x1>
+  58:	4b 01                         	cmp	a, 0xfff01
+  5a:	f2                            	clrb	c
+  5b:	05                            	addw	ax, de
+  5c:	4b 01                         	cmp	a, 0xfff01
+  5e:	4b 01                         	cmp	a, 0xfff01
+  60:	4b 01                         	cmp	a, 0xfff01
+  62:	4b 01                         	cmp	a, 0xfff01
+  64:	4b 01                         	cmp	a, 0xfff01
+  66:	4b 01                         	cmp	a, 0xfff01
+  68:	4b 01                         	cmp	a, 0xfff01
+  6a:	4b 01                         	cmp	a, 0xfff01
+  6c:	4b 01                         	cmp	a, 0xfff01
+  6e:	4b 01                         	cmp	a, 0xfff01
+  70:	4b 01                         	cmp	a, 0xfff01
+  72:	4b 01                         	cmp	a, 0xfff01
+  74:	4b 01                         	cmp	a, 0xfff01
+  76:	4b 01                         	cmp	a, 0xfff01
+  78:	4b 01                         	cmp	a, 0xfff01
+  7a:	4b 01                         	cmp	a, 0xfff01
+  7c:	4b 01                         	cmp	a, 0xfff01
+  7e:	4b 01                         	cmp	a, 0xfff01
+  80:	4b 01                         	cmp	a, 0xfff01
+  82:	4b 01                         	cmp	a, 0xfff01
+  84:	4b 01                         	cmp	a, 0xfff01
+  86:	4b 01                         	cmp	a, 0xfff01
+  88:	4b 01                         	cmp	a, 0xfff01
+  8a:	4b 01                         	cmp	a, 0xfff01
+  8c:	4b 01                         	cmp	a, 0xfff01
+  8e:	4b 01                         	cmp	a, 0xfff01
+  90:	4b 01                         	cmp	a, 0xfff01
+  92:	4b 01                         	cmp	a, 0xfff01
+  94:	4b 01                         	cmp	a, 0xfff01
+  96:	4b 01                         	cmp	a, 0xfff01
+  98:	4b 01                         	cmp	a, 0xfff01
+  9a:	4b 01                         	cmp	a, 0xfff01
+  9c:	4b 01                         	cmp	a, 0xfff01
+  9e:	4b 01                         	cmp	a, 0xfff01
+  a0:	4b 01                         	cmp	a, 0xfff01
+  a2:	4b 01                         	cmp	a, 0xfff01
+  a4:	4b 01                         	cmp	a, 0xfff01
+  a6:	4b 01                         	cmp	a, 0xfff01
+  a8:	4b 01                         	cmp	a, 0xfff01
+  aa:	4b 01                         	cmp	a, 0xfff01
+  ac:	4b 01                         	cmp	a, 0xfff01
+  ae:	4b 01                         	cmp	a, 0xfff01
+  b0:	4b 01                         	cmp	a, 0xfff01
+  b2:	4b 01                         	cmp	a, 0xfff01
+  b4:	4b 01                         	cmp	a, 0xfff01
+  b6:	4b 01                         	cmp	a, 0xfff01
+  b8:	4b 01                         	cmp	a, 0xfff01
+  ba:	4b 01                         	cmp	a, 0xfff01
+  bc:	4b 01                         	cmp	a, 0xfff01
+  be:	4b 01                         	cmp	a, 0xfff01
   c0:	00                            	nop
   c1:	81                            	inc	a
-  c2:	c8 04 00                      	mov	[sp+4], #0
+  c2:	e8 04                         	mov	b, 0xfff04
 	...
 
 00000100 <unilib_or_table>:
  100:	01                            	addw	ax, ax
  101:	02 04 08                      	addw	ax, !f0804 <ADTRGS1+0x77>
  104:	10 20                         	addw	sp, #32
- 106:	40 80 fe fd                   	cmp	!ffe80 <unilib_tick_counter+0x1f74>, #253
+ 106:	40 80 fe fd                   	cmp	!ffe80 <unilib_tick_counter+0x374>, #253
 
 00000108 <unilib_and_table>:
  108:	fe fd fb                      	call	$!fffffd08 <PMC+0xffeffd0a>
  10b:	f7                            	clrw	bc
- 10c:	ef df                         	br	$ed <P14_PEN+0xaf>
- 10e:	bf 7f 00                      	movw	!f007f <PRDSEL+0x1>, ax
+ 10c:	ef df                         	br	$ed <P12_POM+0x91>
+ 10e:	bf 7f 01                      	movw	!f017f <SSE0+0x5d>, ax
 
 00000110 <unilib_port_table>:
- 110:	00                            	nop
+ 110:	01                            	addw	ax, ax
  111:	ff                            	brk1
- 112:	20 ff                         	subw	sp, #255
- 114:	30 00 01                      	movw	ax, #256
- 117:	ff                            	brk1
- 118:	21                            	subw	ax, ax
+ 112:	21                            	subw	ax, ax
+ 113:	ff                            	brk1
+ 114:	31 00 51 00                   	btclr	0xffe51.0, $118 <unilib_port_table+0x8>
+ 118:	03                            	addw	ax, bc
  119:	ff                            	brk1
- 11a:	31 00 03 ff                   	btclr	0xfff03.0, $11d <unilib_port_table+0xd>
- 11e:	23                            	subw	ax, bc
+ 11a:	23                            	subw	ax, bc
+ 11b:	ff                            	brk1
+ 11c:	33                            	xchw	ax, bc
+ 11d:	00                            	nop
+ 11e:	ff                            	brk1
  11f:	ff                            	brk1
- 120:	33                            	xchw	ax, bc
- 121:	00                            	nop
- 122:	04 ff 24                      	addw	ax, #0x24ff
- 125:	ff                            	brk1
- 126:	34 00 06                      	movw	de, #0x600
+ 120:	04 ff 24                      	addw	ax, #0x24ff
+ 123:	ff                            	brk1
+ 124:	34 00 ff                      	movw	de, #0xff00
+ 127:	ff                            	brk1
+ 128:	08                            	xch	a, x
  129:	ff                            	brk1
- 12a:	26 ff                         	subw	ax, 0xffeff
- 12c:	36 00 07                      	movw	hl, #0x700
+ 12a:	28 ff ff                      	mov	65535[c], a
+ 12d:	ff                            	brk1
+ 12e:	ff                            	brk1
  12f:	ff                            	brk1
- 130:	27                            	subw	ax, hl
- 131:	ff                            	brk1
- 132:	37                            	xchw	ax, hl
- 133:	00                            	nop
- 134:	08                            	xch	a, x
- 135:	ff                            	brk1
- 136:	28 ff ff                      	mov	65535[c], a
+ 130:	0c ff                         	add	a, #255
+ 132:	2c ff                         	sub	a, #255
+ 134:	3c 00                         	subc	a, #0
+ 136:	5c 00                         	and	a, #0
+ 138:	0d                            	add	a, [hl]
  139:	ff                            	brk1
- 13a:	09 ff 29                      	mov	a, 10751[b]
+ 13a:	ff                            	brk1
+ 13b:	ff                            	brk1
+ 13c:	ff                            	brk1
  13d:	ff                            	brk1
  13e:	ff                            	brk1
  13f:	ff                            	brk1
- 140:	0c ff                         	add	a, #255
- 142:	2c ff                         	sub	a, #255
- 144:	3c 00                         	subc	a, #0
- 146:	0d                            	add	a, [hl]
- 147:	ff                            	brk1
- 148:	ff                            	brk1
- 149:	ff                            	brk1
- 14a:	ff                            	brk1
- 14b:	ff                            	brk1
- 14c:	0e ff                         	add	a, [hl+255]
- 14e:	2e ff                         	sub	a, [hl+255]
- 150:	3e 00                         	subc	a, [hl+0]
 
-00000152 <mystart>:
- 152:	cb f8 e0 fe                   	movw	sp, #0xfee0
- 156:	61 cf                         	sel	rb0
- 158:	41 00                         	mov	es, #0
- 15a:	ee ae 04                      	br	$!60b <main>
+00000140 <mystart>:
+ 140:	cb f8 e0 fe                   	movw	sp, #0xfee0
+ 144:	61 cf                         	sel	rb0
+ 146:	41 00                         	mov	es, #0
+ 148:	ee fc 04                      	br	$!647 <main>
 
-0000015d <default_handler>:
- 15d:	61 fc                         	reti
+0000014b <default_handler>:
+ 14b:	61 fc                         	reti
 	...
 
 00000200 <out_byte>:
@@ -1593,7 +1314,7 @@ Disassembly of section .text:
  20e:	98 00                         	mov	[sp+0], a
  210:	f1                            	clrb	a
  211:	98 02                         	mov	[sp+2], a
- 213:	fd ff 04                      	call	!4ff <portpin_set_low>
+ 213:	fd 3b 05                      	call	!53b <portpin_set_low>
  216:	30 12 00                      	movw	ax, #18
  219:	b8 00                         	movw	[sp+0], ax
  21b:	f6                            	clrw	ax
@@ -1612,7 +1333,7 @@ Disassembly of section .text:
  233:	ef 40                         	br	$275 <.L2>
  235:	f1                            	clrb	a
  236:	98 02                         	mov	[sp+2], a
- 238:	fd e7 04                      	call	!4e7 <portpin_set_high>
+ 238:	fd 23 05                      	call	!523 <portpin_set_high>
  23b:	8d ea                         	mov	a, 0xffeea
  23d:	31 1a                         	shr	a, 1
  23f:	9d ea                         	mov	0xffeea, a
@@ -1632,7 +1353,7 @@ Disassembly of section .text:
  259:	98 00                         	mov	[sp+0], a
  25b:	f1                            	clrb	a
  25c:	98 02                         	mov	[sp+2], a
- 25e:	fd e7 04                      	call	!4e7 <portpin_set_high>
+ 25e:	fd 23 05                      	call	!523 <portpin_set_high>
  261:	30 64 00                      	movw	ax, #100
  264:	b8 00                         	movw	[sp+0], ax
  266:	f6                            	clrw	ax
@@ -1648,7 +1369,7 @@ Disassembly of section .text:
 00000275 <.L2>:
  275:	8d f0                         	mov	a, 0xffef0
  277:	98 02                         	mov	[sp+2], a
- 279:	fd ff 04                      	call	!4ff <portpin_set_low>
+ 279:	fd 3b 05                      	call	!53b <portpin_set_low>
  27c:	8d ea                         	mov	a, 0xffeea
  27e:	31 1a                         	shr	a, 1
  280:	9d ea                         	mov	0xffeea, a
@@ -1668,10 +1389,10 @@ Disassembly of section .text:
  29a:	d7                            	ret
 
 0000029b <unilib_init>:
- 29b:	f5 02 df                      	clrb	!fdf02 <unilib_ints_enabled>
- 29e:	e5 03 df                      	oneb	!fdf03 <unilib_cpu_prescaler>
+ 29b:	f5 02 fb                      	clrb	!ffb02 <unilib_ints_enabled>
+ 29e:	e5 03 fb                      	oneb	!ffb03 <unilib_cpu_prescaler>
  2a1:	30 5c 04                      	movw	ax, #0x45c
- 2a4:	bf 08 df                      	movw	!fdf08 <printf_output>, ax
+ 2a4:	bf 08 fb                      	movw	!ffb08 <printf_output>, ax
  2a7:	d7                            	ret
 
 000002a8 <unilib_pause>:
@@ -1710,7 +1431,7 @@ Disassembly of section .text:
  2db:	20 04                         	subw	sp, #4
  2dd:	a8 0c                         	movw	ax, [sp+12]
  2df:	bd e8                         	movw	0xffee8, ax
- 2e1:	8f 04 df                      	mov	a, !fdf04 <unilib_cpu_freq>
+ 2e1:	8f 04 fb                      	mov	a, !ffb04 <unilib_cpu_freq>
  2e4:	8f c5 02                      	mov	a, !f02c5 <PLLCTL>
  2e7:	5c fb                         	and	a, #251
  2e9:	9f c5 02                      	mov	!f02c5 <PLLCTL>, a
@@ -1854,7 +1575,7 @@ Disassembly of section .text:
  3e2:	44 00 00                      	cmpw	ax, #0
  3e5:	61 f8                         	sknz
  3e7:	ef 2b                         	br	$414 <.L37>
- 3e9:	8f 04 df                      	mov	a, !fdf04 <unilib_cpu_freq>
+ 3e9:	8f 04 fb                      	mov	a, !ffb04 <unilib_cpu_freq>
  3ec:	70                            	mov	x, a
  3ed:	51 00                         	mov	a, #0
  3ef:	bd f6                         	movw	0xffef6, ax
@@ -1886,28 +1607,28 @@ Disassembly of section .text:
 
 00000415 <enable_interrupts>:
  415:	71 7a fa                      	ei
- 418:	e5 02 df                      	oneb	!fdf02 <unilib_ints_enabled>
+ 418:	e5 02 fb                      	oneb	!ffb02 <unilib_ints_enabled>
  41b:	51 fe                         	mov	a, #254
  41d:	9f 7c 00                      	mov	!f007c <INTMSK>, a
  420:	d7                            	ret
 
 00000421 <disable_interrupts>:
  421:	71 7b fa                      	di
- 424:	f5 02 df                      	clrb	!fdf02 <unilib_ints_enabled>
+ 424:	f5 02 fb                      	clrb	!ffb02 <unilib_ints_enabled>
  427:	51 ff                         	mov	a, #255
  429:	9f 7c 00                      	mov	!f007c <INTMSK>, a
  42c:	d7                            	ret
 
 0000042d <OUTPUT_MEMORY>:
- 42d:	af 06 df                      	movw	ax, !fdf06 <memptr>
+ 42d:	af 06 fb                      	movw	ax, !ffb06 <memptr>
  430:	bd f0                         	movw	0xffef0, ax
  432:	a1                            	incw	ax
- 433:	bf 06 df                      	movw	!fdf06 <memptr>, ax
+ 433:	bf 06 fb                      	movw	!ffb06 <memptr>, ax
  436:	ad f0                         	movw	ax, 0xffef0
  438:	12                            	movw	bc, ax
  439:	88 04                         	mov	a, [sp+4]
  43b:	48 00 00                      	mov	0[bc], a
- 43e:	af 06 df                      	movw	ax, !fdf06 <memptr>
+ 43e:	af 06 fb                      	movw	ax, !ffb06 <memptr>
  441:	12                            	movw	bc, ax
  442:	f1                            	clrb	a
  443:	48 00 00                      	mov	0[bc], a
@@ -1915,14 +1636,14 @@ Disassembly of section .text:
 
 00000447 <set_outchar_routine>:
  447:	a8 04                         	movw	ax, [sp+4]
- 449:	bf 08 df                      	movw	!fdf08 <printf_output>, ax
+ 449:	bf 08 fb                      	movw	!ffb08 <printf_output>, ax
  44c:	d7                            	ret
 
 0000044d <unilib_outchar>:
  44d:	20 02                         	subw	sp, #2
  44f:	88 06                         	mov	a, [sp+6]
  451:	98 00                         	mov	[sp+0], a
- 453:	af 08 df                      	movw	ax, !fdf08 <printf_output>
+ 453:	af 08 fb                      	movw	ax, !ffb08 <printf_output>
  456:	12                            	movw	bc, ax
  457:	61 da                         	call	bc
  459:	10 02                         	addw	sp, #2
@@ -1936,9 +1657,9 @@ Disassembly of section .text:
  45e:	a8 04                         	movw	ax, [sp+4]
  460:	bd f0                         	movw	0xffef0, ax
  462:	30 2d 04                      	movw	ax, #0x42d
- 465:	bf 08 df                      	movw	!fdf08 <printf_output>, ax
+ 465:	bf 08 fb                      	movw	!ffb08 <printf_output>, ax
  468:	ad f0                         	movw	ax, 0xffef0
- 46a:	bf 06 df                      	movw	!fdf06 <memptr>, ax
+ 46a:	bf 06 fb                      	movw	!ffb06 <memptr>, ax
  46d:	12                            	movw	bc, ax
  46e:	f1                            	clrb	a
  46f:	48 00 00                      	mov	0[bc], a
@@ -1956,420 +1677,455 @@ Disassembly of section .text:
  481:	11 29 08 01                   	mov	a, es:264[c]
  485:	5d                            	and	a, [hl]
  486:	9b                            	mov	[hl], a
- 487:	c2                            	pop	bc
- 488:	d7                            	ret
+ 487:	88 06                         	mov	a, [sp+6]
+ 489:	72                            	mov	c, a
+ 48a:	11 69 16 01                   	movw	ax, es:278[c]
+ 48e:	16                            	movw	hl, ax
+ 48f:	88 08                         	mov	a, [sp+8]
+ 491:	5c 07                         	and	a, #7
+ 493:	72                            	mov	c, a
+ 494:	11 29 08 01                   	mov	a, es:264[c]
+ 498:	5d                            	and	a, [hl]
+ 499:	9b                            	mov	[hl], a
+ 49a:	c2                            	pop	bc
+ 49b:	d7                            	ret
 
-00000489 <portpin_set_input_nopull>:
- 489:	c3                            	push	bc
- 48a:	c7                            	push	hl
- 48b:	88 08                         	mov	a, [sp+8]
- 48d:	72                            	mov	c, a
- 48e:	11 69 12 01                   	movw	ax, es:274[c]
- 492:	16                            	movw	hl, ax
- 493:	88 0a                         	mov	a, [sp+10]
- 495:	5c 07                         	and	a, #7
- 497:	72                            	mov	c, a
- 498:	11 29 00 01                   	mov	a, es:256[c]
- 49c:	9d f0                         	mov	0xffef0, a
- 49e:	6d                            	or	a, [hl]
- 49f:	9b                            	mov	[hl], a
- 4a0:	88 08                         	mov	a, [sp+8]
- 4a2:	72                            	mov	c, a
- 4a3:	11 69 14 01                   	movw	ax, es:276[c]
- 4a7:	44 ff ff                      	cmpw	ax, #0xffff
- 4aa:	dd 07                         	bz	$4b3 <set_pin_done>
- 4ac:	16                            	movw	hl, ax
- 4ad:	8d f0                         	mov	a, 0xffef0
- 4af:	7c ff                         	xor	a, #255
- 4b1:	5d                            	and	a, [hl]
- 4b2:	9b                            	mov	[hl], a
-
-000004b3 <set_pin_done>:
- 4b3:	c6                            	pop	hl
- 4b4:	c2                            	pop	bc
- 4b5:	d7                            	ret
-
-000004b6 <portpin_set_input_pullup>:
- 4b6:	c3                            	push	bc
- 4b7:	c7                            	push	hl
+0000049c <portpin_set_odio>:
+ 49c:	c3                            	push	bc
+ 49d:	88 06                         	mov	a, [sp+6]
+ 49f:	72                            	mov	c, a
+ 4a0:	11 69 12 01                   	movw	ax, es:274[c]
+ 4a4:	16                            	movw	hl, ax
+ 4a5:	88 08                         	mov	a, [sp+8]
+ 4a7:	5c 07                         	and	a, #7
+ 4a9:	72                            	mov	c, a
+ 4aa:	11 29 08 01                   	mov	a, es:264[c]
+ 4ae:	5d                            	and	a, [hl]
+ 4af:	9b                            	mov	[hl], a
+ 4b0:	88 06                         	mov	a, [sp+6]
+ 4b2:	72                            	mov	c, a
+ 4b3:	11 69 16 01                   	movw	ax, es:278[c]
+ 4b7:	16                            	movw	hl, ax
  4b8:	88 08                         	mov	a, [sp+8]
- 4ba:	72                            	mov	c, a
- 4bb:	11 69 12 01                   	movw	ax, es:274[c]
- 4bf:	16                            	movw	hl, ax
- 4c0:	88 0a                         	mov	a, [sp+10]
- 4c2:	5c 07                         	and	a, #7
- 4c4:	72                            	mov	c, a
- 4c5:	11 29 00 01                   	mov	a, es:256[c]
- 4c9:	9d f0                         	mov	0xffef0, a
- 4cb:	6d                            	or	a, [hl]
- 4cc:	9b                            	mov	[hl], a
- 4cd:	88 08                         	mov	a, [sp+8]
- 4cf:	72                            	mov	c, a
- 4d0:	11 69 14 01                   	movw	ax, es:276[c]
- 4d4:	44 ff ff                      	cmpw	ax, #0xffff
- 4d7:	dd 05                         	bz	$4de <set_pip_done>
- 4d9:	16                            	movw	hl, ax
- 4da:	8d f0                         	mov	a, 0xffef0
- 4dc:	6d                            	or	a, [hl]
- 4dd:	9b                            	mov	[hl], a
+ 4ba:	5c 07                         	and	a, #7
+ 4bc:	72                            	mov	c, a
+ 4bd:	11 29 00 01                   	mov	a, es:256[c]
+ 4c1:	6d                            	or	a, [hl]
+ 4c2:	9b                            	mov	[hl], a
+ 4c3:	c2                            	pop	bc
+ 4c4:	d7                            	ret
 
-000004de <set_pip_done>:
- 4de:	c6                            	pop	hl
- 4df:	c2                            	pop	bc
- 4e0:	d7                            	ret
+000004c5 <portpin_set_input_nopull>:
+ 4c5:	c3                            	push	bc
+ 4c6:	c7                            	push	hl
+ 4c7:	88 08                         	mov	a, [sp+8]
+ 4c9:	72                            	mov	c, a
+ 4ca:	11 69 12 01                   	movw	ax, es:274[c]
+ 4ce:	16                            	movw	hl, ax
+ 4cf:	88 0a                         	mov	a, [sp+10]
+ 4d1:	5c 07                         	and	a, #7
+ 4d3:	72                            	mov	c, a
+ 4d4:	11 29 00 01                   	mov	a, es:256[c]
+ 4d8:	9d f0                         	mov	0xffef0, a
+ 4da:	6d                            	or	a, [hl]
+ 4db:	9b                            	mov	[hl], a
+ 4dc:	88 08                         	mov	a, [sp+8]
+ 4de:	72                            	mov	c, a
+ 4df:	11 69 14 01                   	movw	ax, es:276[c]
+ 4e3:	44 ff ff                      	cmpw	ax, #0xffff
+ 4e6:	dd 07                         	bz	$4ef <set_pin_done>
+ 4e8:	16                            	movw	hl, ax
+ 4e9:	8d f0                         	mov	a, 0xffef0
+ 4eb:	7c ff                         	xor	a, #255
+ 4ed:	5d                            	and	a, [hl]
+ 4ee:	9b                            	mov	[hl], a
 
-000004e1 <portpin_set>:
- 4e1:	88 08                         	mov	a, [sp+8]
- 4e3:	4c 00                         	cmp	a, #0
- 4e5:	dd 18                         	bz	$4ff <portpin_set_low>
+000004ef <set_pin_done>:
+ 4ef:	c6                            	pop	hl
+ 4f0:	c2                            	pop	bc
+ 4f1:	d7                            	ret
 
-000004e7 <portpin_set_high>:
- 4e7:	c3                            	push	bc
- 4e8:	c7                            	push	hl
- 4e9:	88 08                         	mov	a, [sp+8]
- 4eb:	72                            	mov	c, a
- 4ec:	11 69 10 01                   	movw	ax, es:272[c]
- 4f0:	16                            	movw	hl, ax
- 4f1:	88 0a                         	mov	a, [sp+10]
- 4f3:	5c 07                         	and	a, #7
- 4f5:	72                            	mov	c, a
- 4f6:	11 29 00 01                   	mov	a, es:256[c]
- 4fa:	6d                            	or	a, [hl]
- 4fb:	9b                            	mov	[hl], a
- 4fc:	c6                            	pop	hl
- 4fd:	c2                            	pop	bc
- 4fe:	d7                            	ret
+000004f2 <portpin_set_input_pullup>:
+ 4f2:	c3                            	push	bc
+ 4f3:	c7                            	push	hl
+ 4f4:	88 08                         	mov	a, [sp+8]
+ 4f6:	72                            	mov	c, a
+ 4f7:	11 69 12 01                   	movw	ax, es:274[c]
+ 4fb:	16                            	movw	hl, ax
+ 4fc:	88 0a                         	mov	a, [sp+10]
+ 4fe:	5c 07                         	and	a, #7
+ 500:	72                            	mov	c, a
+ 501:	11 29 00 01                   	mov	a, es:256[c]
+ 505:	9d f0                         	mov	0xffef0, a
+ 507:	6d                            	or	a, [hl]
+ 508:	9b                            	mov	[hl], a
+ 509:	88 08                         	mov	a, [sp+8]
+ 50b:	72                            	mov	c, a
+ 50c:	11 69 14 01                   	movw	ax, es:276[c]
+ 510:	44 ff ff                      	cmpw	ax, #0xffff
+ 513:	dd 05                         	bz	$51a <set_pip_done>
+ 515:	16                            	movw	hl, ax
+ 516:	8d f0                         	mov	a, 0xffef0
+ 518:	6d                            	or	a, [hl]
+ 519:	9b                            	mov	[hl], a
 
-000004ff <portpin_set_low>:
- 4ff:	c3                            	push	bc
- 500:	c7                            	push	hl
- 501:	88 08                         	mov	a, [sp+8]
- 503:	72                            	mov	c, a
- 504:	11 69 10 01                   	movw	ax, es:272[c]
- 508:	16                            	movw	hl, ax
- 509:	88 0a                         	mov	a, [sp+10]
- 50b:	5c 07                         	and	a, #7
- 50d:	72                            	mov	c, a
- 50e:	11 29 08 01                   	mov	a, es:264[c]
- 512:	5d                            	and	a, [hl]
- 513:	9b                            	mov	[hl], a
- 514:	c6                            	pop	hl
- 515:	c2                            	pop	bc
- 516:	d7                            	ret
+0000051a <set_pip_done>:
+ 51a:	c6                            	pop	hl
+ 51b:	c2                            	pop	bc
+ 51c:	d7                            	ret
 
-00000517 <port_set>:
- 517:	c3                            	push	bc
- 518:	c7                            	push	hl
- 519:	88 08                         	mov	a, [sp+8]
- 51b:	72                            	mov	c, a
- 51c:	11 69 10 01                   	movw	ax, es:272[c]
- 520:	16                            	movw	hl, ax
- 521:	88 0a                         	mov	a, [sp+10]
- 523:	9b                            	mov	[hl], a
- 524:	c6                            	pop	hl
- 525:	c2                            	pop	bc
- 526:	d7                            	ret
+0000051d <portpin_set>:
+ 51d:	88 08                         	mov	a, [sp+8]
+ 51f:	4c 00                         	cmp	a, #0
+ 521:	dd 18                         	bz	$53b <portpin_set_low>
 
-00000527 <port_set_nibble0>:
- 527:	c3                            	push	bc
- 528:	c7                            	push	hl
- 529:	88 08                         	mov	a, [sp+8]
- 52b:	72                            	mov	c, a
- 52c:	11 69 10 01                   	movw	ax, es:272[c]
- 530:	16                            	movw	hl, ax
- 531:	8b                            	mov	a, [hl]
- 532:	5c f0                         	and	a, #240
- 534:	9b                            	mov	[hl], a
- 535:	88 0a                         	mov	a, [sp+10]
- 537:	5c 0f                         	and	a, #15
- 539:	0d                            	add	a, [hl]
- 53a:	9b                            	mov	[hl], a
- 53b:	c6                            	pop	hl
- 53c:	c2                            	pop	bc
- 53d:	d7                            	ret
+00000523 <portpin_set_high>:
+ 523:	c3                            	push	bc
+ 524:	c7                            	push	hl
+ 525:	88 08                         	mov	a, [sp+8]
+ 527:	72                            	mov	c, a
+ 528:	11 69 10 01                   	movw	ax, es:272[c]
+ 52c:	16                            	movw	hl, ax
+ 52d:	88 0a                         	mov	a, [sp+10]
+ 52f:	5c 07                         	and	a, #7
+ 531:	72                            	mov	c, a
+ 532:	11 29 00 01                   	mov	a, es:256[c]
+ 536:	6d                            	or	a, [hl]
+ 537:	9b                            	mov	[hl], a
+ 538:	c6                            	pop	hl
+ 539:	c2                            	pop	bc
+ 53a:	d7                            	ret
 
-0000053e <port_set_nibble1>:
- 53e:	c3                            	push	bc
- 53f:	c7                            	push	hl
- 540:	88 08                         	mov	a, [sp+8]
- 542:	72                            	mov	c, a
- 543:	11 69 10 01                   	movw	ax, es:272[c]
- 547:	16                            	movw	hl, ax
- 548:	8b                            	mov	a, [hl]
- 549:	5c 0f                         	and	a, #15
- 54b:	9b                            	mov	[hl], a
- 54c:	88 0a                         	mov	a, [sp+10]
- 54e:	31 49                         	shl	a, 4
- 550:	5c f0                         	and	a, #240
- 552:	0d                            	add	a, [hl]
- 553:	9b                            	mov	[hl], a
- 554:	c6                            	pop	hl
- 555:	c2                            	pop	bc
+0000053b <portpin_set_low>:
+ 53b:	c3                            	push	bc
+ 53c:	c7                            	push	hl
+ 53d:	88 08                         	mov	a, [sp+8]
+ 53f:	72                            	mov	c, a
+ 540:	11 69 10 01                   	movw	ax, es:272[c]
+ 544:	16                            	movw	hl, ax
+ 545:	88 0a                         	mov	a, [sp+10]
+ 547:	5c 07                         	and	a, #7
+ 549:	72                            	mov	c, a
+ 54a:	11 29 08 01                   	mov	a, es:264[c]
+ 54e:	5d                            	and	a, [hl]
+ 54f:	9b                            	mov	[hl], a
+ 550:	c6                            	pop	hl
+ 551:	c2                            	pop	bc
+ 552:	d7                            	ret
 
-00000556 <port_set_nibble2>:
- 556:	d7                            	ret
+00000553 <port_set>:
+ 553:	c3                            	push	bc
+ 554:	c7                            	push	hl
+ 555:	88 08                         	mov	a, [sp+8]
+ 557:	72                            	mov	c, a
+ 558:	11 69 10 01                   	movw	ax, es:272[c]
+ 55c:	16                            	movw	hl, ax
+ 55d:	88 0a                         	mov	a, [sp+10]
+ 55f:	9b                            	mov	[hl], a
+ 560:	c6                            	pop	hl
+ 561:	c2                            	pop	bc
+ 562:	d7                            	ret
 
-00000557 <port_set_high>:
- 557:	c3                            	push	bc
- 558:	c7                            	push	hl
- 559:	88 08                         	mov	a, [sp+8]
- 55b:	72                            	mov	c, a
- 55c:	11 69 10 01                   	movw	ax, es:272[c]
- 560:	16                            	movw	hl, ax
- 561:	88 0a                         	mov	a, [sp+10]
- 563:	6d                            	or	a, [hl]
- 564:	9b                            	mov	[hl], a
- 565:	c6                            	pop	hl
- 566:	c2                            	pop	bc
- 567:	d7                            	ret
+00000563 <port_set_nibble0>:
+ 563:	c3                            	push	bc
+ 564:	c7                            	push	hl
+ 565:	88 08                         	mov	a, [sp+8]
+ 567:	72                            	mov	c, a
+ 568:	11 69 10 01                   	movw	ax, es:272[c]
+ 56c:	16                            	movw	hl, ax
+ 56d:	8b                            	mov	a, [hl]
+ 56e:	5c f0                         	and	a, #240
+ 570:	9b                            	mov	[hl], a
+ 571:	88 0a                         	mov	a, [sp+10]
+ 573:	5c 0f                         	and	a, #15
+ 575:	0d                            	add	a, [hl]
+ 576:	9b                            	mov	[hl], a
+ 577:	c6                            	pop	hl
+ 578:	c2                            	pop	bc
+ 579:	d7                            	ret
 
-00000568 <port_set_low>:
- 568:	c3                            	push	bc
- 569:	c7                            	push	hl
- 56a:	88 08                         	mov	a, [sp+8]
- 56c:	72                            	mov	c, a
- 56d:	11 69 10 01                   	movw	ax, es:272[c]
- 571:	16                            	movw	hl, ax
- 572:	88 0a                         	mov	a, [sp+10]
- 574:	7c ff                         	xor	a, #255
- 576:	5d                            	and	a, [hl]
- 577:	9b                            	mov	[hl], a
- 578:	c6                            	pop	hl
- 579:	c2                            	pop	bc
- 57a:	d7                            	ret
+0000057a <port_set_nibble1>:
+ 57a:	c3                            	push	bc
+ 57b:	c7                            	push	hl
+ 57c:	88 08                         	mov	a, [sp+8]
+ 57e:	72                            	mov	c, a
+ 57f:	11 69 10 01                   	movw	ax, es:272[c]
+ 583:	16                            	movw	hl, ax
+ 584:	8b                            	mov	a, [hl]
+ 585:	5c 0f                         	and	a, #15
+ 587:	9b                            	mov	[hl], a
+ 588:	88 0a                         	mov	a, [sp+10]
+ 58a:	31 49                         	shl	a, 4
+ 58c:	5c f0                         	and	a, #240
+ 58e:	0d                            	add	a, [hl]
+ 58f:	9b                            	mov	[hl], a
+ 590:	c6                            	pop	hl
+ 591:	c2                            	pop	bc
 
-0000057b <port_get>:
- 57b:	c3                            	push	bc
- 57c:	c7                            	push	hl
- 57d:	88 08                         	mov	a, [sp+8]
- 57f:	72                            	mov	c, a
- 580:	11 69 10 01                   	movw	ax, es:272[c]
- 584:	16                            	movw	hl, ax
- 585:	8b                            	mov	a, [hl]
- 586:	c6                            	pop	hl
- 587:	c2                            	pop	bc
- 588:	d7                            	ret
+00000592 <port_set_nibble2>:
+ 592:	d7                            	ret
 
-00000589 <portpin_get>:
- 589:	c3                            	push	bc
- 58a:	c7                            	push	hl
- 58b:	88 08                         	mov	a, [sp+8]
- 58d:	72                            	mov	c, a
- 58e:	11 69 10 01                   	movw	ax, es:272[c]
- 592:	16                            	movw	hl, ax
- 593:	88 0a                         	mov	a, [sp+10]
- 595:	5c 07                         	and	a, #7
+00000593 <port_set_high>:
+ 593:	c3                            	push	bc
+ 594:	c7                            	push	hl
+ 595:	88 08                         	mov	a, [sp+8]
  597:	72                            	mov	c, a
- 598:	11 29 00 01                   	mov	a, es:256[c]
- 59c:	5d                            	and	a, [hl]
- 59d:	dd 07                         	bz	$5a6 <gpl_return0>
+ 598:	11 69 10 01                   	movw	ax, es:272[c]
+ 59c:	16                            	movw	hl, ax
+ 59d:	88 0a                         	mov	a, [sp+10]
+ 59f:	6d                            	or	a, [hl]
+ 5a0:	9b                            	mov	[hl], a
+ 5a1:	c6                            	pop	hl
+ 5a2:	c2                            	pop	bc
+ 5a3:	d7                            	ret
 
-0000059f <gpl_return1>:
- 59f:	51 01                         	mov	a, #1
- 5a1:	9d f0                         	mov	0xffef0, a
- 5a3:	c6                            	pop	hl
- 5a4:	c2                            	pop	bc
- 5a5:	d7                            	ret
+000005a4 <port_set_low>:
+ 5a4:	c3                            	push	bc
+ 5a5:	c7                            	push	hl
+ 5a6:	88 08                         	mov	a, [sp+8]
+ 5a8:	72                            	mov	c, a
+ 5a9:	11 69 10 01                   	movw	ax, es:272[c]
+ 5ad:	16                            	movw	hl, ax
+ 5ae:	88 0a                         	mov	a, [sp+10]
+ 5b0:	7c ff                         	xor	a, #255
+ 5b2:	5d                            	and	a, [hl]
+ 5b3:	9b                            	mov	[hl], a
+ 5b4:	c6                            	pop	hl
+ 5b5:	c2                            	pop	bc
+ 5b6:	d7                            	ret
 
-000005a6 <gpl_return0>:
- 5a6:	51 00                         	mov	a, #0
- 5a8:	9d f0                         	mov	0xffef0, a
- 5aa:	c6                            	pop	hl
- 5ab:	c2                            	pop	bc
- 5ac:	d7                            	ret
-
-000005ad <isr_pwm0>:
- 5ad:	61 fc                         	reti
- 5af:	d7                            	ret
-
-000005b0 <isr_pwm1>:
- 5b0:	61 fc                         	reti
- 5b2:	d7                            	ret
-
-000005b3 <isr_pwm2>:
- 5b3:	61 fc                         	reti
- 5b5:	d7                            	ret
-
-000005b6 <isr_pwm3>:
- 5b6:	61 fc                         	reti
- 5b8:	d7                            	ret
-
-000005b9 <isr_uart0_send>:
- 5b9:	61 fc                         	reti
- 5bb:	d7                            	ret
-
-000005bc <isr_recv_uart0>:
- 5bc:	61 fc                         	reti
- 5be:	d7                            	ret
-
-000005bf <isr_uart1_send>:
- 5bf:	61 fc                         	reti
- 5c1:	d7                            	ret
-
-000005c2 <isr_recv_uart1>:
- 5c2:	61 fc                         	reti
+000005b7 <port_get>:
+ 5b7:	c3                            	push	bc
+ 5b8:	c7                            	push	hl
+ 5b9:	88 08                         	mov	a, [sp+8]
+ 5bb:	72                            	mov	c, a
+ 5bc:	11 69 10 01                   	movw	ax, es:272[c]
+ 5c0:	16                            	movw	hl, ax
+ 5c1:	8b                            	mov	a, [hl]
+ 5c2:	c6                            	pop	hl
+ 5c3:	c2                            	pop	bc
  5c4:	d7                            	ret
 
-000005c5 <isr_ext0>:
- 5c5:	61 fc                         	reti
- 5c7:	d7                            	ret
+000005c5 <portpin_get>:
+ 5c5:	c3                            	push	bc
+ 5c6:	c7                            	push	hl
+ 5c7:	88 08                         	mov	a, [sp+8]
+ 5c9:	72                            	mov	c, a
+ 5ca:	11 69 10 01                   	movw	ax, es:272[c]
+ 5ce:	16                            	movw	hl, ax
+ 5cf:	88 0a                         	mov	a, [sp+10]
+ 5d1:	5c 07                         	and	a, #7
+ 5d3:	72                            	mov	c, a
+ 5d4:	11 29 00 01                   	mov	a, es:256[c]
+ 5d8:	5d                            	and	a, [hl]
+ 5d9:	dd 07                         	bz	$5e2 <gpl_return0>
 
-000005c8 <isr_ext1>:
- 5c8:	61 fc                         	reti
- 5ca:	d7                            	ret
+000005db <gpl_return1>:
+ 5db:	51 01                         	mov	a, #1
+ 5dd:	9d f0                         	mov	0xffef0, a
+ 5df:	c6                            	pop	hl
+ 5e0:	c2                            	pop	bc
+ 5e1:	d7                            	ret
 
-000005cb <_tick_handler>:
- 5cb:	61 cf                         	sel	rb0
- 5cd:	c1                            	push	ax
- 5ce:	c3                            	push	bc
- 5cf:	c5                            	push	de
- 5d0:	c7                            	push	hl
- 5d1:	61 df                         	sel	rb1
- 5d3:	c1                            	push	ax
- 5d4:	c3                            	push	bc
- 5d5:	c5                            	push	de
- 5d6:	c7                            	push	hl
- 5d7:	61 ef                         	sel	rb2
- 5d9:	c7                            	push	hl
- 5da:	61 cf                         	sel	rb0
- 5dc:	51 21                         	mov	a, #33
- 5de:	9f 40 02                      	mov	!f0240 <TRJCR0>, a
- 5e1:	af 0c df                      	movw	ax, !fdf0c <unilib_tick_counter>
- 5e4:	44 00 00                      	cmpw	ax, #0
- 5e7:	61 f8                         	sknz
- 5e9:	ef 0c                         	br	$5f7 <.L12>
- 5eb:	af 0c df                      	movw	ax, !fdf0c <unilib_tick_counter>
- 5ee:	bd f0                         	movw	0xffef0, ax
- 5f0:	b6 f0                         	decw	0xffef0
- 5f2:	ad f0                         	movw	ax, 0xffef0
- 5f4:	bf 0c df                      	movw	!fdf0c <unilib_tick_counter>, ax
+000005e2 <gpl_return0>:
+ 5e2:	51 00                         	mov	a, #0
+ 5e4:	9d f0                         	mov	0xffef0, a
+ 5e6:	c6                            	pop	hl
+ 5e7:	c2                            	pop	bc
+ 5e8:	d7                            	ret
 
-000005f7 <.L12>:
- 5f7:	fd 9a 02                      	call	!29a <user_tick>
- 5fa:	61 ef                         	sel	rb2
- 5fc:	c6                            	pop	hl
- 5fd:	61 df                         	sel	rb1
- 5ff:	c6                            	pop	hl
- 600:	c4                            	pop	de
- 601:	c2                            	pop	bc
- 602:	c0                            	pop	ax
- 603:	61 cf                         	sel	rb0
- 605:	c6                            	pop	hl
- 606:	c4                            	pop	de
- 607:	c2                            	pop	bc
- 608:	c0                            	pop	ax
- 609:	61 fc                         	reti
+000005e9 <isr_pwm0>:
+ 5e9:	61 fc                         	reti
+ 5eb:	d7                            	ret
 
-0000060b <main>:
- 60b:	61 ef                         	sel	rb2
- 60d:	c1                            	push	ax
- 60e:	c3                            	push	bc
- 60f:	61 cf                         	sel	rb0
- 611:	20 04                         	subw	sp, #4
- 613:	fd 9b 02                      	call	!29b <unilib_init>
- 616:	51 12                         	mov	a, #18
- 618:	98 00                         	mov	[sp+0], a
- 61a:	f1                            	clrb	a
- 61b:	98 02                         	mov	[sp+2], a
- 61d:	fd 73 04                      	call	!473 <portpin_set_output>
- 620:	51 12                         	mov	a, #18
- 622:	98 00                         	mov	[sp+0], a
- 624:	f1                            	clrb	a
- 625:	98 02                         	mov	[sp+2], a
- 627:	fd e7 04                      	call	!4e7 <portpin_set_high>
- 62a:	30 31 10                      	movw	ax, #0x1031
- 62d:	b8 00                         	movw	[sp+0], ax
- 62f:	fd d5 02                      	call	!2d5 <clock_config>
- 632:	e5 90 00                      	oneb	!f0090 <DFLCTL>
- 635:	c9 ea 00 10                   	movw	0xffeea, #0x1000
+000005ec <isr_pwm1>:
+ 5ec:	61 fc                         	reti
+ 5ee:	d7                            	ret
 
-00000639 <.L13>:
- 639:	51 12                         	mov	a, #18
- 63b:	98 00                         	mov	[sp+0], a
- 63d:	f1                            	clrb	a
- 63e:	98 02                         	mov	[sp+2], a
- 640:	fd b6 04                      	call	!4b6 <portpin_set_input_pullup>
+000005ef <isr_pwm2>:
+ 5ef:	61 fc                         	reti
+ 5f1:	d7                            	ret
 
-00000643 <.L10>:
- 643:	51 12                         	mov	a, #18
- 645:	98 00                         	mov	[sp+0], a
- 647:	f1                            	clrb	a
- 648:	98 02                         	mov	[sp+2], a
- 64a:	fd 89 05                      	call	!589 <portpin_get>
- 64d:	d4 f0                         	cmp0	0xffef0
- 64f:	61 e8                         	skz
- 651:	ef f0                         	br	$643 <.L10>
+000005f2 <isr_pwm3>:
+ 5f2:	61 fc                         	reti
+ 5f4:	d7                            	ret
 
-00000653 <.L11>:
- 653:	51 12                         	mov	a, #18
- 655:	98 00                         	mov	[sp+0], a
- 657:	f1                            	clrb	a
- 658:	98 02                         	mov	[sp+2], a
- 65a:	fd 89 05                      	call	!589 <portpin_get>
- 65d:	d4 f0                         	cmp0	0xffef0
- 65f:	61 f8                         	sknz
- 661:	ef f0                         	br	$653 <.L11>
- 663:	30 05 00                      	movw	ax, #5
- 666:	b8 00                         	movw	[sp+0], ax
- 668:	fd dc 03                      	call	!3dc <unilib_pause_ms>
- 66b:	51 12                         	mov	a, #18
- 66d:	98 00                         	mov	[sp+0], a
- 66f:	f1                            	clrb	a
- 670:	98 02                         	mov	[sp+2], a
- 672:	fd e7 04                      	call	!4e7 <portpin_set_high>
+000005f5 <isr_uart0_send>:
+ 5f5:	61 fc                         	reti
+ 5f7:	d7                            	ret
+
+000005f8 <isr_recv_uart0>:
+ 5f8:	61 fc                         	reti
+ 5fa:	d7                            	ret
+
+000005fb <isr_uart1_send>:
+ 5fb:	61 fc                         	reti
+ 5fd:	d7                            	ret
+
+000005fe <isr_recv_uart1>:
+ 5fe:	61 fc                         	reti
+ 600:	d7                            	ret
+
+00000601 <isr_ext0>:
+ 601:	61 fc                         	reti
+ 603:	d7                            	ret
+
+00000604 <isr_ext1>:
+ 604:	61 fc                         	reti
+ 606:	d7                            	ret
+
+00000607 <_tick_handler>:
+ 607:	61 cf                         	sel	rb0
+ 609:	c1                            	push	ax
+ 60a:	c3                            	push	bc
+ 60b:	c5                            	push	de
+ 60c:	c7                            	push	hl
+ 60d:	61 df                         	sel	rb1
+ 60f:	c1                            	push	ax
+ 610:	c3                            	push	bc
+ 611:	c5                            	push	de
+ 612:	c7                            	push	hl
+ 613:	61 ef                         	sel	rb2
+ 615:	c7                            	push	hl
+ 616:	61 cf                         	sel	rb0
+ 618:	51 21                         	mov	a, #33
+ 61a:	9f 40 02                      	mov	!f0240 <TRJCR0>, a
+ 61d:	af 0c fb                      	movw	ax, !ffb0c <unilib_tick_counter>
+ 620:	44 00 00                      	cmpw	ax, #0
+ 623:	61 f8                         	sknz
+ 625:	ef 0c                         	br	$633 <.L12>
+ 627:	af 0c fb                      	movw	ax, !ffb0c <unilib_tick_counter>
+ 62a:	bd f0                         	movw	0xffef0, ax
+ 62c:	b6 f0                         	decw	0xffef0
+ 62e:	ad f0                         	movw	ax, 0xffef0
+ 630:	bf 0c fb                      	movw	!ffb0c <unilib_tick_counter>, ax
+
+00000633 <.L12>:
+ 633:	fd 9a 02                      	call	!29a <user_tick>
+ 636:	61 ef                         	sel	rb2
+ 638:	c6                            	pop	hl
+ 639:	61 df                         	sel	rb1
+ 63b:	c6                            	pop	hl
+ 63c:	c4                            	pop	de
+ 63d:	c2                            	pop	bc
+ 63e:	c0                            	pop	ax
+ 63f:	61 cf                         	sel	rb0
+ 641:	c6                            	pop	hl
+ 642:	c4                            	pop	de
+ 643:	c2                            	pop	bc
+ 644:	c0                            	pop	ax
+ 645:	61 fc                         	reti
+
+00000647 <main>:
+ 647:	61 ef                         	sel	rb2
+ 649:	c1                            	push	ax
+ 64a:	c3                            	push	bc
+ 64b:	61 cf                         	sel	rb0
+ 64d:	20 04                         	subw	sp, #4
+ 64f:	fd 9b 02                      	call	!29b <unilib_init>
+ 652:	51 12                         	mov	a, #18
+ 654:	98 00                         	mov	[sp+0], a
+ 656:	f1                            	clrb	a
+ 657:	98 02                         	mov	[sp+2], a
+ 659:	fd 73 04                      	call	!473 <portpin_set_output>
+ 65c:	51 12                         	mov	a, #18
+ 65e:	98 00                         	mov	[sp+0], a
+ 660:	f1                            	clrb	a
+ 661:	98 02                         	mov	[sp+2], a
+ 663:	fd 23 05                      	call	!523 <portpin_set_high>
+ 666:	30 31 10                      	movw	ax, #0x1031
+ 669:	b8 00                         	movw	[sp+0], ax
+ 66b:	fd d5 02                      	call	!2d5 <clock_config>
+ 66e:	e5 90 00                      	oneb	!f0090 <DFLCTL>
+ 671:	c9 ea 00 10                   	movw	0xffeea, #0x1000
+
+00000675 <.L13>:
  675:	51 12                         	mov	a, #18
  677:	98 00                         	mov	[sp+0], a
  679:	f1                            	clrb	a
  67a:	98 02                         	mov	[sp+2], a
- 67c:	fd 73 04                      	call	!473 <portpin_set_output>
- 67f:	ad ea                         	movw	ax, 0xffeea
- 681:	bd e8                         	movw	0xffee8, ax
- 683:	04 00 08                      	addw	ax, #0x800
- 686:	bd ea                         	movw	0xffeea, ax
+ 67c:	fd f2 04                      	call	!4f2 <portpin_set_input_pullup>
 
-00000688 <.L12>:
- 688:	fa e8                         	movw	hl, 0xffee8
- 68a:	8b                            	mov	a, [hl]
- 68b:	98 00                         	mov	[sp+0], a
- 68d:	fd 00 02                      	call	!200 <out_byte>
- 690:	a6 e8                         	incw	0xffee8
- 692:	ad ea                         	movw	ax, 0xffeea
- 694:	46 e8                         	cmpw	ax, 0xffee8
- 696:	61 f8                         	sknz
- 698:	ef 9f                         	br	$639 <.L13>
- 69a:	fa e8                         	movw	hl, 0xffee8
- 69c:	8b                            	mov	a, [hl]
- 69d:	98 00                         	mov	[sp+0], a
- 69f:	fd 00 02                      	call	!200 <out_byte>
- 6a2:	a6 e8                         	incw	0xffee8
- 6a4:	ad ea                         	movw	ax, 0xffeea
- 6a6:	46 e8                         	cmpw	ax, 0xffee8
- 6a8:	61 e8                         	skz
- 6aa:	ef dc                         	br	$688 <.L12>
- 6ac:	ef 8b                         	br	$639 <.L13>
+0000067f <.L10>:
+ 67f:	51 12                         	mov	a, #18
+ 681:	98 00                         	mov	[sp+0], a
+ 683:	f1                            	clrb	a
+ 684:	98 02                         	mov	[sp+2], a
+ 686:	fd c5 05                      	call	!5c5 <portpin_get>
+ 689:	d4 f0                         	cmp0	0xffef0
+ 68b:	61 e8                         	skz
+ 68d:	ef f0                         	br	$67f <.L10>
+
+0000068f <.L11>:
+ 68f:	51 12                         	mov	a, #18
+ 691:	98 00                         	mov	[sp+0], a
+ 693:	f1                            	clrb	a
+ 694:	98 02                         	mov	[sp+2], a
+ 696:	fd c5 05                      	call	!5c5 <portpin_get>
+ 699:	d4 f0                         	cmp0	0xffef0
+ 69b:	61 f8                         	sknz
+ 69d:	ef f0                         	br	$68f <.L11>
+ 69f:	30 05 00                      	movw	ax, #5
+ 6a2:	b8 00                         	movw	[sp+0], ax
+ 6a4:	fd dc 03                      	call	!3dc <unilib_pause_ms>
+ 6a7:	51 12                         	mov	a, #18
+ 6a9:	98 00                         	mov	[sp+0], a
+ 6ab:	f1                            	clrb	a
+ 6ac:	98 02                         	mov	[sp+2], a
+ 6ae:	fd 23 05                      	call	!523 <portpin_set_high>
+ 6b1:	51 12                         	mov	a, #18
+ 6b3:	98 00                         	mov	[sp+0], a
+ 6b5:	f1                            	clrb	a
+ 6b6:	98 02                         	mov	[sp+2], a
+ 6b8:	fd 73 04                      	call	!473 <portpin_set_output>
+ 6bb:	ad ea                         	movw	ax, 0xffeea
+ 6bd:	bd e8                         	movw	0xffee8, ax
+ 6bf:	04 00 08                      	addw	ax, #0x800
+ 6c2:	bd ea                         	movw	0xffeea, ax
+
+000006c4 <.L12>:
+ 6c4:	fa e8                         	movw	hl, 0xffee8
+ 6c6:	8b                            	mov	a, [hl]
+ 6c7:	98 00                         	mov	[sp+0], a
+ 6c9:	fd 00 02                      	call	!200 <out_byte>
+ 6cc:	a6 e8                         	incw	0xffee8
+ 6ce:	ad ea                         	movw	ax, 0xffeea
+ 6d0:	46 e8                         	cmpw	ax, 0xffee8
+ 6d2:	61 f8                         	sknz
+ 6d4:	ef 9f                         	br	$675 <.L13>
+ 6d6:	fa e8                         	movw	hl, 0xffee8
+ 6d8:	8b                            	mov	a, [hl]
+ 6d9:	98 00                         	mov	[sp+0], a
+ 6db:	fd 00 02                      	call	!200 <out_byte>
+ 6de:	a6 e8                         	incw	0xffee8
+ 6e0:	ad ea                         	movw	ax, 0xffeea
+ 6e2:	46 e8                         	cmpw	ax, 0xffee8
+ 6e4:	61 e8                         	skz
+ 6e6:	ef dc                         	br	$6c4 <.L12>
+ 6e8:	ef 8b                         	br	$675 <.L13>
 
 Disassembly of section .bss:
 
-000fdf00 <_bss_start>:
+000ffb00 <_bss_start>:
 	...
 
-000fdf02 <unilib_ints_enabled>:
+000ffb02 <unilib_ints_enabled>:
 	...
 
-000fdf03 <unilib_cpu_prescaler>:
+000ffb03 <unilib_cpu_prescaler>:
 	...
 
-000fdf04 <unilib_cpu_freq>:
+000ffb04 <unilib_cpu_freq>:
 	...
 
-000fdf06 <memptr>:
+000ffb06 <memptr>:
 	...
 
-000fdf08 <printf_output>:
+000ffb08 <printf_output>:
 	...
 
-000fdf0a <unilib_tick_scale>:
+000ffb0a <unilib_tick_scale>:
 	...
 
-000fdf0c <unilib_tick_counter>:
+000ffb0c <unilib_tick_counter>:
 	...

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ftdi_eeprom --device i:0x0403:0x6661 --read-eeprom vanilla.conf
+ftdi_eeprom --device i:0x0403:0x6661 --flash-eeprom vanilla.conf
+rm -f eeprom.new

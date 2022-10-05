@@ -34,6 +34,13 @@
 #include <algorithm/algo_st7flite.h>
 #include <algorithm/algo_stm8.h>
 #include <algorithm/algo_stm32swd.h>
+#include <algorithm/algo_stm32f0.h>
+#include <algorithm/algo_stm32f1.h>
+#include <algorithm/algo_stm32f2.h>
+#include <algorithm/algo_stm32f3.h>
+#include <algorithm/algo_stm32f4.h>
+#include <algorithm/algo_stm32f7.h>
+#include <algorithm/algo_stm32l4.h>
 #include <algorithm/algo_spiflash.h>
 #include <algorithm/algo_spieeprom.h>
 #include <algorithm/algo_dataflash.h>
@@ -50,7 +57,6 @@
 #include <algorithm/algo_fgen.h>
 #include <algorithm/algo_la.h>
 #include <algorithm/algo_lps25h.h>
-
 #include <algorithm/algo_s32kswd.h>
 #include <algorithm/algo_kea64swd.h>
 #include <algorithm/algo_sici.h>
@@ -60,7 +66,9 @@
 #include <algorithm/algo_onewire.h>
 //#include <algorithm/algo_samdswd.h>
 #include <algorithm/algo_veml3328.h>
+#include <algorithm/algo_tle986x.h>
 
+#include <algorithm/algo_ra6.h>
 
 #include <algorithm/algo_xc9500.h>
 #include <algorithm/algo_rundev.h>

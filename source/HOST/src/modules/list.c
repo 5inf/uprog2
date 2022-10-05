@@ -63,13 +63,14 @@ void list_devices(void)
 	listgroup(4,5,0,"Texas Instruments MSP430");
 	listgroup(31,0,0,"Texas Instruments CC25xx");
 	listgroup(51,0,0,"Texas Instruments CC2640");
-	listgroup(1,0,0,"Freescale HCS08");
-	listgroup(6,7,11,"Freescale S12X");
+	listgroup(1,0,0,"Freescale/NXP HCS08");
+	listgroup(6,7,11,"Freescale/NXP S12X");
 	listgroup(2,0,0,"Renesas R8C");
 	listgroup(12,0,0,"Renesas 78K0R");
 	listgroup(13,0,0,"Renesas RL78");
 	listgroup(42,0,0,"Renesas V850");
 	listgroup(26,0,0,"Renesas RH850");
+	listgroup(72,0,0,"Renesas RA6");
 	listgroup(20,0,0,"STMicro ST7");
 	listgroup(8,0,0,"STMicro STM8");
 	listgroup(16,0,0,"STMicro SPC56xx (BAM)");
@@ -87,6 +88,7 @@ void list_devices(void)
 	listgroup(62,0,0,"NXP S12Z");
 	listgroup(54,0,0,"NXP MPC57xx (JTAG)");
 	listgroup(64,0,0,"Silabs EFM32/EFR32");	
+	listgroup(46,0,0,"Infineon TL986x/TL987x");	
 	listgroup(32,0,0,"Cypress PSoC4");
 	listgroup(21,0,0,"I2C EEPROM");
 	listgroup(22,0,0,"SPI Flash");

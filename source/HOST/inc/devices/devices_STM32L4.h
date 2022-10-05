@@ -1,9 +1,21 @@
 
+	"STM32L4xx-64k",
+	52,
+	0x08000000,0x010000,		//main flash pages
+	0x1FFF7800,0x000024,		//option bytes
+	0x20000000,0x001000,		//RAM
+	0x000000A5,0x00005A,		//ROP
+	0x00000004,0x000000,		//erase mode
+	0x00000000,
+	0x0000,0x0000,
+	0x0000,0x0000,
+	0x0000,0x0000,
+	0x0000,0x0000,
 
 	"STM32L4xx-128k",
 	52,
 	0x08000000,0x020000,		//main flash pages
-	0x1FFFC000,0x000010,		//option bytes
+	0x1FFF7800,0x000024,		//option bytes
 	0x20000000,0x001000,		//RAM
 	0x000000A5,0x00005A,		//ROP
 	0x00000004,0x000000,		//erase mode
@@ -16,7 +28,7 @@
 	"STM32L4xx-256k",
 	52,
 	0x08000000,0x040000,		//main flash pages
-	0x1FFFC000,0x000010,		//option bytes
+	0x1FFF7800,0x000024,		//option bytes
 	0x20000000,0x001000,		//RAM
 	0x000000A5,0x00005A,		//ROP
 	0x00000004,0x000000,		//erase mode
@@ -29,7 +41,7 @@
 	"STM32L4xx-384k",
 	52,
 	0x08000000,0x060000,		//main flash pages
-	0x1FFFC000,0x000010,		//option bytes
+	0x1FFF7800,0x000024,		//option bytes
 	0x20000000,0x001000,		//RAM
 	0x000000A5,0x00005A,		//ROP
 	0x00000004,0x000000,		//erase mode
@@ -42,7 +54,7 @@
 	"STM32L4xx-512k",
 	52,
 	0x08000000,0x080000,		//main flash pages
-	0x1FFFC000,0x000010,		//option bytes
+	0x1FFF7800,0x000024,		//option bytes
 	0x20000000,0x001000,		//RAM
 	0x000000A5,0x00005A,		//ROP
 	0x00000004,0x000000,		//erase mode
@@ -55,7 +67,7 @@
 	"STM32L4xx-768k",
 	52,
 	0x08000000,0x0C0000,		//main flash pages
-	0x1FFFC000,0x000010,		//option bytes
+	0x1FFF7800,0x000024,		//option bytes
 	0x20000000,0x001000,		//RAM
 	0x000000A5,0x00005A,		//ROP
 	0x00000004,0x000000,		//erase mode
@@ -68,7 +80,7 @@
 	"STM32L4xx-1024k",
 	52,
 	0x08000000,0x100000,		//main flash pages
-	0x1FFFC000,0x000010,		//option bytes
+	0x1FFF7800,0x000024,		//option bytes
 	0x20000000,0x001000,		//RAM
 	0x000000A5,0x00005A,		//ROP
 	0x00000004,0x000000,		//erase mode

@@ -2,9 +2,7 @@
 ;#										#
 ;# UPROG2 universal programmer							#
 ;#										#
-;# version 1.0									#
-;#										#
-;# copyright (c) 2010-2015 Joerg Wolfram (joerg@jcwolfram.de)			#
+;# copyright (c) 2010-2022 Joerg Wolfram (joerg@jcwolfram.de)			#
 ;#										#
 ;#										#
 ;# This program is free software; you can redistribute it and/or		#
@@ -25,10 +23,11 @@
 ;################################################################################
 
 .equ		max_transfer	= 0x08		;2K max. transfer size (HIGH byte)
-.equ		bl_version 	= 17		;bootloader version 1.5
+.equ		bl_version 	= 17		;bootloader version 1.7
 
 .macro	hget
 lpp:		lds	r0,UCSR0A
+;		wdr				;reset watchdog
 		sbrs	r0, RXC0
 		rjmp	lpp
 		lds	XL,UDR0
@@ -116,9 +115,16 @@ bl_reset:		cli				;disable interrupts
 			rcall	host_flush
 			
 			ldi	ZL,0				;1s
-			ldi	ZH,4
+			ldi	ZH,2
 			rcall	wait_ms
 			cbi	LEDPORT,BUSY_LED		;set red LED off
+
+			out	GPIOR1,const_0			;RTS flow active
+	
+;			ldi	XL,0x31				;activate watchdog (8s)
+;			ldi	XH,0x29
+;			sts	WDTCSR,XL
+;			sts	WDTCSR,XH
 
 			rcall	host_flush
 firstcmd:		hget
@@ -215,6 +221,7 @@ main_loop_12:;		hget					;dummy value to prevent +++
 
 			;F0=get programmer info
 main_loop_14:		brne	main_loop_20			;0xf0 -> send BL info
+			out	GPIOR1,r19			;par4 is /use_RTS
 			ldi	XL,bl_version
 			sts	0x100,XL
 			ldi	XL,max_transfer			;max transfer size
@@ -266,8 +273,11 @@ main_loop_52:		sbiw	ZL,1
 			brne	main_loop_52
 			rjmp	main_loop_ok
 
-			;F7=get calibration data (obsolete)
-main_loop_60:	
+			;F7=force reset
+main_loop_60:		cpi	ZL,0xf7	
+			brne	main_loop_70
+force_reset:		rjmp	force_reset			
+			
 			;F8=read voltages
 main_loop_70:		cpi	ZL,0xf8				;voltage
 			brne	main_loop_80
@@ -336,9 +346,12 @@ host_get:		lds	r0,UCSR0A
 ;------------------------------------------------------------------------------
 ; put a single char to host
 ;------------------------------------------------------------------------------
-host_put:		sbic	PIND,2			;wait for RTS is LOW
+host_put:		in	r0,GPIOR1
+			cpse	r0,const_0
+			rjmp	host_put_2
+			sbic	PIND,2			;wait for RTS is LOW
 			rjmp	host_put
-			lds	r0,UCSR0A
+host_put_2:		lds	r0,UCSR0A
 			sbrs	r0,UDRE0
 			rjmp	host_put
 			sts	UDR0,XL
@@ -511,7 +524,7 @@ set_br1250K:		ldi	XH,1			;1250K
 			sts	UCSR0A,XL
 			ldi	XL,0x18			;enable RX/TX
 			sts	UCSR0B,XL
-			ldi	XL,0x0E			;2 stopp bits
+			ldi	XL,0x06			;2 stopp bits
 			sts	UCSR0C,XL
 			ldi	XH,1			;1250K
 			sts	UBRR0H,const_0

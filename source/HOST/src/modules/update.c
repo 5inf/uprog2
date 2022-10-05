@@ -77,7 +77,7 @@ int check_update(void)
 			
 		errc=prg_comm(0xfb,0,0,0,0,0,0,0,0);	//5V mode
 
-		for(faddr=0;faddr<57344;faddr++)
+		for(faddr=0;faddr<63488;faddr++)
 		{			
 			memory[faddr]=system_644[faddr];
 		}	
