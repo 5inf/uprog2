@@ -118,8 +118,11 @@ Any AVR ISP compatible programmer works with the board. I recommend an AVR ISP m
 With a programmer programming can be done using e.g. AVRdude (https://www.nongnu.org/avrdude/) or uisp (http://savannah.nongnu.org/projects/uisp).
 
     sudo apt-get install avrdude
-    sudo avrdude -c avrisp2 -p atmega644p -U hfuse:w:0xD0:m -U lfuse:w:0xE6:m -U efuse:w:0xFF:m -U flash:w:./binary/PROG/main.hex
+    sudo avrdude -c avrisp2 -p atmega644p -U hfuse:w:0xD4:m -U lfuse:w:0xE6:m -U efuse:w:0xFF:m -U flash:w:./binary/PROG/main.hex
     
+Note: As of version 1.42 and possibly earlier versions too, the documentation on the uprog2 website states the wrong fuse values.
+The fuse values used here have been comunicated by Jörg to me via mail and have been confirmed to work with 1.42.
+
     apt-get install uisp
     uisp ...
     
