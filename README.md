@@ -122,7 +122,7 @@ The fuse values used here have been comunicated by Jörg to me via mail and have
     uprog2 ATMEGA644PA -5vlslf 0xE6
     uprog2 ATMEGA644PA -5vlshf 0xD4
     uprog2 ATMEGA644PA -5vlsef 0xFF
-    uprog2 ATMEGA644PA -5veapm main.hex
+    uprog2 ATMEGA644PA -5veapmve main.hex
        
 ##### Setting USB device strings on the FTDI USB Serial interface
 
