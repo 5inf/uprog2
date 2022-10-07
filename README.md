@@ -119,8 +119,11 @@ The fuse values used here have been comunicated by Jörg to me via mail and have
     
  If at least one uprog is already available uprog2 itsel can be used to program the next ones.
  
-    uprog2 ATMEGA644PA -empmvm main-usb.hex
-    
+    uprog2 ATMEGA644PA -5vlslf 0xE6
+    uprog2 ATMEGA644PA -5vlshf 0xD4
+    uprog2 ATMEGA644PA -5vlsef 0xFF
+    uprog2 ATMEGA644PA -5veapm main.hex
+       
 ##### Setting USB device strings on the FTDI USB Serial interface
 
 ! WARNING: This changes the configuration of the FTDI chip on your uprog2 board. It has been tested and is working properly in a setup consisting of multiple uprog2 programmers. However: Use with caution!
