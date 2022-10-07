@@ -79,35 +79,29 @@ Another way to get access to to the hardware is by adding to following udev rule
 
 ### Adapter device
 
-! This description is still work in progress. The build under Linux is currently not working as described.
+To build the adapter device we need an assembler. 
+There are two options, gcc-avr contains avr-as as an assembler, but it does not understand the dialect used by uprog2.
 
-    apt-get install gcc-avr
-    apt-get install avra
-    git clone https://github.com/5inf/uprog2.git
-    cd uprog2
-    cd source/PROG_USB or cd source/PROG_BT
+avra is an assembler which would be capable of assembling uprog2.
+As the version in Debian is currently to old (1.3.0) to know about the mega644 chip.
+Support is only included since https://github.com/Ro5bert/avra/pull/3.
+Thus we need to get the current version ourself from the official repository.
 
-One can then try to assemble with a)
+    cd ~
+    git clone https://github.com/Ro5bert/avra.git
+    cd avra
+    make
+    sudo make install
+    which avra
     
-    avr-as main-usb.asm 2>&1 | less 
-    
-("2>&1 | less" so to see the full errors log, especcially the first one which tells us gcc avr-as does not understand the avr assembler dialect used.)
- 
-or b)
+Also, as uprog2 does include some "non public devices", we need to edit main.asm to uncomment (with a semicolon) the lines referencing files inside the folder devices_no_public/.
 
-    avra main-usb.asm 
-    
-avra knows the correct dialect, but m644def.inc is not found in /usr/local/include/avr/m644def.inc.
-The avra installation locates it's include files at /usr/share/avra/ but also there is no m644def.inc.
-One can get the file e.g. from here (https://github.com/DarkSector/AVR/blob/master/asm/include/m644def.inc) or from a local AVR Studio (Windows) installation.
-~~Even then avra seem to be lacking support for the ATmega644 at the moment (https://github.com/hsoft/avra/issues/2).~~~
-The issue is fixed in https://github.com/5inf/avra and waiting to be pulled into https://github.com/hsoft/avra.
+We can then build the binary for the adapter device with
 
-In main-usb.asm currently the lines with .include devices_no_public/... need to be commented out and then 
+    cd ~/uprog2/source/PROG
+    ./asemble
 
-    avra main-usb.asm 
-    
-successfully builds the AVR binary.
+This successfully builds the birnary to be programmed into the hardware adapter AVR644(P).
     
 #### Initial adapter device programming
 
@@ -122,9 +116,6 @@ With a programmer programming can be done using e.g. AVRdude (https://www.nongnu
     
 Note: As of version 1.42 and possibly earlier versions too, the documentation on the uprog2 website states the wrong fuse values.
 The fuse values used here have been comunicated by Jörg to me via mail and have been confirmed to work with 1.42.
-
-    apt-get install uisp
-    uisp ...
     
  If at least one uprog is already available uprog2 itsel can be used to program the next ones.
  
@@ -132,11 +123,15 @@ The fuse values used here have been comunicated by Jörg to me via mail and have
     
 ##### Setting USB device strings on the FTDI USB Serial interface
 
-! WARNING: This changes the configuration of the FTDI chip on your uprog2 board. Use with caution!
+! WARNING: This changes the configuration of the FTDI chip on your uprog2 board. It has been tested and is working properly in a setup consisting of multiple uprog2 programmers. However: Use with caution!
 
-Currently uprog2 has problems when multiple FTDI USB serial converter are connected to the machine, as uprog2 will simply open the first one and then fails if that one is not the actual uprog2 hardware.
+Initially, around version 1.33, uprog2 had problems when multiple FTDI FT232 USB serial converter with vid=0403 and pid 6001 were connected to the machine.
+This might happen in a typical setup, where besides uprog2 another FTDI FT232 chip is connected, e.g. to provide a USB UART for debugging.
+Then uprog2 will simply open the first one it finds and then fails if that one is not the actual uprog2 hardware.
 
-In the future it is desired to have uprog2 check the USB device strings (manufacturer, device name and/or serial number) to find a matching programmer.
+Therefore it is desired to have uprog2 check the USB device strings (manufacturer, device name and/or serial number) to find a matching programmer.
+
+In recent versions (e.g. 1.42) uprog checks for vid=0x0403,pid=0x6661 (which Jörg uses) or vid=0x2763,pid=0xffff (officially reserved for uprog2) instead of the default vid=0x0403,pid=0x6001.
 
 To adjust the USB device strings (manufacturer name and device name) the FT_PROG utility from FTDI (FT_PROG 3.3.88.402 - EEPROM Programming Utility, https://www.ftdichip.com/Support/Utilities.htm#FT_PROG) is needed. Unfortunately this utility is Windows only.
 
