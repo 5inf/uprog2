@@ -1,2 +1,11 @@
-/source/HOST/build
 *.out
+/source/HOST/build
+/source/HOST/uprog2
+/config/eeprom.new
+/config/eeprom.bak
+/source/PROG/main.eep.hex
+/source/PROG/main.hex
+/source/PROG/main.lst
+/source/PROG/main.mmap
+/source/PROG/main.obj
+/binary/
